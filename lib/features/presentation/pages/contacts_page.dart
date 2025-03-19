@@ -1,7 +1,6 @@
 import 'package:contactsafe/features/presentation/pages/contact_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'contact_details.dart';
 
 class ContactsPage extends StatefulWidget {
   @override
