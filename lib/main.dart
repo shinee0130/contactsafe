@@ -1,61 +1,60 @@
+import 'package:contactsafe/features/presentation/widgets/nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:contactsafe/features/presentation/pages/contacts_page.dart';
-import 'package:contactsafe/features/presentation/pages/search_page.dart';
-import 'package:contactsafe/features/presentation/pages/events_page.dart';
-import 'package:contactsafe/features/presentation/pages/photos_page.dart';
-import 'package:contactsafe/features/presentation/pages/settings_page.dart';
-import 'package:contactsafe/features/presentation/widgets/header_bar.dart';
-import 'package:contactsafe/features/presentation/widgets/nav_bar.dart'
-    as customnav;
+import 'features/presentation/pages/contacts_page.dart';
+import 'features/presentation/pages/search_page.dart';
+import 'features/presentation/pages/events_page.dart';
+import 'features/presentation/pages/photos_page.dart';
+import 'features/presentation/pages/settings_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ContactSafeApp());
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 0;
+class ContactSafeApp extends StatelessWidget {
+  const ContactSafeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: HeaderBar(),
-        ),
-        body: _buildBody(),
-        bottomNavigationBar: customnav.NavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-        ),
-      ),
+      theme: ThemeData.dark(),
+      home: MainScreen(),
     );
   }
+}
 
-  Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return ContactsPage();
-      case 1:
-        return SearchPage();
-      case 2:
-        return EventsPage();
-      case 3:
-        return PhotosPage();
-      case 4:
-        return SettingsPage();
-      default:
-        return Container();
-    }
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    ContactsScreen(),
+    SearchScreen(),
+    EventsScreen(),
+    PhotosScreen(),
+    SettingsScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: NavBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
+      ),
+    );
   }
 }
