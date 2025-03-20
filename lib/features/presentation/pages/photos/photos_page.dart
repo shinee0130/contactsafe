@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/header_bar.dart';
+import '../../widgets/header_bar.dart';
 
 class PhotosScreen extends StatelessWidget {
   const PhotosScreen({super.key});

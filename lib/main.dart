@@ -1,10 +1,10 @@
 import 'package:contactsafe/features/presentation/widgets/nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'features/presentation/pages/contacts_page.dart';
-import 'features/presentation/pages/search_page.dart';
-import 'features/presentation/pages/events_page.dart';
-import 'features/presentation/pages/photos_page.dart';
-import 'features/presentation/pages/settings_page.dart';
+import 'features/presentation/pages/home/contacts_page.dart';
+import 'features/presentation/pages/search/search_page.dart';
+import 'features/presentation/pages/events/events_page.dart';
+import 'features/presentation/pages/photos/photos_page.dart';
+import 'features/presentation/pages/settings/settings_page.dart';
 
 void main() {
   runApp(ContactSafeApp());

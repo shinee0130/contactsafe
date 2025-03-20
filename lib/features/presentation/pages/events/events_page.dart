@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
-import '../widgets/header_bar.dart';
+import '../../widgets/header_bar.dart';
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+class EventsScreen extends StatelessWidget {
+  const EventsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HeaderBar(title: "Search"),
+      appBar: HeaderBar(
+        title: "Events",
+        actions: [
+          IconButton(
+            onPressed: () {},
+            color: Colors.blue,
+            icon: Icon(Icons.sync),
+          ),
+          IconButton(
+            onPressed: () {},
+            color: Colors.blue,
+            icon: Icon(Icons.add),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextField(

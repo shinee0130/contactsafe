@@ -1,4 +1,5 @@
-import 'package:contactsafe/features/presentation/pages/contact_details.dart';
+import 'package:contactsafe/features/presentation/pages/home/contact_details.dart';
+import 'package:contactsafe/features/presentation/pages/home/create_contact.dart'; // Import create contact page
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -18,14 +19,17 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _fetchContacts() async {
-    List<Contact> contacts = await FlutterContacts.getContacts(
-      withProperties: true,
-      withThumbnail: true,
-    );
-    setState(() {
-      _contacts = contacts;
-      _filteredContacts = contacts;
-    });
+    if (await FlutterContacts.requestPermission()) {
+      // Request permission
+      List<Contact> contacts = await FlutterContacts.getContacts(
+        withProperties: true,
+        withThumbnail: true,
+      );
+      setState(() {
+        _contacts = contacts;
+        _filteredContacts = contacts;
+      });
+    }
   }
 
   void _filterContacts(String query) {
@@ -39,6 +43,14 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
+  void _navigateToCreateContact() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateContactScreen()),
+    );
+    _fetchContacts(); // Refresh contacts after adding a new contact
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +62,7 @@ class _ContactsPageState extends State<ContactsPage> {
             child: TextField(
               onChanged: _filterContacts,
               decoration: InputDecoration(
-                hintText: "Search Contacts",
+                hintText: "Search",
                 prefixIcon: Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.grey[900],
@@ -81,7 +93,11 @@ class _ContactsPageState extends State<ContactsPage> {
                                       _getInitials(contact.displayName),
                                     ),
                                   ),
-                          title: Text(contact.displayName),
+                          title: Text(
+                            contact.displayName.isNotEmpty
+                                ? contact.displayName
+                                : "Unknown",
+                          ),
                           subtitle:
                               contact.phones.isNotEmpty
                                   ? Text(contact.phones.first.number)
@@ -101,6 +117,10 @@ class _ContactsPageState extends State<ContactsPage> {
                     ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToCreateContact,
+        child: Icon(Icons.add),
       ),
     );
   }
