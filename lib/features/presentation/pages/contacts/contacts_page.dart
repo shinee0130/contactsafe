@@ -1,5 +1,5 @@
-import 'package:contactsafe/features/presentation/pages/home/contact_details.dart';
-import 'package:contactsafe/features/presentation/pages/home/create_contact.dart'; // Import create contact page
+import 'package:contactsafe/features/presentation/pages/contacts/contact_details.dart';
+import 'package:contactsafe/features/presentation/pages/contacts/create_contact.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
