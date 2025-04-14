@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:contactsafe/common/widgets/header.dart';
 import 'package:contactsafe/common/widgets/navigation.dart';
+import 'package:contactsafe/common/theme/app_colors.dart';
+import 'package:contactsafe/common/theme/app_styles.dart';
 
 class ContactsFilteredScreen extends StatefulWidget {
   @override
@@ -19,44 +21,39 @@ class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
     });
   }
 
+  void _navigateToGroups() {
+    print('Navigate to Groups screen');
+    // TODO: Implement navigation to the groups screen
+  }
+
+  void _addNewFilter() {
+    print('Add new filter/group');
+    // TODO: Implement add new filter/group functionality
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ContactSafeHeader(
         titleText: 'ContactSafe',
-        leading: TextButton(
-          onPressed: () {
-            // TODO: Implement navigation to groups screen
-            print('Navigate to Groups');
-          },
-          child: Text('Groups', style: TextStyle(color: Colors.blue)),
+        onGroupsPressed: _navigateToGroups,
+        onAddPressed: _addNewFilter,
+        logo: Image.asset(
+          'assets/contactsafe_logo.png', // Adjust as needed
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              // TODO: Implement add new filter/group
-              print('Add new filter/group');
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16),
-            Text(
-              'ContactSafe - filtered',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            Text('ContactSafe - filtered', style: AppStyles.headlineMedium),
             SizedBox(height: 16),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
@@ -66,8 +63,11 @@ class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
                 print('Search query: $value');
               },
             ),
-            SizedBox(height: 16),
-            Text('Filtered Contacts will be displayed here'),
+            SizedBox(height: 24),
+            Text(
+              'Filtered Contacts will be displayed here',
+              style: AppStyles.bodyMedium,
+            ),
           ],
         ),
       ),
