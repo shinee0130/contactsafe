@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/widgets/header.dart';
 import 'package:contactsafe/common/widgets/navigation.dart';
+import 'package:contactsafe/common/widgets/header.dart';
 import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:contactsafe/common/theme/app_styles.dart';
 
-class ContactsFilteredScreen extends StatefulWidget {
+class SearchScreen extends StatefulWidget {
   @override
-  _ContactsFilteredScreenState createState() => _ContactsFilteredScreenState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
+class _SearchScreenState extends State<SearchScreen> {
   TextEditingController _searchController = TextEditingController();
-  int _currentIndex = 0;
+  int _currentIndex = 1; // Index for the "Search" tab
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -37,31 +37,18 @@ class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
     });
   }
 
-  void _navigateToGroups() {
-    print('Navigate to Groups screen');
-    // TODO: Implement navigation to the groups screen
-  }
-
-  void _addNewFilter() {
-    print('Add new filter/group');
-    // TODO: Implement add new filter/group functionality
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ContactSafeHeader(
-        titleText: 'ContactSafe',
-        onGroupsPressed: _navigateToGroups,
-        onAddPressed: _addNewFilter,
-        logo: Image.asset('assets/contactsafe_logo.png'),
+        titleText: 'Search',
+        // You might not need the "Groups" and "+" buttons here
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(10.0),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ContactSafe - filtered', style: AppStyles.headlineMedium),
             SizedBox(height: 16),
             TextField(
               controller: _searchController,
@@ -79,7 +66,7 @@ class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
             ),
             SizedBox(height: 24),
             Text(
-              'Filtered Contacts will be displayed here',
+              'Search Results will appear here.',
               style: AppStyles.bodyMedium,
             ),
           ],

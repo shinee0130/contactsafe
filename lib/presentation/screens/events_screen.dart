@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/widgets/header.dart';
 import 'package:contactsafe/common/widgets/navigation.dart';
+import 'package:contactsafe/common/widgets/header.dart';
 import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:contactsafe/common/theme/app_styles.dart';
 
-class ContactsFilteredScreen extends StatefulWidget {
+class EventsScreen extends StatefulWidget {
   @override
-  _ContactsFilteredScreenState createState() => _ContactsFilteredScreenState();
+  _EventsScreenState createState() => _EventsScreenState();
 }
 
-class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
+class _EventsScreenState extends State<EventsScreen> {
   TextEditingController _searchController = TextEditingController();
-  int _currentIndex = 0;
+  int _currentIndex = 2; // Index for the "Events" tab
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -37,31 +37,22 @@ class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
     });
   }
 
-  void _navigateToGroups() {
-    print('Navigate to Groups screen');
-    // TODO: Implement navigation to the groups screen
-  }
-
-  void _addNewFilter() {
-    print('Add new filter/group');
-    // TODO: Implement add new filter/group functionality
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ContactSafeHeader(
-        titleText: 'ContactSafe',
-        onGroupsPressed: _navigateToGroups,
-        onAddPressed: _addNewFilter,
-        logo: Image.asset('assets/contactsafe_logo.png'),
+        titleText: 'Events',
+        actions: [
+          IconButton(icon: Icon(Icons.sort), onPressed: () {}),
+          IconButton(icon: Icon(Icons.add), onPressed: () {}),
+          SizedBox(width: 8),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(10.0),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ContactSafe - filtered', style: AppStyles.headlineMedium),
             SizedBox(height: 16),
             TextField(
               controller: _searchController,
@@ -73,13 +64,13 @@ class _ContactsFilteredScreenState extends State<ContactsFilteredScreen> {
                 ),
               ),
               onChanged: (value) {
-                // TODO: Implement search functionality
-                print('Search query: $value');
+                // TODO: Implement search functionality for events
+                print('Search events: $value');
               },
             ),
             SizedBox(height: 24),
             Text(
-              'Filtered Contacts will be displayed here',
+              'List of Events will be displayed here.',
               style: AppStyles.bodyMedium,
             ),
           ],

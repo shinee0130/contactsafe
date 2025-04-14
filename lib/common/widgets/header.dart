@@ -7,6 +7,7 @@ class ContactSafeHeader extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onGroupsPressed;
   final VoidCallback? onAddPressed;
   final Widget? logo;
+  final List<Widget>? actions;
 
   const ContactSafeHeader({
     Key? key,
@@ -14,6 +15,7 @@ class ContactSafeHeader extends StatelessWidget implements PreferredSizeWidget {
     this.onGroupsPressed,
     this.onAddPressed,
     this.logo,
+    this.actions,
   }) : super(key: key);
 
   @override

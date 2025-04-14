@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:contactsafe/common/theme/app_colors.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -14,15 +15,20 @@ class ContactSafeNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
+      onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Contacts'),
+      selectedItemColor: AppColors.primary,
+      unselectedItemColor: Colors.grey,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.contacts), label: 'Contacts'),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
         BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Events'),
-        BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: 'Photos'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.photo_library),
+          label: 'Photos',
+        ),
         BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
       ],
-      onTap: onTap,
     );
   }
 }
