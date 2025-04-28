@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/widgets/navigation.dart';
-import 'package:contactsafe/common/widgets/header.dart';
-import 'package:contactsafe/common/theme/app_colors.dart';
-import 'package:contactsafe/common/theme/app_styles.dart';
+import '../../common/widgets/navigation_bar.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _currentIndex = 4; // Index for the "Settings" tab
+  int _currentIndex = 4; // To highlight the current tab
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -39,42 +38,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ContactSafeHeader(titleText: 'Settings'),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ListView(
+      appBar: AppBar(
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Privacy', style: AppStyles.headlineMedium),
-            ListTile(
-              title: Text('Open "Settings" App', style: AppStyles.bodyMedium),
+            Text('ContactSafe'),
+            SizedBox(width: 8.0),
+            Icon(Icons.person_outline), // Replace with your actual icon
+          ],
+        ),
+      ),
+      body: const SingleChildScrollView(
+        // Assuming settings might have a scrollable list
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Privacy', style: TextStyle(fontWeight: FontWeight.bold)),
+            ListTile(title: Text('Open in "Settings" app')),
+            Divider(),
+            Text('About', style: TextStyle(fontWeight: FontWeight.bold)),
+            ListTile(title: Text('Version')),
+            ListTile(title: Text('Imprint')),
+            ListTile(title: Text('Privacy')),
+            Divider(),
+            Text('General', style: TextStyle(fontWeight: FontWeight.bold)),
+            // ListTile(
+            //   title: Text('Sort by First name'),
+            //   trailing: Switch(value: true, onChanged:),
+            // ),
+            // ListTile(
+            //   title: Text('Last name first'),
+            //   trailing: Switch(value: false, onChanged:),
+            // ),
+            Divider(),
+            Text('Import', style: TextStyle(fontWeight: FontWeight.bold)),
+            ListTile(title: Text('Import contacts')),
+            Divider(),
+            Text('Backup', style: TextStyle(fontWeight: FontWeight.bold)),
+            ListTile(title: Text('Create backup')),
+            ListTile(title: Text('Restore from Backup')),
+            ListTile(title: Text('Backup in iCloud')),
+            ListTile(title: Text('Restore from iCloud')),
+            ListTile(title: Text('Import backup from link')),
+            Divider(),
+            Text(
+              'Accessibility',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            Divider(color: AppColors.dividerColor),
-            Text('About', style: AppStyles.headlineMedium),
-            ListTile(title: Text('Version', style: AppStyles.bodyMedium)),
-            ListTile(title: Text('Imprint', style: AppStyles.bodyMedium)),
-            ListTile(title: Text('Privacy', style: AppStyles.bodyMedium)),
-            Divider(color: AppColors.dividerColor),
-            Text('General', style: AppStyles.headlineMedium),
-            ListTile(
-              title: Text('Sort by first name', style: AppStyles.bodyMedium),
-              trailing: Switch(value: true, onChanged: (bool value) {}),
-            ),
-            ListTile(
-              title: Text('Last name first', style: AppStyles.bodyMedium),
-              trailing: Switch(value: false, onChanged: (bool value) {}),
-            ),
-            Divider(color: AppColors.dividerColor),
-            Text('Import', style: AppStyles.headlineMedium),
-            ListTile(
-              title: Text('Import contacts', style: AppStyles.bodyMedium),
-            ),
-            Divider(color: AppColors.dividerColor),
-            Text('Backup', style: AppStyles.headlineMedium),
-            ListTile(title: Text('Create backup', style: AppStyles.bodyMedium)),
-            ListTile(
-              title: Text('Restore from backup', style: AppStyles.bodyMedium),
-            ),
-            // ... more settings items
+            ListTile(title: Text('On board tour')),
+            ListTile(title: Text('Select TabBar order')),
+            ListTile(title: Text('Change password')),
+            ListTile(title: Text('Delete all data')),
+            Divider(),
+            Text('Password', style: TextStyle(fontWeight: FontWeight.bold)),
+            // ListTile(
+            //   title: Text('Use FaceID'),
+            //   trailing: Switch(value: true, onChanged: (value) {}), // Example switch
+            // ),
+            ListTile(title: Text('Change password')),
+            Divider(),
+            Text('Powered by thekeyring.at', style: TextStyle(fontSize: 12.0)),
           ],
         ),
       ),

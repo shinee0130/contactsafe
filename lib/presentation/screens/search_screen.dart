@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/widgets/navigation.dart';
-import 'package:contactsafe/common/widgets/header.dart';
-import 'package:contactsafe/common/theme/app_colors.dart';
-import 'package:contactsafe/common/theme/app_styles.dart';
+import '../../common/widgets/navigation_bar.dart';
 
 class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  TextEditingController _searchController = TextEditingController();
-  int _currentIndex = 1; // Index for the "Search" tab
+  int _currentIndex = 1; // To highlight the current tab
+  final TextEditingController _searchController = TextEditingController();
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -40,34 +39,44 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ContactSafeHeader(
-        titleText: 'Search',
-        // You might not need the "Groups" and "+" buttons here
+      appBar: AppBar(
+        title: const Row(
+          children: [
+            Text('ContactSafe'),
+            SizedBox(width: 8.0),
+            Icon(Icons.person_outline), // Replace with your actual icon
+          ],
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16),
+            const Text(
+              'Search',
+              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _searchController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Search',
-                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
               ),
               onChanged: (value) {
                 // TODO: Implement search functionality
                 print('Search query: $value');
               },
             ),
-            SizedBox(height: 24),
-            Text(
-              'Search Results will appear here.',
-              style: AppStyles.bodyMedium,
+            const SizedBox(height: 16.0),
+            const Expanded(
+              child: Center(
+                child: Text(
+                  'Search Results will appear here',
+                ), // Replace with your search results display
+              ),
             ),
           ],
         ),

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/widgets/navigation.dart';
-import 'package:contactsafe/common/widgets/header.dart';
-import 'package:contactsafe/common/theme/app_colors.dart';
-import 'package:contactsafe/common/theme/app_styles.dart';
+import '../../common/widgets/navigation_bar.dart';
 
 class EventsScreen extends StatefulWidget {
+  const EventsScreen({super.key});
+
   @override
-  _EventsScreenState createState() => _EventsScreenState();
+  State<EventsScreen> createState() => _EventsScreenState();
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  TextEditingController _searchController = TextEditingController();
-  int _currentIndex = 2; // Index for the "Events" tab
+  int _currentIndex = 2; // To highlight the current tab
+  final TextEditingController _searchController = TextEditingController();
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -37,41 +36,56 @@ class _EventsScreenState extends State<EventsScreen> {
     });
   }
 
+  void _addNewEvent() {
+    // TODO: Implement add new event
+    print('Add new event');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ContactSafeHeader(
-        titleText: 'Events',
+      appBar: AppBar(
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('ContactSafe'),
+            SizedBox(width: 8.0),
+            Icon(Icons.person_outline), // Replace with your actual icon
+          ],
+        ),
         actions: [
-          IconButton(icon: Icon(Icons.sort), onPressed: () {}),
-          IconButton(icon: Icon(Icons.add), onPressed: () {}),
-          SizedBox(width: 8),
+          IconButton(icon: const Icon(Icons.add), onPressed: _addNewEvent),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16),
+            const Text(
+              'Events',
+              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _searchController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Search',
-                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
               ),
               onChanged: (value) {
-                // TODO: Implement search functionality for events
-                print('Search events: $value');
+                // TODO: Implement search functionality
+                print('Search query: $value');
               },
             ),
-            SizedBox(height: 24),
-            Text(
-              'List of Events will be displayed here.',
-              style: AppStyles.bodyMedium,
+            const SizedBox(height: 16.0),
+            const Expanded(
+              child: Center(
+                child: Text(
+                  'Events will be displayed here',
+                ), // Replace with your events list
+              ),
             ),
           ],
         ),

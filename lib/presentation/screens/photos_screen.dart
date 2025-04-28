@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/widgets/navigation.dart';
-import 'package:contactsafe/common/widgets/header.dart';
-import 'package:contactsafe/common/theme/app_colors.dart';
-import 'package:contactsafe/common/theme/app_styles.dart';
+import '../../common/widgets/navigation_bar.dart';
 
 class PhotosScreen extends StatefulWidget {
+  const PhotosScreen({super.key});
+
   @override
-  _PhotosScreenState createState() => _PhotosScreenState();
+  State<PhotosScreen> createState() => _PhotosScreenState();
 }
 
 class _PhotosScreenState extends State<PhotosScreen> {
-  int _currentIndex = 3; // Index for the "Photos" tab
+  int _currentIndex = 3; // To highlight the current tab
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -36,33 +35,40 @@ class _PhotosScreenState extends State<PhotosScreen> {
     });
   }
 
+  void _editPhotos() {
+    // TODO: Implement edit photos functionality
+    print('Edit photos');
+  }
+
+  void _uploadPhotos() {
+    // TODO: Implement upload photos functionality
+    print('Upload photos');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ContactSafeHeader(
-        titleText: 'Photos',
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: Text('Edit', style: TextStyle(color: AppColors.primary)),
-          ),
-          IconButton(icon: Icon(Icons.sort), onPressed: () {}),
-          SizedBox(width: 8),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 16),
-            Text(
-              'Photos Grid/List will be displayed here.',
-              style: AppStyles.bodyMedium,
-            ),
-            // TODO: Implement photo grid/list view
+            Text('ContactSafe'),
+            SizedBox(width: 8.0),
+            Icon(Icons.person_outline), // Replace with your actual icon
           ],
         ),
+        actions: [
+          TextButton(onPressed: _editPhotos, child: const Text('Edit')),
+          IconButton(
+            icon: const Icon(Icons.upload_file), // Example upload icon
+            onPressed: _uploadPhotos,
+          ),
+        ],
+      ),
+      body: const Center(
+        child: Text(
+          'Photos will be displayed here',
+        ), // Replace with your photos grid
       ),
       bottomNavigationBar: ContactSafeNavigationBar(
         currentIndex: _currentIndex,

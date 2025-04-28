@@ -1,9 +1,15 @@
+import 'package:contactsafe/presentation/screens/add_contact_screen.dart';
+import 'package:contactsafe/presentation/screens/contact_detail_screen.dart';
+import 'package:contactsafe/presentation/screens/contact_files_screen.dart';
+import 'package:contactsafe/presentation/screens/contact_group_screen.dart';
+import 'package:contactsafe/presentation/screens/contact_notes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:contactsafe/presentation/screens/contacts_screen.dart';
 import 'package:contactsafe/presentation/screens/search_screen.dart';
 import 'package:contactsafe/presentation/screens/events_screen.dart';
 import 'package:contactsafe/presentation/screens/photos_screen.dart';
 import 'package:contactsafe/presentation/screens/settings_screen.dart';
+import 'package:flutter_contacts/contact.dart';
 
 class ContactSafeApp extends StatelessWidget {
   const ContactSafeApp({super.key});
@@ -13,14 +19,28 @@ class ContactSafeApp extends StatelessWidget {
     return MaterialApp(
       title: 'ContactSafe',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home:
-          ContactsFilteredScreen(), // Set ContactsScreen as the initial screen
+      debugShowCheckedModeBanner: false,
+      home: ContactsScreen(),
       routes: {
-        '/contacts': (context) => ContactsFilteredScreen(),
-        '/search': (context) => SearchScreen(),
-        '/events': (context) => EventsScreen(),
-        '/photos': (context) => PhotosScreen(),
-        '/settings': (context) => SettingsScreen(),
+        '/contacts': (context) => const ContactsScreen(),
+        '/search': (context) => const SearchScreen(),
+        '/events': (context) => const EventsScreen(),
+        '/photos': (context) => const PhotosScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/contact_detail':
+            (context) => ContactDetailScreen(
+              contact: ModalRoute.of(context)!.settings.arguments as Contact,
+            ),
+        '/add_contact': (context) => const AddContactScreen(),
+        '/groups': (context) => const ContactGroupsScreen(),
+        '/contact_files':
+            (context) => ContactFilesScreen(
+              contact: ModalRoute.of(context)!.settings.arguments as Contact,
+            ),
+        '/contact_notes':
+            (context) => ContactNotesScreen(
+              contact: ModalRoute.of(context)!.settings.arguments as Contact,
+            ),
       },
     );
   }
