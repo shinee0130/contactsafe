@@ -1,8 +1,8 @@
-import 'package:contactsafe/presentation/screens/add_contact_screen.dart';
-import 'package:contactsafe/presentation/screens/contact_detail_screen.dart';
-import 'package:contactsafe/presentation/screens/contact_files_screen.dart';
-import 'package:contactsafe/presentation/screens/contact_group_screen.dart';
-import 'package:contactsafe/presentation/screens/contact_notes_screen.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/add_contact_screen.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/contact_detail_screen.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/contact_files_screen.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/contact_group_screen.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/contact_notes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:contactsafe/presentation/screens/contacts_screen.dart';
 import 'package:contactsafe/presentation/screens/search_screen.dart';

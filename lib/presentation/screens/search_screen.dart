@@ -40,11 +40,15 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('ContactSafe'),
-            SizedBox(width: 8.0),
-            Icon(Icons.person_outline), // Replace with your actual icon
+            const Text(
+              'ContactSafe',
+              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 5.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
       ),

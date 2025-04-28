@@ -1,11 +1,11 @@
-import 'package:contactsafe/presentation/screens/contact_group_screen.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/contact_group_screen.dart';
 import 'package:flutter/material.dart';
 import '../../common/widgets/customsearchbar.dart';
 import '../../common/widgets/navigation_bar.dart';
 import '../../common/theme/app_colors.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'add_contact_screen.dart';
-import 'contact_detail_screen.dart';
+import 'contacts_screen/add_contact_screen.dart';
+import 'contacts_screen/contact_detail_screen.dart';
 import 'dart:typed_data';
 
 class ContactsScreen extends StatefulWidget {
@@ -219,7 +219,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'ContactSafe - filtered',
+              'Contacts',
               style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
