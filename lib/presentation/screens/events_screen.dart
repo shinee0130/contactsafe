@@ -1,4 +1,7 @@
+import 'package:contactsafe/common/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/contact.dart' show Contact;
+import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../common/widgets/navigation_bar.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -11,6 +14,9 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen> {
   int _currentIndex = 2; // To highlight the current tab
   final TextEditingController _searchController = TextEditingController();
+  List<Contact> _contacts = [];
+  List<Contact> _allContacts = [];
+  final ScrollController _scrollController = ScrollController();
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -34,6 +40,55 @@ class _EventsScreenState extends State<EventsScreen> {
           break;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchContacts();
+  }
+
+  Future<void> _fetchContacts() async {
+    try {
+      bool isGranted = await FlutterContacts.requestPermission();
+      print('Permission Granted: $isGranted');
+      if (isGranted) {
+        List<Contact> contacts = await FlutterContacts.getContacts(
+          withProperties: true,
+          withPhoto: true,
+        ); // Fetch with photo
+        contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+        setState(() {
+          _contacts = contacts;
+          _allContacts = List.from(contacts);
+        });
+        print('Fetched ${contacts.length} contacts.');
+      } else {
+        print('Contact permission not granted.');
+      }
+    } catch (e) {
+      print('Error requesting contact permission: $e');
+    }
+  }
+
+  void _filterContacts(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _contacts = List.from(_allContacts);
+      });
+    } else {
+      final filteredList =
+          _allContacts
+              .where(
+                (contact) => contact.displayName.toLowerCase().contains(
+                  query.toLowerCase(),
+                ),
+              )
+              .toList();
+      setState(() {
+        _contacts = filteredList;
+      });
+    }
   }
 
   void _addNewEvent() {
@@ -64,20 +119,11 @@ class _EventsScreenState extends State<EventsScreen> {
           children: [
             const Text(
               'Events',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16.0),
-            TextField(
+            CustomSearchBar(
               controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                // TODO: Implement search functionality
-                print('Search query: $value');
-              },
+              onChanged: _filterContacts,
             ),
             const SizedBox(height: 16.0),
             const Expanded(

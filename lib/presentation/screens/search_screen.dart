@@ -1,4 +1,6 @@
+import 'package:contactsafe/common/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../common/widgets/navigation_bar.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -9,8 +11,11 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  int _currentIndex = 1; // To highlight the current tab
+  int _currentIndex = 1;
   final TextEditingController _searchController = TextEditingController();
+  List<Contact> _contacts = [];
+  List<Contact> _allContacts = [];
+  final ScrollController _scrollController = ScrollController();
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -37,6 +42,55 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _fetchContacts();
+  }
+
+  Future<void> _fetchContacts() async {
+    try {
+      bool isGranted = await FlutterContacts.requestPermission();
+      print('Permission Granted: $isGranted');
+      if (isGranted) {
+        List<Contact> contacts = await FlutterContacts.getContacts(
+          withProperties: true,
+          withPhoto: true,
+        ); // Fetch with photo
+        contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+        setState(() {
+          _contacts = contacts;
+          _allContacts = List.from(contacts);
+        });
+        print('Fetched ${contacts.length} contacts.');
+      } else {
+        print('Contact permission not granted.');
+      }
+    } catch (e) {
+      print('Error requesting contact permission: $e');
+    }
+  }
+
+  void _filterContacts(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _contacts = List.from(_allContacts);
+      });
+    } else {
+      final filteredList =
+          _allContacts
+              .where(
+                (contact) => contact.displayName.toLowerCase().contains(
+                  query.toLowerCase(),
+                ),
+              )
+              .toList();
+      setState(() {
+        _contacts = filteredList;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -59,29 +113,14 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             const Text(
               'Search',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16.0),
-            TextField(
+            CustomSearchBar(
               controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                // TODO: Implement search functionality
-                print('Search query: $value');
-              },
+              onChanged: _filterContacts,
             ),
             const SizedBox(height: 16.0),
-            const Expanded(
-              child: Center(
-                child: Text(
-                  'Search Results will appear here',
-                ), // Replace with your search results display
-              ),
-            ),
+            const Expanded(child: Center(child: Text(''))),
           ],
         ),
       ),

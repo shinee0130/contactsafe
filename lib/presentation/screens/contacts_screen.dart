@@ -222,7 +222,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
               'Contacts',
               style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8.0),
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContacts,

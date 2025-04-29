@@ -20,14 +20,23 @@ class ContactSafeNavigationBar extends StatelessWidget {
       selectedItemColor: AppColors.primary,
       unselectedItemColor: Colors.grey,
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.contacts), label: 'Contacts'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-        BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Events'),
         BottomNavigationBarItem(
-          icon: Icon(Icons.photo_library),
+          icon: Icon(Icons.home_outlined),
+          label: 'Contacts',
+        ),
+        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.event_available_outlined),
+          label: 'Events',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.camera_alt_outlined),
           label: 'Photos',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings_outlined),
+          label: 'Settings',
+        ),
       ],
     );
   }

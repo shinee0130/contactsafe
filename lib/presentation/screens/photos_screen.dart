@@ -50,7 +50,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
               'ContactSafe',
@@ -60,18 +60,35 @@ class _PhotosScreenState extends State<PhotosScreen> {
             Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
+        leadingWidth: 110.0,
+        leading: TextButton(onPressed: () {}, child: const Text('')),
         actions: [
           TextButton(onPressed: _editPhotos, child: const Text('Edit')),
           IconButton(
-            icon: const Icon(Icons.upload_file), // Example upload icon
+            icon: const Icon(Icons.upload_file),
             onPressed: _uploadPhotos,
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          'Photos will be displayed here',
-        ), // Replace with your photos grid
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Photos',
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0),
+            const Expanded(
+              child: Center(
+                child: Text(
+                  'Photos will be displayed here',
+                ), // Replace with your events list
+              ),
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: ContactSafeNavigationBar(
         currentIndex: _currentIndex,
