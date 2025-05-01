@@ -5,8 +5,6 @@ import '../../common/widgets/navigation_bar.dart';
 import '../../common/theme/app_colors.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'contacts_screen/add_contact_screen.dart';
-import 'contacts_screen/contact_detail_screen.dart';
-import 'dart:typed_data';
 
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({super.key});
@@ -36,7 +34,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         List<Contact> contacts = await FlutterContacts.getContacts(
           withProperties: true,
           withPhoto: true,
-        ); // Fetch with photo
+        );
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
         setState(() {
           _contacts = contacts;
@@ -222,6 +220,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               'Contacts',
               style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 10),
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContacts,
@@ -238,7 +237,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         itemBuilder: (context, index) {
                           final letter = sortedKeys[index];
                           final contactsForLetter = groupedContacts[letter]!;
-
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

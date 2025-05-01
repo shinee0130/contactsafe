@@ -2,11 +2,8 @@ import 'package:contactsafe/presentation/screens/contacts_screen/edit_contact_sc
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../common/theme/app_colors.dart';
-import 'contact_files_screen.dart';
-import 'contact_notes_screen.dart';
-import 'dart:typed_data';
 
-class ContactDetailScreen extends StatelessWidget {
+class ContactDetailScreen extends StatefulWidget {
   final Contact contact;
   final bool isFavorite;
 
@@ -16,12 +13,56 @@ class ContactDetailScreen extends StatelessWidget {
     this.isFavorite = false,
   });
 
+  @override
+  State<ContactDetailScreen> createState() => _ContactDetailScreenState();
+}
+
+class _ContactDetailScreenState extends State<ContactDetailScreen> {
+  Contact?
+  _detailedContact; // Use a state variable to hold the potentially refetched contact
+
+  @override
+  void initState() {
+    super.initState();
+    _loadContactDetails(widget.contact.id); // Use widget.contact.id here
+  }
+
+  Future<void> _loadContactDetails(String contactId) async {
+    try {
+      if (await FlutterContacts.requestPermission()) {
+        Contact? fetchedContact = await FlutterContacts.getContact(
+          contactId,
+          withAccounts: true, // THIS IS CRUCIAL
+          withPhoto: true,
+        );
+        setState(() {
+          _detailedContact =
+              fetchedContact ??
+              widget.contact; // Use fetched or fallback to the passed contact
+        });
+      } else {
+        // Handle permission denial (e.g., show a message)
+        setState(() {
+          _detailedContact = widget.contact; // Fallback if no permission
+        });
+      }
+    } catch (e) {
+      print('Error loading contact details with accounts: $e');
+      setState(() {
+        _detailedContact = widget.contact; // Fallback on error
+      });
+    }
+  }
+
   Widget _buildAvatar(Contact contact) {
     return const Icon(Icons.person_outline, size: 100, color: Colors.blue);
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentContact =
+        _detailedContact ?? widget.contact; // Use the stateful contact
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -56,7 +97,10 @@ class ContactDetailScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditContactScreen(contact: contact),
+                  builder:
+                      (context) => EditContactScreen(
+                        contact: currentContact,
+                      ), // Use the stateful contact
                 ),
               );
             },
@@ -72,13 +116,20 @@ class ContactDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(child: _buildAvatar(contact)),
+            const Text(
+              'Contact Details',
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+            ),
+            Divider(),
+            Center(
+              child: _buildAvatar(currentContact),
+            ), // Use the stateful contact
             const SizedBox(height: 16),
             Center(
               child: Text(
-                contact.displayName,
+                currentContact.displayName, // Use the stateful contact
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -86,9 +137,9 @@ class ContactDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             const Divider(),
-            if (contact.phones.isNotEmpty)
+            if (currentContact.phones.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -96,12 +147,15 @@ class ContactDetailScreen extends StatelessWidget {
                       'Mobile',
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
-                        color: Colors.grey,
-                        fontSize: 14,
+                        color: AppColors.primary,
+                        fontSize: 15,
                       ),
                     ),
                     Text(
-                      contact.phones.first.number,
+                      currentContact
+                          .phones
+                          .first
+                          .number, // Use the stateful contact
                       style: const TextStyle(
                         fontSize: 18,
                         color: Colors.black87,
@@ -116,7 +170,7 @@ class ContactDetailScreen extends StatelessWidget {
               trailing: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('0', style: TextStyle(color: Colors.grey)),
+                  Text('0', style: TextStyle(fontSize: 20)),
                   Icon(Icons.chevron_right),
                 ],
               ),
@@ -124,7 +178,7 @@ class ContactDetailScreen extends StatelessWidget {
                 Navigator.pushNamed(
                   context,
                   '/contact_files',
-                  arguments: contact,
+                  arguments: currentContact, // Use the stateful contact
                 );
               },
             ),
@@ -134,7 +188,7 @@ class ContactDetailScreen extends StatelessWidget {
               trailing: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('0', style: TextStyle(color: Colors.grey)),
+                  Text('0', style: TextStyle(fontSize: 20)),
                   Icon(Icons.chevron_right),
                 ],
               ),
@@ -142,7 +196,7 @@ class ContactDetailScreen extends StatelessWidget {
                 Navigator.pushNamed(
                   context,
                   '/contact_notes',
-                  arguments: contact,
+                  arguments: currentContact, // Use the stateful contact
                 );
               },
             ),

@@ -13,9 +13,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   int _currentIndex = 1;
   final TextEditingController _searchController = TextEditingController();
-  List<Contact> _contacts = [];
   List<Contact> _allContacts = [];
-  final ScrollController _scrollController = ScrollController();
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -58,7 +56,6 @@ class _SearchScreenState extends State<SearchScreen> {
         ); // Fetch with photo
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
         setState(() {
-          _contacts = contacts;
           _allContacts = List.from(contacts);
         });
         print('Fetched ${contacts.length} contacts.');
@@ -72,21 +69,15 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _filterContacts(String query) {
     if (query.isEmpty) {
-      setState(() {
-        _contacts = List.from(_allContacts);
-      });
+      setState(() {});
     } else {
-      final filteredList =
-          _allContacts
-              .where(
-                (contact) => contact.displayName.toLowerCase().contains(
-                  query.toLowerCase(),
-                ),
-              )
-              .toList();
-      setState(() {
-        _contacts = filteredList;
-      });
+      _allContacts
+          .where(
+            (contact) =>
+                contact.displayName.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
+      setState(() {});
     }
   }
 
@@ -115,6 +106,7 @@ class _SearchScreenState extends State<SearchScreen> {
               'Search',
               style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 10),
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContacts,

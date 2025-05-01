@@ -41,7 +41,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   Future<void> _saveContact() async {
     String firstName = _firstNameController.text.trim();
     String lastName = _lastNameController.text.trim();
-    String company = _companyController.text.trim();
+    _companyController.text.trim();
 
     List<Phone> phones =
         _phoneControllers.map((c) => Phone(c.text.trim())).toList();

@@ -1,6 +1,7 @@
+import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../common/theme/app_colors.dart';
+import 'dart:typed_data';
 
 class EditContactScreen extends StatefulWidget {
   final Contact contact;
@@ -12,6 +13,7 @@ class EditContactScreen extends StatefulWidget {
 }
 
 class _EditContactScreenState extends State<EditContactScreen> {
+  Uint8List? _selectedPhoto;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
@@ -21,31 +23,36 @@ class _EditContactScreenState extends State<EditContactScreen> {
   List<TextEditingController> _addressControllers = [];
 
   Contact get _updatedContact => Contact(
-    id: widget.contact.id, // Keep the original ID for updating
+    id: widget.contact.id,
     name: Name(
       first: _firstNameController.text.trim(),
       last: _lastNameController.text.trim(),
     ),
-    // company: _companyController.text.trim(), // Still using the controller value
+    organizations: [Organization(company: _companyController.text.trim())],
     phones: _phoneControllers.map((c) => Phone(c.text.trim())).toList(),
     emails: _emailControllers.map((c) => Email(c.text.trim())).toList(),
     websites: _websiteControllers.map((c) => Website(c.text.trim())).toList(),
-    addresses:
-        _addressControllers
-            .map((c) => Address(c.text.trim()))
-            .toList(), // Providing street
+    addresses: _addressControllers.map((c) => Address(c.text.trim())).toList(),
+    photo: _selectedPhoto,
   );
 
   @override
   void initState() {
     super.initState();
+    print(
+      'Contact in Edit Screen: ${widget.contact.toJson()}',
+    ); // Print the contact details
     _populateFields();
   }
 
   void _populateFields() {
+    _selectedPhoto = widget.contact.photo;
     _firstNameController.text = widget.contact.name.first ?? '';
     _lastNameController.text = widget.contact.name.last ?? '';
-    // _companyController.text = widget.contact.company ?? ''; // Still using the controller
+    _companyController.text =
+        widget.contact.organizations?.isNotEmpty == true
+            ? widget.contact.organizations!.first.company ?? ''
+            : '';
     _phoneControllers =
         widget.contact.phones
             .map((p) => TextEditingController(text: p.number))
@@ -95,10 +102,9 @@ class _EditContactScreenState extends State<EditContactScreen> {
   Future<void> _saveContact() async {
     try {
       await FlutterContacts.updateContact(_updatedContact);
-      Navigator.pop(context); // Go back to the contact detail screen
+      Navigator.pop(context);
     } catch (e) {
       print('Error updating contact: $e');
-      // Optionally show an error message to the user
     }
   }
 
@@ -111,6 +117,33 @@ class _EditContactScreenState extends State<EditContactScreen> {
       print('Error deleting contact: $e');
       // Optionally show an error message
     }
+  }
+
+  void _clearPhoto() {
+    setState(() {
+      _selectedPhoto = null;
+    });
+  }
+
+  Widget _buildAvatar() {
+    return InkWell(
+      onTap: () {
+        // TODO: Implement image picker functionality here
+        print('Tapped to choose photo');
+        // After picking the image, update _selectedPhoto and call setState
+      },
+      child:
+          _selectedPhoto != null
+              ? CircleAvatar(
+                radius: 40,
+                backgroundImage: MemoryImage(_selectedPhoto!),
+              )
+              : const Icon(
+                Icons.person_outline,
+                size: 80,
+                color: Colors.blueGrey,
+              ),
+    );
   }
 
   @override
@@ -139,19 +172,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Icon(
-                Icons.person_outline,
-                size: 80,
-                color: Colors.blueGrey,
-              ),
-            ),
+            Center(child: _buildAvatar()),
             Center(
               child: TextButton(
-                onPressed: () {
-                  // TODO: Implement clear/change photo functionality
-                  print('Clear photo');
-                },
+                onPressed: _clearPhoto,
                 child: const Text(
                   'Clear',
                   style: TextStyle(color: Colors.grey),

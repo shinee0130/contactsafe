@@ -52,7 +52,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       body: const SingleChildScrollView(
-        // Assuming settings might have a scrollable list
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

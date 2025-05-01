@@ -1,5 +1,5 @@
+import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-import '../../../common/theme/app_colors.dart'; // Assuming you have this
 
 class ContactGroupsScreen extends StatefulWidget {
   const ContactGroupsScreen({super.key});
@@ -9,71 +9,60 @@ class ContactGroupsScreen extends StatefulWidget {
 }
 
 class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
-  // TODO: Fetch and manage contact groups
-  List<String> _groups = [
-    'Select all groups',
-    'Not assigned',
-    'sss',
-  ]; // Example data
+  bool _selectAll = false;
+  final List<String> _groups = ['Not assigned'];
+  final List<String> _selectedGroups = [];
 
-  void _showNewGroupDialog(BuildContext context) {
-    TextEditingController _newGroupNameController = TextEditingController();
+  void _toggleSelectAll() {
+    setState(() {
+      _selectAll = !_selectAll;
+      if (_selectAll) {
+        _selectedGroups.addAll(_groups);
+      } else {
+        _selectedGroups.clear();
+      }
+    });
+  }
 
+  void _toggleGroupSelection(String groupName) {
+    setState(() {
+      if (_selectedGroups.contains(groupName)) {
+        _selectedGroups.remove(groupName);
+      } else {
+        _selectedGroups.add(groupName);
+      }
+      _selectAll = _selectedGroups.length == _groups.length;
+    });
+  }
+
+  void _addNewGroup(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        TextEditingController newGroupController = TextEditingController();
         return AlertDialog(
-          title: const Text('New Group'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Do you want to add a new group?'),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _newGroupNameController,
-                decoration: const InputDecoration(
-                  hintText: 'Add name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
+          title: const Text('Add New Group'),
+          content: TextField(
+            controller: newGroupController,
+            decoration: const InputDecoration(hintText: 'Group name'),
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cancel
-              },
               child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
             TextButton(
+              child: const Text('Add'),
               onPressed: () {
-                String newGroupName = _newGroupNameController.text.trim();
-                if (newGroupName.isNotEmpty) {
-                  // TODO: Implement group creation logic
-                  print('Create group: $newGroupName');
+                if (newGroupController.text.isNotEmpty) {
                   setState(() {
-                    _groups.add(newGroupName); // Update the local list
+                    _groups.add(newGroupController.text.trim());
                   });
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('OK'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newGroupName = _newGroupNameController.text.trim();
-                if (newGroupName.isNotEmpty) {
-                  // TODO: Implement group creation and navigate to add contacts
-                  print('Create and add contacts to: $newGroupName');
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => AddContactsToGroupScreen(groupName: newGroupName)));
-                  setState(() {
-                    _groups.add(newGroupName); // Update the local list
-                  });
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Ok & add contacts'),
             ),
           ],
         );
@@ -85,41 +74,66 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Groups'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Groups',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        leadingWidth: 60.0,
         leading: TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('Done', style: TextStyle(color: AppColors.primary)),
+          child: const Text(
+            'Done',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 14.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              _showNewGroupDialog(context); // Show the dialog
-            },
+            icon: const Icon(Icons.add, color: AppColors.primary, size: 30),
+            onPressed: () => _addNewGroup(context),
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: _groups.length,
-        itemBuilder: (context, index) {
-          final groupName = _groups[index];
-          return ListTile(
-            title: Text(groupName),
-            onTap: () {
-              // TODO: Implement functionality for tapping on a group
-              print('Tapped on group: $groupName');
-              if (groupName == 'Select all groups') {
-                // TODO: Implement select all groups logic
-              } else if (groupName == 'Not assigned') {
-                // TODO: Implement navigation to 'not assigned' contacts
-              } else {
-                // TODO: Implement navigation to group details or editing
-              }
-            },
-          );
-        },
+      body: ListView(
+        children: [
+          ListTile(
+            title: const Text('Select all groups'),
+            leading: Checkbox(
+              value: _selectAll,
+              onChanged: (bool? value) {
+                if (value != null) {
+                  _toggleSelectAll();
+                }
+              },
+            ),
+            onTap: _toggleSelectAll,
+          ),
+          const Divider(),
+          ..._groups.map(
+            (group) => ListTile(
+              title: Text(group),
+              leading: Checkbox(
+                value: _selectedGroups.contains(group),
+                onChanged: (bool? value) {
+                  if (value != null) {
+                    _toggleGroupSelection(group);
+                  }
+                },
+              ),
+              onTap: () => _toggleGroupSelection(group),
+            ),
+          ),
+        ],
       ),
     );
   }

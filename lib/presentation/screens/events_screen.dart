@@ -1,6 +1,5 @@
 import 'package:contactsafe/common/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart' show Contact;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../common/widgets/navigation_bar.dart';
 
@@ -12,11 +11,9 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  int _currentIndex = 2; // To highlight the current tab
+  int _currentIndex = 2;
   final TextEditingController _searchController = TextEditingController();
-  List<Contact> _contacts = [];
   List<Contact> _allContacts = [];
-  final ScrollController _scrollController = ScrollController();
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -59,7 +56,6 @@ class _EventsScreenState extends State<EventsScreen> {
         ); // Fetch with photo
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
         setState(() {
-          _contacts = contacts;
           _allContacts = List.from(contacts);
         });
         print('Fetched ${contacts.length} contacts.');
@@ -73,28 +69,22 @@ class _EventsScreenState extends State<EventsScreen> {
 
   void _filterContacts(String query) {
     if (query.isEmpty) {
-      setState(() {
-        _contacts = List.from(_allContacts);
-      });
+      setState(() {});
     } else {
-      final filteredList =
-          _allContacts
-              .where(
-                (contact) => contact.displayName.toLowerCase().contains(
-                  query.toLowerCase(),
-                ),
-              )
-              .toList();
-      setState(() {
-        _contacts = filteredList;
-      });
+      _allContacts
+          .where(
+            (contact) =>
+                contact.displayName.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
+      setState(() {});
     }
   }
 
-  void _addNewEvent() {
-    // TODO: Implement add new event
-    print('Add new event');
-  }
+  // void _addNewEvent() {
+  //   // TODO: Implement add new event
+  //   print('Add new event');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -121,17 +111,14 @@ class _EventsScreenState extends State<EventsScreen> {
               'Events',
               style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 10),
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContacts,
             ),
             const SizedBox(height: 16.0),
             const Expanded(
-              child: Center(
-                child: Text(
-                  'Events will be displayed here',
-                ), // Replace with your events list
-              ),
+              child: Center(child: Text('Events will be displayed here')),
             ),
           ],
         ),
