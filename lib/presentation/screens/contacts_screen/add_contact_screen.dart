@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../common/theme/app_colors.dart'; // Assuming you have this
+import 'package:image_picker/image_picker.dart';
+import '../../../common/theme/app_colors.dart';
+import 'dart:typed_data'; // Import for Uint8List
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({super.key});
@@ -10,6 +12,7 @@ class AddContactScreen extends StatefulWidget {
 }
 
 class _AddContactScreenState extends State<AddContactScreen> {
+  Uint8List? _selectedPhoto;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
@@ -41,7 +44,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   Future<void> _saveContact() async {
     String firstName = _firstNameController.text.trim();
     String lastName = _lastNameController.text.trim();
-    _companyController.text.trim();
+    String company = _companyController.text.trim(); // Get company
 
     List<Phone> phones =
         _phoneControllers.map((c) => Phone(c.text.trim())).toList();
@@ -54,10 +57,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
     Contact newContact = Contact(
       name: Name(first: firstName, last: lastName),
+      organizations: [
+        Organization(company: company),
+      ], // Wrap in a List<Organization>
       phones: phones,
       emails: emails,
       websites: websites,
       addresses: addresses,
+      photo: _selectedPhoto,
     );
 
     try {
@@ -66,6 +73,49 @@ class _AddContactScreenState extends State<AddContactScreen> {
     } catch (e) {
       print('Error saving contact: $e');
     }
+  }
+
+  Future<void> _changePhoto() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      setState(() {
+        _selectedPhoto = bytes;
+      });
+    }
+  }
+
+  void _clearPhoto() {
+    setState(() {
+      _selectedPhoto = null;
+    });
+  }
+
+  Widget _buildAvatar() {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        _selectedPhoto != null
+            ? CircleAvatar(
+              radius: 75,
+              backgroundImage: MemoryImage(_selectedPhoto!),
+            )
+            : const CircleAvatar(
+              radius: 75,
+              backgroundColor: AppColors.primary,
+              child: Icon(Icons.person_outline, size: 75, color: Colors.white),
+            ),
+        GestureDetector(
+          onTap: _changePhoto,
+          child: const CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.camera_alt, size: 18, color: Colors.white),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -96,28 +146,28 @@ class _AddContactScreenState extends State<AddContactScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              children: [
-                const Icon(
-                  Icons.person_outline,
-                  size: 100,
-                  color: Colors.blueGrey,
-                ),
-                TextButton(
-                  onPressed: () {
-                    // TODO: Implement clear/change photo functionality
-                    print('Clear/Change photo');
-                  },
-                  child: const Text(
-                    'Clear',
-                    style: TextStyle(color: Colors.grey),
+            const Text(
+              'Create contact',
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            Center(child: _buildAvatar()),
+            Center(
+              child: TextButton(
+                onPressed: _clearPhoto,
+                child: const Text(
+                  'Clear',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
+              ),
             ),
-            const SizedBox(),
+            const SizedBox(height: 16),
             _buildTextField(
               labelText: 'First name',
               controller: _firstNameController,
@@ -130,7 +180,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
               labelText: 'Company',
               controller: _companyController,
             ),
-            const SizedBox(),
+            const SizedBox(height: 16),
             _buildAddableSection(
               label: 'Phone',
               controllers: _phoneControllers,
@@ -179,7 +229,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
     required TextEditingController controller,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -190,7 +240,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
               color: Colors.grey,
             ),
           ),
-          const SizedBox(height: 0),
+          const SizedBox(height: 4),
           TextField(
             controller: controller,
             decoration: const InputDecoration(border: UnderlineInputBorder()),
@@ -210,7 +260,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: TextButton.icon(
             onPressed: onAdd,
             icon: const Icon(
@@ -229,7 +279,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
           itemCount: controllers.length,
           itemBuilder: (context, index) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 0),
+              padding: const EdgeInsets.only(bottom: 8.0),
               child: TextField(
                 controller: controllers[index],
                 decoration: InputDecoration(
@@ -242,7 +292,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
             );
           },
         ),
-        const SizedBox(height: 0),
+        const SizedBox(height: 16),
       ],
     );
   }

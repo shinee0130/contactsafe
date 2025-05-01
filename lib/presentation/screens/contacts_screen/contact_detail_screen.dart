@@ -18,13 +18,12 @@ class ContactDetailScreen extends StatefulWidget {
 }
 
 class _ContactDetailScreenState extends State<ContactDetailScreen> {
-  Contact?
-  _detailedContact; // Use a state variable to hold the potentially refetched contact
+  Contact? _detailedContact;
 
   @override
   void initState() {
     super.initState();
-    _loadContactDetails(widget.contact.id); // Use widget.contact.id here
+    _loadContactDetails(widget.contact.id);
   }
 
   Future<void> _loadContactDetails(String contactId) async {
@@ -32,36 +31,43 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       if (await FlutterContacts.requestPermission()) {
         Contact? fetchedContact = await FlutterContacts.getContact(
           contactId,
-          withAccounts: true, // THIS IS CRUCIAL
+          withAccounts: true,
           withPhoto: true,
         );
         setState(() {
-          _detailedContact =
-              fetchedContact ??
-              widget.contact; // Use fetched or fallback to the passed contact
+          _detailedContact = fetchedContact ?? widget.contact;
         });
       } else {
-        // Handle permission denial (e.g., show a message)
         setState(() {
-          _detailedContact = widget.contact; // Fallback if no permission
+          _detailedContact = widget.contact;
         });
       }
     } catch (e) {
       print('Error loading contact details with accounts: $e');
       setState(() {
-        _detailedContact = widget.contact; // Fallback on error
+        _detailedContact = widget.contact;
       });
     }
   }
 
   Widget _buildAvatar(Contact contact) {
-    return const Icon(Icons.person_outline, size: 100, color: Colors.blue);
+    if (contact.photo != null && contact.photo!.isNotEmpty) {
+      return CircleAvatar(
+        radius: 50,
+        backgroundImage: MemoryImage(contact.photo!),
+      );
+    } else {
+      return const Icon(
+        Icons.person_outline,
+        size: 100,
+        color: Colors.blueGrey,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentContact =
-        _detailedContact ?? widget.contact; // Use the stateful contact
+    final currentContact = _detailedContact ?? widget.contact;
 
     return Scaffold(
       appBar: AppBar(
@@ -98,9 +104,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 context,
                 MaterialPageRoute(
                   builder:
-                      (context) => EditContactScreen(
-                        contact: currentContact,
-                      ), // Use the stateful contact
+                      (context) => EditContactScreen(contact: currentContact),
                 ),
               );
             },
@@ -120,14 +124,12 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               'Contact Details',
               style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
-            Divider(),
-            Center(
-              child: _buildAvatar(currentContact),
-            ), // Use the stateful contact
+            const Divider(),
+            Center(child: _buildAvatar(currentContact)),
             const SizedBox(height: 16),
             Center(
               child: Text(
-                currentContact.displayName, // Use the stateful contact
+                currentContact.displayName,
                 style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -152,10 +154,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       ),
                     ),
                     Text(
-                      currentContact
-                          .phones
-                          .first
-                          .number, // Use the stateful contact
+                      currentContact.phones.first.number,
                       style: const TextStyle(
                         fontSize: 18,
                         color: Colors.black87,
@@ -178,7 +177,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 Navigator.pushNamed(
                   context,
                   '/contact_files',
-                  arguments: currentContact, // Use the stateful contact
+                  arguments: currentContact,
                 );
               },
             ),
@@ -196,7 +195,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 Navigator.pushNamed(
                   context,
                   '/contact_notes',
-                  arguments: currentContact, // Use the stateful contact
+                  arguments: currentContact,
                 );
               },
             ),

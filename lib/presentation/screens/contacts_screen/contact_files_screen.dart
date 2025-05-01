@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../common/theme/app_colors.dart'; // Assuming you have this
+import '../../../common/theme/app_colors.dart';
 
 class ContactFilesScreen extends StatelessWidget {
   final Contact contact;
@@ -11,7 +11,17 @@ class ContactFilesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${contact.displayName} - Files'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'ContactSafe',
+              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 5.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+          ],
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () {
@@ -20,7 +30,11 @@ class ContactFilesScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.swap_vert), // Up/down arrow icon
+            icon: const Icon(
+              Icons.swap_vert,
+              size: 30,
+              color: AppColors.primary,
+            ),
             onPressed: () {
               // TODO: Implement sorting/filtering functionality
               print('Sort/Filter files');
@@ -33,11 +47,15 @@ class ContactFilesScreen extends StatelessWidget {
             },
             child: const Text(
               'Edit',
-              style: TextStyle(color: AppColors.primary),
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, size: 30, color: AppColors.primary),
             onPressed: () {
               // TODO: Implement Add file functionality
               print('Add file');
@@ -45,15 +63,25 @@ class ContactFilesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text('No files associated with this contact.'),
-        // Or you could start with an empty ListView:
-        // child: ListView.builder(
-        //   itemCount: 0, // Initially empty
-        //   itemBuilder: (context, index) {
-        //     return Container(); // Replace with file display widget
-        //   },
-        // ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${contact.displayName} - Files', // Use string interpolation directly
+              style: const TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // TODO: Implement UI to display the contact's files here
+            // This could be a ListView.builder that fetches and displays
+            // the files associated with the contact. For now, we'll
+            // just display a placeholder.
+            const Text('No files available for this contact yet.'),
+          ],
+        ),
       ),
     );
   }

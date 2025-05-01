@@ -102,8 +102,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
   Future<void> _saveContact() async {
     try {
       await FlutterContacts.updateContact(_updatedContact);
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
+      // ignore: avoid_print
       print('Error updating contact: $e');
     }
   }
@@ -111,9 +113,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
   Future<void> _deleteContact() async {
     try {
       await FlutterContacts.deleteContact(widget.contact);
+      // ignore: use_build_context_synchronously
       Navigator.pop(context); // Go back
+      // ignore: use_build_context_synchronously
       Navigator.pop(context); // Go back to contacts screen
     } catch (e) {
+      // ignore: avoid_print
       print('Error deleting contact: $e');
       // Optionally show an error message
     }
