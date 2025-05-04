@@ -133,6 +133,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
             Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           TextButton(
             onPressed: _saveContact,

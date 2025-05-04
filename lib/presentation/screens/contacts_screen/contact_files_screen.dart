@@ -23,7 +23,7 @@ class ContactFilesScreen extends StatelessWidget {
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () {
             Navigator.pop(context);
           },

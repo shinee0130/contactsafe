@@ -242,8 +242,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(
-                                  top: 8.0,
-                                  bottom: 4.0,
+                                  top: 0,
+                                  bottom: 0,
                                 ),
                                 child: Text(
                                   letter,
@@ -253,6 +253,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                   ),
                                 ),
                               ),
+                              Divider(),
                               ListView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
@@ -277,6 +278,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                   );
                                 },
                               ),
+                              Divider(),
                             ],
                           );
                         },
@@ -284,7 +286,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: SizedBox(
-                      width: 30,
+                      width: 0,
                       child: ListView.builder(
                         shrinkWrap: true,
                         itemCount: _buildIndexLetters().length,
@@ -296,11 +298,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 4.0,
+                                vertical: 1.0,
                               ),
                               child: Text(
                                 letter,
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                  color: AppColors.primary,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),

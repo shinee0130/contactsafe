@@ -2,6 +2,8 @@ import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
+import 'package:contactsafe/presentation/screens/contacts_screen/add_contact_screen.dart';
 
 class EditContactScreen extends StatefulWidget {
   final Contact contact;
@@ -43,6 +45,17 @@ class _EditContactScreenState extends State<EditContactScreen> {
       'Contact in Edit Screen: ${widget.contact.toJson()}',
     ); // Print the contact details
     _populateFields();
+  }
+
+  Future<void> _changePhoto() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      setState(() {
+        _selectedPhoto = bytes;
+      });
+    }
   }
 
   void _populateFields() {
@@ -131,23 +144,28 @@ class _EditContactScreenState extends State<EditContactScreen> {
   }
 
   Widget _buildAvatar() {
-    return InkWell(
-      onTap: () {
-        // TODO: Implement image picker functionality here
-        print('Tapped to choose photo');
-        // After picking the image, update _selectedPhoto and call setState
-      },
-      child:
-          _selectedPhoto != null
-              ? CircleAvatar(
-                radius: 40,
-                backgroundImage: MemoryImage(_selectedPhoto!),
-              )
-              : const Icon(
-                Icons.person_outline,
-                size: 80,
-                color: Colors.blueGrey,
-              ),
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        _selectedPhoto != null
+            ? CircleAvatar(
+              radius: 75,
+              backgroundImage: MemoryImage(_selectedPhoto!),
+            )
+            : const CircleAvatar(
+              radius: 75,
+              backgroundColor: AppColors.primary,
+              child: Icon(Icons.person_outline, size: 75, color: Colors.white),
+            ),
+        GestureDetector(
+          onTap: _changePhoto,
+          child: const CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.camera_alt, size: 18, color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 
@@ -155,12 +173,22 @@ class _EditContactScreenState extends State<EditContactScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Contact'),
-        leading: TextButton(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'ContactSafe',
+              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 5.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+          ],
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('Back', style: TextStyle(color: AppColors.primary)),
         ),
         actions: [
           TextButton(
@@ -177,13 +205,22 @@ class _EditContactScreenState extends State<EditContactScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Edit contact',
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
             Center(child: _buildAvatar()),
             Center(
               child: TextButton(
                 onPressed: _clearPhoto,
                 child: const Text(
                   'Clear',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
