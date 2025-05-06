@@ -16,10 +16,18 @@ class _AddContactScreenState extends State<AddContactScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
-  List<TextEditingController> _phoneControllers = [TextEditingController()];
-  List<TextEditingController> _emailControllers = [TextEditingController()];
-  List<TextEditingController> _websiteControllers = [TextEditingController()];
-  List<TextEditingController> _addressControllers = [TextEditingController()];
+  final List<TextEditingController> _phoneControllers = [
+    TextEditingController(),
+  ];
+  final List<TextEditingController> _emailControllers = [
+    TextEditingController(),
+  ];
+  final List<TextEditingController> _websiteControllers = [
+    TextEditingController(),
+  ];
+  final List<TextEditingController> _addressControllers = [
+    TextEditingController(),
+  ];
 
   @override
   void dispose() {
@@ -44,7 +52,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   Future<void> _saveContact() async {
     String firstName = _firstNameController.text.trim();
     String lastName = _lastNameController.text.trim();
-    String company = _companyController.text.trim(); // Get company
+    String company = _companyController.text.trim();
 
     List<Phone> phones =
         _phoneControllers.map((c) => Phone(c.text.trim())).toList();
@@ -57,9 +65,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
     Contact newContact = Contact(
       name: Name(first: firstName, last: lastName),
-      organizations: [
-        Organization(company: company),
-      ], // Wrap in a List<Organization>
+      organizations: [Organization(company: company)],
       phones: phones,
       emails: emails,
       websites: websites,
@@ -69,6 +75,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
     try {
       await FlutterContacts.insertContact(newContact);
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
       print('Error saving contact: $e');
@@ -175,14 +182,17 @@ class _AddContactScreenState extends State<AddContactScreen> {
             ),
             const SizedBox(height: 16),
             _buildTextField(
+              hintText: 'Firstname',
               labelText: 'First name',
               controller: _firstNameController,
             ),
             _buildTextField(
+              hintText: 'Firstname',
               labelText: 'Last name',
               controller: _lastNameController,
             ),
             _buildTextField(
+              hintText: 'Firstname',
               labelText: 'Company',
               controller: _companyController,
             ),
@@ -232,6 +242,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   Widget _buildTextField({
     required String labelText,
+    required String hintText,
     required TextEditingController controller,
   }) {
     return Padding(
@@ -239,17 +250,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            labelText,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
           const SizedBox(height: 4),
           TextField(
             controller: controller,
-            decoration: const InputDecoration(border: UnderlineInputBorder()),
+            decoration: InputDecoration(
+              hintText: hintText,
+              labelText: labelText,
+              border: const OutlineInputBorder(),
+            ),
           ),
         ],
       ),
@@ -286,19 +294,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
           itemBuilder: (context, index) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: TextField(
+              child: _buildTextField(
+                labelText:
+                    controllers.length > 1 ? '$label ${index + 1}' : label,
+                hintText: 'Enter $label',
                 controller: controllers[index],
-                decoration: InputDecoration(
-                  labelText:
-                      controllers.length > 1 ? '$label ${index + 1}' : label,
-                  border: const UnderlineInputBorder(),
-                ),
-                maxLines: maxLines,
               ),
             );
           },
         ),
-        const SizedBox(height: 16),
       ],
     );
   }

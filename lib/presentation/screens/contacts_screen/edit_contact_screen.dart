@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
-import 'package:contactsafe/presentation/screens/contacts_screen/add_contact_screen.dart';
 
 class EditContactScreen extends StatefulWidget {
   final Contact contact;
@@ -41,9 +40,6 @@ class _EditContactScreenState extends State<EditContactScreen> {
   @override
   void initState() {
     super.initState();
-    print(
-      'Contact in Edit Screen: ${widget.contact.toJson()}',
-    ); // Print the contact details
     _populateFields();
   }
 
@@ -60,11 +56,11 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
   void _populateFields() {
     _selectedPhoto = widget.contact.photo;
-    _firstNameController.text = widget.contact.name.first ?? '';
-    _lastNameController.text = widget.contact.name.last ?? '';
+    _firstNameController.text = widget.contact.name.first;
+    _lastNameController.text = widget.contact.name.last;
     _companyController.text =
-        widget.contact.organizations?.isNotEmpty == true
-            ? widget.contact.organizations!.first.company ?? ''
+        widget.contact.organizations.isNotEmpty == true
+            ? widget.contact.organizations.first.company
             : '';
     _phoneControllers =
         widget.contact.phones
@@ -72,24 +68,28 @@ class _EditContactScreenState extends State<EditContactScreen> {
             .toList();
     _emailControllers =
         widget.contact.emails
-            .map((e) => TextEditingController(text: e.address ?? ''))
+            .map((e) => TextEditingController(text: e.address))
             .toList();
     _websiteControllers =
         widget.contact.websites
-            .map((w) => TextEditingController(text: w.url ?? ''))
+            .map((w) => TextEditingController(text: w.url))
             .toList();
     _addressControllers =
         widget.contact.addresses
-            .map((a) => TextEditingController(text: a.street ?? ''))
+            .map((a) => TextEditingController(text: a.street))
             .toList();
-    if (_phoneControllers.isEmpty)
+    if (_phoneControllers.isEmpty) {
       _phoneControllers.add(TextEditingController());
-    if (_emailControllers.isEmpty)
+    }
+    if (_emailControllers.isEmpty) {
       _emailControllers.add(TextEditingController());
-    if (_websiteControllers.isEmpty)
+    }
+    if (_websiteControllers.isEmpty) {
       _websiteControllers.add(TextEditingController());
-    if (_addressControllers.isEmpty)
+    }
+    if (_addressControllers.isEmpty) {
       _addressControllers.add(TextEditingController());
+    }
   }
 
   @override

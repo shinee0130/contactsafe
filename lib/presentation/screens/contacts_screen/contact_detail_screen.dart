@@ -47,7 +47,6 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         });
       }
     } catch (e) {
-      print('Error loading contact details with accounts: $e');
       setState(() {
         _detailedContact = widget.contact;
       });
@@ -61,17 +60,17 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     vcfContent.writeln('VERSION:3.0');
 
     String formattedName = '';
-    if (contact.name?.prefix != null && contact.name!.prefix!.isNotEmpty) {
-      formattedName += '${contact.name!.prefix} ';
+    if (contact.name.prefix.isNotEmpty) {
+      formattedName += '${contact.name.prefix} ';
     }
-    if (contact.name?.first != null && contact.name!.first!.isNotEmpty) {
-      formattedName += '${contact.name!.first} ';
+    if (contact.name.first.isNotEmpty) {
+      formattedName += '${contact.name.first} ';
     }
-    if (contact.name?.middle != null && contact.name!.middle!.isNotEmpty) {
-      formattedName += '${contact.name!.middle} ';
+    if (contact.name.middle.isNotEmpty) {
+      formattedName += '${contact.name.middle} ';
     }
-    if (contact.name?.last != null && contact.name!.last!.isNotEmpty) {
-      formattedName += contact.name!.last!;
+    if (contact.name.last.isNotEmpty) {
+      formattedName += contact.name.last;
     }
     formattedName = formattedName.trim();
 
@@ -79,13 +78,18 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       vcfContent.writeln('FN:$formattedName');
     }
 
-    if (contact.name?.last != null ||
-        contact.name?.first != null ||
-        contact.name?.middle != null ||
-        contact.name?.prefix != null ||
-        contact.name?.suffix != null) {
+    // ignore: unnecessary_null_comparison
+    if (contact.name.last != null ||
+        // ignore: unnecessary_null_comparison
+        contact.name.first != null ||
+        // ignore: unnecessary_null_comparison
+        contact.name.middle != null ||
+        // ignore: unnecessary_null_comparison
+        contact.name.prefix != null ||
+        // ignore: unnecessary_null_comparison
+        contact.name.suffix != null) {
       vcfContent.writeln(
-        'N:${contact.name?.last ?? ''};${contact.name?.first ?? ''};${contact.name?.middle ?? ''};${contact.name?.prefix ?? ''};${contact.name?.suffix ?? ''}',
+        'N:${contact.name.last};${contact.name.first};${contact.name.middle};${contact.name.prefix};${contact.name.suffix}',
       );
     }
 
@@ -105,7 +109,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       String typeLabel = '';
       switch (address) {}
       vcfContent.writeln(
-        'ADR;TYPE=$typeLabel:;;${address.street ?? ''};${address.city ?? ''};${address ?? ''};${address.postalCode ?? ''};${address.country ?? ''}',
+        'ADR;TYPE=$typeLabel:;;${address.street};${address.city};$address;${address.postalCode};${address.country}',
       );
     }
 
@@ -133,27 +137,29 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           String fileName = '${contactName.replaceAll(' ', '_')}.vcf';
           File file = File('${directory.path}/$fileName');
           await file.writeAsString(vcfContent);
-          print('VCF file saved to: ${file.path}');
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('VCF file saved to: ${file.path}')),
           );
         } else {
-          print('Error: Could not access storage directory.');
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Error accessing storage.')),
           );
         }
       } catch (e) {
-        print('Error saving VCF file: $e');
         ScaffoldMessenger.of(
+          // ignore: use_build_context_synchronously
           context,
         ).showSnackBar(SnackBar(content: Text('Error saving VCF file: $e')));
       }
     } else if (status.isDenied) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission denied.')),
       );
     } else if (status.isPermanentlyDenied) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
@@ -174,8 +180,8 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     } else {
       return const Icon(
         Icons.person_outline,
-        size: 100,
-        color: Colors.blueGrey,
+        size: 180,
+        color: AppColors.primary,
       );
     }
   }

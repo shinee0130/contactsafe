@@ -1,3 +1,4 @@
+import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../common/widgets/navigation_bar.dart';
 
@@ -63,9 +64,23 @@ class _PhotosScreenState extends State<PhotosScreen> {
         leadingWidth: 110.0,
         leading: TextButton(onPressed: () {}, child: const Text('')),
         actions: [
-          TextButton(onPressed: _editPhotos, child: const Text('Edit')),
+          TextButton(
+            onPressed: _editPhotos,
+            child: const Text(
+              'Edit',
+              style: TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
           IconButton(
-            icon: const Icon(Icons.upload_file),
+            icon: const Icon(
+              Icons.swap_vert,
+              color: AppColors.primary,
+              size: 30,
+            ),
             onPressed: _uploadPhotos,
           ),
         ],

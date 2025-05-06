@@ -200,7 +200,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             style: TextStyle(
               color: AppColors.primary,
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              // fontWeight: FontWeight.bold,
             ),
           ),
         ),

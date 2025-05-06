@@ -41,33 +41,70 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
       builder: (BuildContext context) {
         TextEditingController newGroupController = TextEditingController();
         return AlertDialog(
-          title: const Text('Add New Group'),
-          content: TextField(
-            controller: newGroupController,
-            decoration: const InputDecoration(hintText: 'Group name'),
+          title: const Text('New Group'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // Ensure content fits
+            children: [
+              const Text('Do you want to add a new group?'),
+              const SizedBox(height: 8.0),
+              TextField(
+                controller: newGroupController,
+                decoration: const InputDecoration(hintText: 'Add name'),
+              ),
+            ],
           ),
           actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                _addNewGroupToList(
+                  newGroupController.text.trim(),
+                  shouldAddContacts: false,
+                );
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Ok & add contacts'),
+              onPressed: () {
+                _addNewGroupToList(
+                  newGroupController.text.trim(),
+                  shouldAddContacts: true,
+                );
+                Navigator.of(context).pop();
+              },
+            ),
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(
-              child: const Text('Add'),
-              onPressed: () {
-                if (newGroupController.text.isNotEmpty) {
-                  setState(() {
-                    _groups.add(newGroupController.text.trim());
-                  });
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
           ],
         );
       },
     );
+  }
+
+  void _addNewGroupToList(
+    String newGroupName, {
+    required bool shouldAddContacts,
+  }) {
+    if (newGroupName.isNotEmpty && !_groups.contains(newGroupName)) {
+      setState(() {
+        _groups.add(newGroupName);
+      });
+      if (shouldAddContacts) {
+        // Navigate to the screen where the user can add contacts to this group
+        print('Navigate to add contacts for group: $newGroupName');
+        // Replace the print statement with your actual navigation logic
+        // Example using Navigator.push:
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => AddContactsToGroupScreen(groupName: newGroupName)),
+        // );
+      }
+    }
   }
 
   @override

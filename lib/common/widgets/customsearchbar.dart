@@ -15,10 +15,18 @@ class CustomSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      style: const TextStyle(color: Colors.black),
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 18.0,
+        fontWeight: FontWeight.bold,
+      ),
       decoration: InputDecoration(
         hintText: 'Search',
-        hintStyle: const TextStyle(color: Colors.grey),
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontWeight: FontWeight.bold,
+          fontSize: 18.0,
+        ),
         prefixIcon: const Icon(Icons.search, color: Colors.grey),
         suffixIcon: IconButton(
           icon: const Icon(Icons.clear, color: Colors.grey),

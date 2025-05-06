@@ -1,3 +1,4 @@
+import 'package:contactsafe/common/theme/app_colors.dart';
 import 'package:contactsafe/common/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -81,10 +82,10 @@ class _EventsScreenState extends State<EventsScreen> {
     }
   }
 
-  // void _addNewEvent() {
-  //   // TODO: Implement add new event
-  //   print('Add new event');
-  // }
+  void _addNewEvent() {
+    // TODO: Implement add new event
+    print('Add new event');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +102,22 @@ class _EventsScreenState extends State<EventsScreen> {
             Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
+        leadingWidth: 100.0,
+        leading: TextButton(onPressed: () {}, child: const Text('')),
+        actions: [
+          IconButton(
+            onPressed: _addNewEvent,
+            icon: const Icon(
+              Icons.swap_vert,
+              color: AppColors.primary,
+              size: 30,
+            ),
+          ),
+          IconButton(
+            onPressed: _addNewEvent,
+            icon: const Icon(Icons.add, color: AppColors.primary, size: 30),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
