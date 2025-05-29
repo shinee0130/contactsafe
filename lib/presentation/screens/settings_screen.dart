@@ -1,3 +1,5 @@
+import 'package:contactsafe/common/theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../common/widgets/navigation_bar.dart';
 
@@ -9,12 +11,18 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _currentIndex = 4; // To highlight the current tab
+  int _currentIndex = 4;
+  bool _sortByFirstName = false;
+  bool _lastNameFirst = false;
+  bool _useFaceId = false;
+  bool _usePass = false;
 
   void _onBottomNavigationTap(int index) {
     setState(() {
       _currentIndex = index;
-      print('Bottom navigation tapped: $index');
+      if (kDebugMode) {
+        print('Bottom navigation tapped: $index');
+      }
       switch (index) {
         case 0:
           Navigator.pushReplacementNamed(context, '/contacts');
@@ -51,56 +59,205 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-      body: const SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Privacy', style: TextStyle(fontWeight: FontWeight.bold)),
-            ListTile(title: Text('Open in "Settings" app')),
-            Divider(),
-            Text('About', style: TextStyle(fontWeight: FontWeight.bold)),
-            ListTile(title: Text('Version')),
-            ListTile(title: Text('Imprint')),
-            ListTile(title: Text('Privacy')),
-            Divider(),
-            Text('General', style: TextStyle(fontWeight: FontWeight.bold)),
-            // ListTile(
-            //   title: Text('Sort by First name'),
-            //   trailing: Switch(value: true, onChanged:),
-            // ),
-            // ListTile(
-            //   title: Text('Last name first'),
-            //   trailing: Switch(value: false, onChanged:),
-            // ),
-            Divider(),
-            Text('Import', style: TextStyle(fontWeight: FontWeight.bold)),
-            ListTile(title: Text('Import contacts')),
-            Divider(),
-            Text('Backup', style: TextStyle(fontWeight: FontWeight.bold)),
-            ListTile(title: Text('Create backup')),
-            ListTile(title: Text('Restore from Backup')),
-            ListTile(title: Text('Backup in iCloud')),
-            ListTile(title: Text('Restore from iCloud')),
-            ListTile(title: Text('Import backup from link')),
-            Divider(),
-            Text(
-              'Accessibility',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            const Text(
+              'Settings',
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
-            ListTile(title: Text('On board tour')),
-            ListTile(title: Text('Select TabBar order')),
-            ListTile(title: Text('Change password')),
-            ListTile(title: Text('Delete all data')),
-            Divider(),
-            Text('Password', style: TextStyle(fontWeight: FontWeight.bold)),
-            // ListTile(
-            //   title: Text('Use FaceID'),
-            //   trailing: Switch(value: true, onChanged: (value) {}), // Example switch
-            // ),
-            ListTile(title: Text('Change password')),
-            Divider(),
-            Text('Powered by thekeyring.at', style: TextStyle(fontSize: 12.0)),
+            const SizedBox(height: 30.0),
+            const Text(
+              'Privacy',
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+            const ListTile(
+              title: Text('Open in "Settings" app'),
+              trailing: Icon(Icons.chevron_right, color: Colors.grey),
+            ),
+            const ListTile(
+              title: Text('Language'),
+              trailing: Icon(Icons.chevron_right, color: Colors.grey),
+            ),
+            const Divider(),
+            const Text(
+              'About',
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+            const ListTile(
+              title: Text('Version'),
+              trailing: Text(
+                '1.0.1 (90)',
+                style: TextStyle(color: Colors.grey, fontSize: 15.0),
+              ),
+            ),
+            const ListTile(
+              title: Text('Imprint'),
+              trailing: Icon(Icons.chevron_right, color: Colors.grey),
+            ),
+            const ListTile(
+              title: Text('Privacy'),
+              trailing: Icon(Icons.chevron_right, color: Colors.grey),
+            ),
+            const Divider(),
+            const Text(
+              'General',
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+            SwitchListTile(
+              title: const Text('Sort by first name'),
+              value: _sortByFirstName,
+              onChanged: (bool value) {
+                setState(() {
+                  _sortByFirstName = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Last name first'),
+              value: _lastNameFirst,
+              onChanged: (bool value) {
+                setState(() {
+                  _lastNameFirst = value;
+                });
+              },
+            ),
+            const Divider(),
+            const Text(
+              'Import',
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Import contacts',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const Divider(),
+            const Text(
+              'Backup',
+              style: TextStyle(fontSize: 15, color: Colors.grey),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Create backup',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Restore from backup',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Backup in Google Drive',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Restore from Google Drive',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Import backup from link',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const Divider(),
+            const Text(
+              'Usability',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'On board tour',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Select TabBar order',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Change password',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Delete all data',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const Divider(),
+            const Text(
+              'Password',
+              style: TextStyle(fontSize: 15, color: Colors.grey),
+            ),
+            SwitchListTile(
+              title: const Text('Use Password'),
+              value: _usePass,
+              onChanged: (bool value) {
+                setState(() {
+                  _usePass = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Use FaceID'),
+              value: _useFaceId,
+              onChanged: (bool value) {
+                setState(() {
+                  _useFaceId = value;
+                });
+              },
+            ),
+            const ListTile(
+              title: Center(
+                child: Text(
+                  'Change password',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ),
+            ),
+            const Divider(),
+            const Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Text(
+                'Powered by InAppSettingKit',
+                style: TextStyle(fontSize: 12.0, color: Colors.grey),
+              ),
+            ),
           ],
         ),
       ),
