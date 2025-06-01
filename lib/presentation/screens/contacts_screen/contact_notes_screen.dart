@@ -51,9 +51,6 @@ class ContactNotesScreen extends StatelessWidget {
               ),
             ),
             // TODO: Implement UI to display the contact's files here
-            // This could be a ListView.builder that fetches and displays
-            // the files associated with the contact. For now, we'll
-            // just display a placeholder.
             const Text('No files available for this contact yet.'),
           ],
         ),

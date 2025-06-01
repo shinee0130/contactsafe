@@ -69,16 +69,13 @@ class ContactFilesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${contact.displayName} - Files', // Use string interpolation directly
+              '${contact.displayName} - Files',
               style: const TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
             // TODO: Implement UI to display the contact's files here
-            // This could be a ListView.builder that fetches and displays
-            // the files associated with the contact. For now, we'll
-            // just display a placeholder.
             const Text('No files available for this contact yet.'),
           ],
         ),

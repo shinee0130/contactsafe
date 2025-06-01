@@ -43,7 +43,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
         return AlertDialog(
           title: const Text('New Group'),
           content: Column(
-            mainAxisSize: MainAxisSize.min, // Ensure content fits
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Text('Do you want to add a new group?'),
               const SizedBox(height: 8.0),
@@ -95,14 +95,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
         _groups.add(newGroupName);
       });
       if (shouldAddContacts) {
-        // Navigate to the screen where the user can add contacts to this group
         print('Navigate to add contacts for group: $newGroupName');
-        // Replace the print statement with your actual navigation logic
-        // Example using Navigator.push:
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => AddContactsToGroupScreen(groupName: newGroupName)),
-        // );
       }
     }
   }

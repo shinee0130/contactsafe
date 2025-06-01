@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../common/theme/app_colors.dart';
-import 'dart:typed_data'; // Import for Uint8List
+import 'dart:typed_data';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({super.key});

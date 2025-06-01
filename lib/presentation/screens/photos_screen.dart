@@ -10,7 +10,7 @@ class PhotosScreen extends StatefulWidget {
 }
 
 class _PhotosScreenState extends State<PhotosScreen> {
-  int _currentIndex = 3; // To highlight the current tab
+  int _currentIndex = 3;
 
   void _onBottomNavigationTap(int index) {
     setState(() {
@@ -96,11 +96,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
             ),
             const SizedBox(height: 16.0),
             const Expanded(
-              child: Center(
-                child: Text(
-                  'Photos will be displayed here',
-                ), // Replace with your events list
-              ),
+              child: Center(child: Text('Photos will be displayed here')),
             ),
           ],
         ),

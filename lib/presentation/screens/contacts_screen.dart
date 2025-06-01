@@ -197,11 +197,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           onPressed: _navigateToGroups,
           child: const Text(
             'Groups',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 14,
-              // fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: AppColors.primary, fontSize: 14),
           ),
         ),
         actions: [

@@ -78,15 +78,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       vcfContent.writeln('FN:$formattedName');
     }
 
-    // ignore: unnecessary_null_comparison
     if (contact.name.last != null ||
-        // ignore: unnecessary_null_comparison
         contact.name.first != null ||
-        // ignore: unnecessary_null_comparison
         contact.name.middle != null ||
-        // ignore: unnecessary_null_comparison
         contact.name.prefix != null ||
-        // ignore: unnecessary_null_comparison
         contact.name.suffix != null) {
       vcfContent.writeln(
         'N:${contact.name.last};${contact.name.first};${contact.name.middle};${contact.name.prefix};${contact.name.suffix}',
@@ -137,29 +132,24 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           String fileName = '${contactName.replaceAll(' ', '_')}.vcf';
           File file = File('${directory.path}/$fileName');
           await file.writeAsString(vcfContent);
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('VCF file saved to: ${file.path}')),
           );
         } else {
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Error accessing storage.')),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(
-          // ignore: use_build_context_synchronously
           context,
         ).showSnackBar(SnackBar(content: Text('Error saving VCF file: $e')));
       }
     } else if (status.isDenied) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission denied.')),
       );
     } else if (status.isPermanentlyDenied) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
