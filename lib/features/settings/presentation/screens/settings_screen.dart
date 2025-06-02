@@ -2,7 +2,6 @@ import 'package:contactsafe/features/settings/controller/settings_controller.dar
 import 'package:contactsafe/features/settings/presentation/screens/pin_dialog.dart';
 import 'package:contactsafe/features/settings/presentation/screens/select_tab_bar_order_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -205,49 +204,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return true;
   }
 
-  Future<void> _handlePasswordToggle(bool value) async {
-    try {
-      if (value) {
-        // Show PIN creation dialog
-        final pin = await showDialog<String>(
-          context: context,
-          builder: (context) => PinDialog(title: 'Create a 4-digit PIN'),
-        );
-
-        if (pin != null && pin.length == 4) {
-          await _controller.savePin(pin);
-          setState(() => _usePass = true);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('PIN saved successfully')),
-          );
-        } else {
-          setState(() => _usePass = false);
-        }
-      } else {
-        // Verify PIN before disabling
-        final verified = await showDialog<bool>(
-          context: context,
-          builder: (context) => PinDialog(title: 'Enter your current PIN'),
-        );
-
-        if (verified == true) {
-          await _controller.deletePin();
-          setState(() => _usePass = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('PIN protection disabled')),
-          );
-        } else {
-          setState(() => _usePass = true);
-        }
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
-      setState(() => _usePass = !value); // Revert the toggle
-    }
-  }
-
   Future<void> _handleBiometricToggle(bool value) async {
     if (value) {
       final biometrics = await _controller.checkBiometrics();
@@ -439,9 +395,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: (context) async {
                   try {
                     // Get your contacts list (replace with your actual contacts fetching logic)
-                    final contacts = await FlutterContacts.getContacts(
-                      withProperties: true,
-                    );
                     showDialog(
                       context: context,
                       barrierDismissible: false,
