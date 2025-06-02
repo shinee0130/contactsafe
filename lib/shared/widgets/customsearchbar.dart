@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../common/theme/app_colors.dart';
+import '../../core/theme/app_colors.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final TextEditingController controller;

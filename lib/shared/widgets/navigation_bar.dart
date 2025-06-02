@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/theme/app_colors.dart';
+import 'package:contactsafe/core/theme/app_colors.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
   final int currentIndex;

@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:contactsafe/presentation/screens/contacts_screen/edit_contact_screen.dart';
+import 'package:contactsafe/features/contacts/presentation/screens/edit_contact_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../common/theme/app_colors.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class ContactDetailScreen extends StatefulWidget {
   final Contact contact;

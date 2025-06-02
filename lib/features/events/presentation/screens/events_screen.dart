@@ -1,8 +1,8 @@
-import 'package:contactsafe/common/theme/app_colors.dart';
-import 'package:contactsafe/common/widgets/customsearchbar.dart';
+import 'package:contactsafe/core/theme/app_colors.dart';
+import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../common/widgets/navigation_bar.dart';
+import '../../../../shared/widgets/navigation_bar.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});

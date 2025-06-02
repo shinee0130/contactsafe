@@ -1,10 +1,10 @@
-import 'package:contactsafe/presentation/screens/contacts_screen/contact_group_screen.dart';
+import 'package:contactsafe/features/contacts/presentation/widgets/contact_group_screen.dart';
 import 'package:flutter/material.dart';
-import '../../common/widgets/customsearchbar.dart';
-import '../../common/widgets/navigation_bar.dart';
-import '../../common/theme/app_colors.dart';
+import '../../../../shared/widgets/customsearchbar.dart';
+import '../../../../shared/widgets/navigation_bar.dart';
+import '../../../../core/theme/app_colors.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'contacts_screen/add_contact_screen.dart';
+import 'add_contact_screen.dart';
 
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({super.key});

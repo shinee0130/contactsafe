@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:contactsafe/common/theme/app_colors.dart';
-import 'package:contactsafe/presentation/screens/onboarding_screen.dart';
+import 'package:contactsafe/core/theme/app_colors.dart';
+import 'package:contactsafe/features/settings/presentation/widgets/onboarding_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
@@ -9,10 +9,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../common/widgets/navigation_bar.dart';
+import '../../../../shared/widgets/navigation_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../common/widgets/navigation_item.dart';
+import '../../../../shared/widgets/navigation_item.dart';
 import 'select_tab_bar_order_screen.dart';
 import 'package:local_auth/local_auth.dart';
 

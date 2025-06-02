@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/common/theme/app_colors.dart'; // Import your colors
+import 'package:contactsafe/core/theme/app_colors.dart'; // Import your colors
 
 class AppStyles {
   // Base Text Style

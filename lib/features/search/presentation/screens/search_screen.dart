@@ -1,7 +1,7 @@
-import 'package:contactsafe/common/widgets/customsearchbar.dart';
+import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../common/widgets/navigation_bar.dart';
+import '../../../../shared/widgets/navigation_bar.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

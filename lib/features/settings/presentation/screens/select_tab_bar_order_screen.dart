@@ -1,4 +1,4 @@
-import 'package:contactsafe/common/widgets/navigation_item.dart';
+import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:flutter/material.dart';
 
 class SelectTabBarOrderScreen extends StatefulWidget {

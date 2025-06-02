@@ -1,4 +1,4 @@
-import 'package:contactsafe/common/theme/app_colors.dart';
+import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'dart:typed_data';

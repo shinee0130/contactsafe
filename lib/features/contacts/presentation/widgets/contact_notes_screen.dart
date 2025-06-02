@@ -1,11 +1,11 @@
+import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../common/theme/app_colors.dart';
 
-class ContactFilesScreen extends StatelessWidget {
+class ContactNotesScreen extends StatelessWidget {
   final Contact contact;
 
-  const ContactFilesScreen({super.key, required this.contact});
+  const ContactNotesScreen({super.key, required this.contact});
 
   @override
   Widget build(BuildContext context) {
@@ -30,35 +30,10 @@ class ContactFilesScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.swap_vert,
-              size: 30,
-              color: AppColors.primary,
-            ),
-            onPressed: () {
-              // TODO: Implement sorting/filtering functionality
-              print('Sort/Filter files');
-            },
-          ),
-          TextButton(
-            onPressed: () {
-              // TODO: Implement Edit files functionality
-              print('Edit files');
-            },
-            child: const Text(
-              'Edit',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          IconButton(
             icon: const Icon(Icons.add, size: 30, color: AppColors.primary),
             onPressed: () {
-              // TODO: Implement Add file functionality
-              print('Add file');
+              // TODO: Implement Add new note functionality
+              print('Add new note');
             },
           ),
         ],
@@ -69,7 +44,7 @@ class ContactFilesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${contact.displayName} - Files',
+              '${contact.displayName} - Notes',
               style: const TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
