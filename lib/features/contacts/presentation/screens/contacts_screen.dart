@@ -1,8 +1,10 @@
-import 'package:contactsafe/features/contacts/presentation/widgets/contact_group_screen.dart';
+import 'package:contactsafe/features/contacts/presentation/provider/contacts_provider.dart';
+import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/customsearchbar.dart';
-import '../../../../shared/widgets/navigation_bar.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
+import 'package:contactsafe/shared/widgets/customsearchbar.dart';
+import 'package:contactsafe/shared/widgets/navigation_bar.dart';
+import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'add_contact_screen.dart';
 
@@ -16,105 +18,36 @@ class ContactsScreen extends StatefulWidget {
 class _ContactsScreenState extends State<ContactsScreen> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-  List<Contact> _contacts = [];
-  List<Contact> _allContacts = [];
   final ScrollController _scrollController = ScrollController();
+  final ContactsProvider _contactsProvider = ContactsProvider();
 
   @override
   void initState() {
     super.initState();
-    _fetchContacts();
+    _loadContacts();
   }
 
-  Future<void> _fetchContacts() async {
-    try {
-      bool isGranted = await FlutterContacts.requestPermission();
-      print('Permission Granted: $isGranted');
-      if (isGranted) {
-        List<Contact> contacts = await FlutterContacts.getContacts(
-          withProperties: true,
-          withPhoto: true,
-        );
-        contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
-        setState(() {
-          _contacts = contacts;
-          _allContacts = List.from(contacts);
-        });
-        print('Fetched ${contacts.length} contacts.');
-      } else {
-        print('Contact permission not granted.');
-      }
-    } catch (e) {
-      print('Error requesting contact permission: $e');
-    }
+  Future<void> _loadContacts() async {
+    await _contactsProvider.fetchContacts();
+    if (mounted) setState(() {});
   }
 
   void _filterContacts(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        _contacts = List.from(_allContacts);
-      });
-    } else {
-      final filteredList =
-          _allContacts
-              .where(
-                (contact) => contact.displayName.toLowerCase().contains(
-                  query.toLowerCase(),
-                ),
-              )
-              .toList();
-      setState(() {
-        _contacts = filteredList;
-      });
-    }
-  }
-
-  Map<String, List<Contact>> _groupContacts(List<Contact> contacts) {
-    final Map<String, List<Contact>> groupedContacts = {};
-    for (final contact in contacts) {
-      if (contact.displayName.isNotEmpty) {
-        final firstLetter = contact.displayName[0].toUpperCase();
-        if (!groupedContacts.containsKey(firstLetter)) {
-          groupedContacts[firstLetter] = [];
-        }
-        groupedContacts[firstLetter]!.add(contact);
-      }
-    }
-    return groupedContacts;
-  }
-
-  List<String> _buildIndexLetters() {
-    final groupedContacts = _groupContacts(_contacts);
-    final sortedKeys = groupedContacts.keys.toList()..sort();
-    return sortedKeys;
+    _contactsProvider.filterContacts(query);
+    setState(() {});
   }
 
   void _scrollToLetter(String letter) {
-    final groupedContacts = _groupContacts(_contacts);
-    final sortedKeys = groupedContacts.keys.toList()..sort();
-    int indexToScrollTo = -1;
+    final groupedContacts = _contactsProvider.groupContacts(
+      _contactsProvider.contacts,
+    );
+    final index = _contactsProvider.findContactIndexForLetter(
+      letter,
+      groupedContacts,
+    );
 
-    for (int i = 0; i < sortedKeys.length; i++) {
-      if (sortedKeys[i] == letter) {
-        final firstContactInGroup = groupedContacts[letter]!.first;
-        indexToScrollTo = _allContacts.indexOf(firstContactInGroup);
-        break;
-      }
-    }
-
-    if (indexToScrollTo != -1) {
-      int offset = 0;
-      final filteredGroupedContacts = _groupContacts(_contacts);
-      final filteredSortedKeys = filteredGroupedContacts.keys.toList()..sort();
-
-      for (final key in filteredSortedKeys) {
-        if (key == letter) {
-          break;
-        }
-        offset += 1;
-        offset += filteredGroupedContacts[key]!.length;
-      }
-
+    if (index != -1) {
+      final offset = _calculateScrollOffset(letter, groupedContacts);
       _scrollController.animateTo(
         offset * 56.0,
         duration: const Duration(milliseconds: 300),
@@ -123,18 +56,20 @@ class _ContactsScreenState extends State<ContactsScreen> {
     }
   }
 
-  Widget _buildLeadingIcon(Contact contact) {
-    if (contact.photo != null) {
-      return CircleAvatar(backgroundImage: MemoryImage(contact.photo!));
-    } else {
-      return CircleAvatar(
-        child: Text(
-          contact.displayName.isNotEmpty
-              ? contact.displayName[0].toUpperCase()
-              : '',
-        ),
-      );
+  int _calculateScrollOffset(
+    String letter,
+    Map<String, List<Contact>> groupedContacts,
+  ) {
+    int offset = 0;
+    final sortedKeys = groupedContacts.keys.toList()..sort();
+
+    for (final key in sortedKeys) {
+      if (key == letter) break;
+      offset += 1; // For the header
+      offset += groupedContacts[key]!.length; // For the contacts
+      offset += 2; // For the dividers (assuming each group has 2 dividers)
     }
+    return offset;
   }
 
   void _onBottomNavigationTap(int index) {
@@ -171,14 +106,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AddContactScreen()),
-    );
+    ).then((_) => _loadContacts());
   }
 
   @override
   Widget build(BuildContext context) {
-    final groupedContacts = _groupContacts(_contacts);
-    final sortedKeys = groupedContacts.keys.toList()..sort();
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -223,95 +155,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
             const SizedBox(height: 16.0),
             Expanded(
-              child: Stack(
-                children: [
-                  _contacts.isEmpty
-                      ? const Center(child: Text('No contacts found.'))
-                      : ListView.builder(
-                        controller: _scrollController,
-                        itemCount: sortedKeys.length,
-                        itemBuilder: (context, index) {
-                          final letter = sortedKeys[index];
-                          final contactsForLetter = groupedContacts[letter]!;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 0,
-                                  bottom: 0,
-                                ),
-                                child: Text(
-                                  letter,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              Divider(),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: contactsForLetter.length,
-                                itemBuilder: (context, contactIndex) {
-                                  final contact =
-                                      contactsForLetter[contactIndex];
-                                  return ListTile(
-                                    leading: _buildLeadingIcon(contact),
-                                    title: Text(contact.displayName),
-                                    trailing: const Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
-                                    ),
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/contact_detail',
-                                        arguments: contact,
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                              Divider(),
-                            ],
-                          );
-                        },
-                      ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: SizedBox(
-                      width: 0,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _buildIndexLetters().length,
-                        itemBuilder: (context, index) {
-                          final letter = _buildIndexLetters()[index];
-                          return GestureDetector(
-                            onTap: () {
-                              _scrollToLetter(letter);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 1.0,
-                              ),
-                              child: Text(
-                                letter,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                  color: AppColors.primary,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+              child: ContactListWidget(
+                contacts: _contactsProvider.contacts,
+                scrollController: _scrollController,
+                onContactTap: (contact) {
+                  Navigator.pushNamed(
+                    context,
+                    '/contact_detail',
+                    arguments: contact,
+                  );
+                },
+                onLetterTap: _scrollToLetter,
               ),
             ),
           ],
