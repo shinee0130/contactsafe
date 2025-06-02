@@ -78,16 +78,6 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       vcfContent.writeln('FN:$formattedName');
     }
 
-    if (contact.name.last != null ||
-        contact.name.first != null ||
-        contact.name.middle != null ||
-        contact.name.prefix != null ||
-        contact.name.suffix != null) {
-      vcfContent.writeln(
-        'N:${contact.name.last};${contact.name.first};${contact.name.middle};${contact.name.prefix};${contact.name.suffix}',
-      );
-    }
-
     for (var phone in contact.phones) {
       String typeLabel = '';
       switch (phone) {}
