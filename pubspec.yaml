@@ -42,7 +42,9 @@ dependencies:
   flutter_settings_ui: ^3.0.0
   flutter_riverpod: ^2.4.9
   shared_preferences: ^2.2.2
-  local_auth: ^2.1.6
+  local_auth: ^2.3.0
+  url_launcher: ^6.3.1
+  file_picker: ^10.1.9
 
 dev_dependencies:
   flutter_test:
