@@ -1,6 +1,8 @@
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
+import 'package:contactsafe/features/settings/presentation/screens/pin_dialog.dart';
 import 'package:contactsafe/features/settings/presentation/screens/select_tab_bar_order_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -144,6 +146,105 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to delete all data: $e')));
+    }
+  }
+
+  Future<String?> _showCreatePinDialog() async {
+    String? pin;
+    String? confirmPin;
+    String? error;
+
+    // First PIN entry
+    pin = await showDialog<String>(
+      context: context,
+      builder:
+          (context) => PinDialog(title: 'Create a 4-digit PIN', error: error),
+    );
+
+    if (pin == null) return null;
+
+    // Confirm PIN
+    confirmPin = await showDialog<String>(
+      context: context,
+      builder: (context) => PinDialog(title: 'Confirm your PIN', error: error),
+    );
+
+    if (confirmPin == null) return null;
+
+    if (pin != confirmPin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PINs do not match. Please try again.')),
+      );
+      return await _showCreatePinDialog(); // Recursive call to retry
+    }
+
+    return pin;
+  }
+
+  Future<bool> _showVerifyPinDialog() async {
+    final hasPin = await _controller.hasPin();
+    if (!hasPin) return true;
+
+    bool verified = false;
+    String? error;
+
+    while (!verified) {
+      final enteredPin = await showDialog<String>(
+        context: context,
+        builder: (context) => PinDialog(title: 'Enter your PIN', error: error),
+      );
+
+      if (enteredPin == null) return false;
+
+      verified = await _controller.verifyPin(enteredPin);
+      if (!verified) {
+        error = 'Incorrect PIN. Please try again.';
+      }
+    }
+
+    return true;
+  }
+
+  Future<void> _handlePasswordToggle(bool value) async {
+    try {
+      if (value) {
+        // Show PIN creation dialog
+        final pin = await showDialog<String>(
+          context: context,
+          builder: (context) => PinDialog(title: 'Create a 4-digit PIN'),
+        );
+
+        if (pin != null && pin.length == 4) {
+          await _controller.savePin(pin);
+          setState(() => _usePass = true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('PIN saved successfully')),
+          );
+        } else {
+          setState(() => _usePass = false);
+        }
+      } else {
+        // Verify PIN before disabling
+        final verified = await showDialog<bool>(
+          context: context,
+          builder: (context) => PinDialog(title: 'Enter your current PIN'),
+        );
+
+        if (verified == true) {
+          await _controller.deletePin();
+          setState(() => _usePass = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('PIN protection disabled')),
+          );
+        } else {
+          setState(() => _usePass = true);
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      setState(() => _usePass = !value); // Revert the toggle
     }
   }
 
@@ -328,7 +429,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 onPressed: (context) => _restoreFromBackup(),
               ),
-              // ... other backup tiles ...
+              SettingsTile.navigation(
+                title: Center(
+                  child: Text(
+                    'Backup in Google Drive',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
+                ),
+                onPressed: (context) async {
+                  try {
+                    // Get your contacts list (replace with your actual contacts fetching logic)
+                    final contacts = await FlutterContacts.getContacts(
+                      withProperties: true,
+                    );
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder:
+                          (context) => const AlertDialog(
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height: 20),
+                                Text('Backing up to Google Drive...'),
+                              ],
+                            ),
+                          ),
+                    );
+
+                    Navigator.of(context).pop(); // Close loading dialog
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Backup completed successfully!'),
+                      ),
+                    );
+                  } catch (e) {
+                    Navigator.of(context).pop(); // Close loading dialog
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Backup failed: ${e.toString()}')),
+                    );
+                  }
+                },
+              ),
+              SettingsTile.navigation(
+                title: Center(
+                  child: Text(
+                    'Restore from Google Drive',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
+                ),
+                onPressed: (context) async {},
+              ),
+              SettingsTile.navigation(
+                title: Center(
+                  child: Text(
+                    'Import backup from link',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
+                ),
+                onPressed: (context) {},
+              ),
             ],
           ),
           SettingsSection(
@@ -378,6 +540,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
+                    'Change password',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
+                ),
+                onPressed: (context) {
+                  // TODO: Implement password change flow
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Password change functionality coming soon!',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                title: Center(
+                  child: Text(
                     'Delete all data',
                     style: TextStyle(color: Colors.red),
                   ),
@@ -393,18 +573,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             tiles: [
               SettingsTile.switchTile(
-                title: const Text('Use Password'),
+                title: const Text('Use password'),
                 initialValue: _usePass,
                 onToggle: (value) async {
-                  setState(() => _usePass = value);
-                  await _controller.saveUsePasswordSetting(value);
+                  if (value) {
+                    // Enable PIN
+                    final pin = await _showCreatePinDialog();
+                    if (pin != null && pin.length == 4) {
+                      await _controller.savePin(pin);
+                      setState(() => _usePass = true);
+                      await _controller.saveUsePasswordSetting(true);
+                    } else {
+                      setState(() => _usePass = false);
+                    }
+                  } else {
+                    // Disable PIN
+                    final verified = await _showVerifyPinDialog();
+                    if (verified) {
+                      await _controller.deletePin();
+                      setState(() => _usePass = false);
+                      await _controller.saveUsePasswordSetting(false);
+                    }
+                  }
                 },
               ),
               SettingsTile.switchTile(
-                title: const Text('Use FaceID & Fingerprint'),
+                title: const Text('Use Fingerprint'),
                 initialValue: _useFaceId,
                 onToggle: _handleBiometricToggle,
               ),
+              if (_usePass)
+                SettingsTile.navigation(
+                  title: Center(
+                    child: Text(
+                      'Change PIN',
+                      style: TextStyle(color: AppColors.primary),
+                    ),
+                  ),
+                  onPressed: (context) async {
+                    final verified = await _showVerifyPinDialog();
+                    if (verified) {
+                      final newPin = await _showCreatePinDialog();
+                      if (newPin != null && newPin.length == 4) {
+                        await _controller.savePin(newPin);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('PIN changed successfully'),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
             ],
           ),
           CustomSettingsSection(

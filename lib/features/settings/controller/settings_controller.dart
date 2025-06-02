@@ -10,6 +10,8 @@ import 'package:file_picker/file_picker.dart';
 
 class SettingsController {
   final LocalAuthentication _localAuth = LocalAuthentication();
+  static const String _pinKey = 'user_pin';
+  static const String _usePasswordKey = 'usePassword';
 
   // Load all settings
   Future<Map<String, dynamic>> loadSettings() async {
@@ -21,13 +23,32 @@ class SettingsController {
     };
   }
 
-  // Save password setting
-  Future<void> saveUsePasswordSetting(bool value) async {
+  Future<void> savePin(String pin) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('usePassword', value);
-    if (kDebugMode) {
-      print('Saved usePassword: $value');
-    }
+    await prefs.setString(_pinKey, pin);
+    await prefs.setBool(_usePasswordKey, true);
+  }
+
+  Future<bool> verifyPin(String pin) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPin = prefs.getString(_pinKey);
+    return savedPin == pin;
+  }
+
+  Future<void> deletePin() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_pinKey);
+    await prefs.setBool(_usePasswordKey, false);
+  }
+
+  Future<bool> hasPinEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_usePasswordKey) ?? false;
+  }
+
+  Future<bool> hasPin() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey(_pinKey);
   }
 
   // Save FaceID setting
@@ -197,4 +218,6 @@ class SettingsController {
     String twoDigits(int n) => n >= 10 ? '$n' : '0$n';
     return '${dateTime.year}${twoDigits(dateTime.month)}${twoDigits(dateTime.day)}_${twoDigits(dateTime.hour)}${twoDigits(dateTime.minute)}${twoDigits(dateTime.second)}';
   }
+
+  Future<void> saveUsePasswordSetting(bool value) async {}
 }
