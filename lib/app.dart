@@ -1,15 +1,15 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_contacts/contact.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/add_contact_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_detail_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_files_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_notes_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contacts_screen.dart';
 import 'package:contactsafe/features/search/presentation/screens/search_screen.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_screen.dart';
 import 'package:contactsafe/features/photos/presentation/screens/photos_screen.dart';
 import 'package:contactsafe/features/settings/presentation/screens/settings_screen.dart';
-import 'package:flutter_contacts/contact.dart';
 
 class ContactSafeApp extends StatelessWidget {
   const ContactSafeApp({super.key});
