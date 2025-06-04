@@ -1,3 +1,4 @@
+import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -43,7 +44,6 @@ class ContactListWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Divider(),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -56,7 +56,6 @@ class ContactListWidget extends StatelessWidget {
                         );
                       },
                     ),
-                    const Divider(),
                   ],
                 );
               },
@@ -79,7 +78,7 @@ class ContactListWidget extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
-                        color: Colors.blue, // Or use your AppColors.primary
+                        color: AppColors.primary,
                       ),
                       textAlign: TextAlign.center,
                     ),
