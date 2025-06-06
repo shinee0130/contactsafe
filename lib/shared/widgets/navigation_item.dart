@@ -16,7 +16,7 @@ class NavigationItem {
   // Convert to JSON for saving
   Map<String, dynamic> toJson() => {
     'label': label,
-    'iconCodePoint': icon.codePoint, // Store icon's code point
+    'iconCodePoint': icon.codePoint,
     'fontFamily': icon.fontFamily,
     'fontPackage': icon.fontPackage,
     'routeName': routeName,

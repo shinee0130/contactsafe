@@ -99,7 +99,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
     Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const ContactGroupsScreen(),
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+                const ContactGroupsScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: Tween<Offset>(
@@ -133,32 +135,29 @@ class _ContactsScreenState extends State<ContactsScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/contactsafe_logo.png', height: 26),
-            const SizedBox(width: 8.0),
             const Text(
               'ContactSafe',
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
+            const SizedBox(width: 8.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
         leading: SizedBox(
-        width: 120, // Fixed width
-        child: TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            padding: EdgeInsets.only(left: 16.0), // Remove default padding
-          ),
-        onPressed: _navigateToGroups,
-        child: const Text(
-          'Group',
-          style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-              ),
+          width: 120, // Fixed width
+          child: TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              padding: EdgeInsets.only(left: 16.0), // Remove default padding
+            ),
+            onPressed: _navigateToGroups,
+            child: const Text(
+              'Group',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ),
         ),
@@ -172,11 +171,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   color: AppColors.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.add,
-                  color: AppColors.primary,
-                  size: 24,
-                ),
+                child: Icon(Icons.add, color: AppColors.primary, size: 24),
               ),
               onPressed: _addNewContact,
             ),

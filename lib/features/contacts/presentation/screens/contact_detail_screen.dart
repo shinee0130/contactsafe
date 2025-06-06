@@ -429,8 +429,6 @@ Future<void> _sendEmail(String emailAddress) async {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/contactsafe_logo.png', height: 26),
-            const SizedBox(width: 8.0),
             const Text(
               'ContactSafe',
               style: TextStyle(
@@ -439,6 +437,8 @@ Future<void> _sendEmail(String emailAddress) async {
                 color: AppColors.textPrimary,
               ),
             ),
+            const SizedBox(width: 8.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
         actions: [

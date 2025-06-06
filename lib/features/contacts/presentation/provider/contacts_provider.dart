@@ -14,6 +14,7 @@ class ContactsProvider {
         List<Contact> contacts = await FlutterContacts.getContacts(
           withProperties: true,
           withPhoto: true,
+          withAccounts: true,
         );
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
         _contacts = contacts;

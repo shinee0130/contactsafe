@@ -24,18 +24,32 @@ class _EditContactScreenState extends State<EditContactScreen> {
   List<TextEditingController> _addressControllers = [];
 
   Contact get _updatedContact => Contact(
-    id: widget.contact.id,
-    name: Name(
-      first: _firstNameController.text.trim(),
-      last: _lastNameController.text.trim(),
-    ),
-    organizations: [Organization(company: _companyController.text.trim())],
-    phones: _phoneControllers.map((c) => Phone(c.text.trim())).toList(),
-    emails: _emailControllers.map((c) => Email(c.text.trim())).toList(),
-    websites: _websiteControllers.map((c) => Website(c.text.trim())).toList(),
-    addresses: _addressControllers.map((c) => Address(c.text.trim())).toList(),
-    photo: _selectedPhoto,
-  );
+        id: widget.contact.id,
+        name: Name(
+          first: _firstNameController.text.trim(),
+          last: _lastNameController.text.trim(),
+        ),
+        organizations: _companyController.text.trim().isNotEmpty
+            ? [Organization(company: _companyController.text.trim())]
+            : [],
+        phones: _phoneControllers
+            .where((c) => c.text.trim().isNotEmpty)
+            .map((c) => Phone(c.text.trim()))
+            .toList(),
+        emails: _emailControllers
+            .where((c) => c.text.trim().isNotEmpty)
+            .map((c) => Email(c.text.trim()))
+            .toList(),
+        websites: _websiteControllers
+            .where((c) => c.text.trim().isNotEmpty)
+            .map((c) => Website(c.text.trim()))
+            .toList(),
+        addresses: _addressControllers
+            .where((c) => c.text.trim().isNotEmpty)
+            .map((c) => Address(c.text.trim()))
+            .toList(),
+        photo: _selectedPhoto,
+      );
 
   @override
   void initState() {
@@ -76,7 +90,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             .toList();
     _addressControllers =
         widget.contact.addresses
-            .map((a) => TextEditingController(text: a.street))
+            .map((a) => TextEditingController(text: a.address))
             .toList();
     if (_phoneControllers.isEmpty) {
       _phoneControllers.add(TextEditingController());
@@ -349,8 +363,9 @@ class _EditContactScreenState extends State<EditContactScreen> {
                     onPressed: () {
                       setState(() {
                         if (controllers.length > 1) {
+                          controllers[index].dispose();
                           controllers.removeAt(index);
-                        } else if (controllers.length == 1) {
+                        } else {
                           controllers[index].clear();
                         }
                       });
