@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:contactsafe/features/contacts/presentation/screens/edit_contact_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../../core/theme/app_colors.dart';
+import 'package:contactsafe/features/contacts/presentation/screens/edit_contact_screen.dart';
 
 class ContactDetailScreen extends StatefulWidget {
   final Contact contact;
@@ -53,6 +56,58 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
   }
 
+  Future<void> _makePhoneCall(String phoneNumber) async {
+  final Uri launchUri = Uri(
+    scheme: 'tel',
+    path: phoneNumber,
+  );
+  if (await canLaunchUrl(launchUri)) {
+    await launchUrl(launchUri);
+  } else {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch phone call')),
+      );
+    }
+  }
+}
+
+Future<void> _sendSms(String phoneNumber) async {
+  final Uri launchUri = Uri(
+    scheme: 'sms',
+    path: phoneNumber,
+  );
+  if (await canLaunchUrl(launchUri)) {
+    await launchUrl(launchUri);
+  } else {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch messaging app')),
+      );
+    }
+  }
+}
+
+Future<void> _sendEmail(String emailAddress) async {
+  final Uri launchUri = Uri(
+    scheme: 'mailto',
+    path: emailAddress,
+    queryParameters: {
+      'subject': 'Regarding our contact', 
+      'body': 'Hello,',
+    },
+  );
+  if (await canLaunchUrl(launchUri)) {
+    await launchUrl(launchUri);
+  } else {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch email app')),
+      );
+    }
+  }
+}
+
   String generateVcf(Contact contact) {
     StringBuffer vcfContent = StringBuffer();
 
@@ -78,23 +133,25 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       vcfContent.writeln('FN:$formattedName');
     }
 
+    // Add organization to VCF if available
+    if (contact.organizations.isNotEmpty) {
+      vcfContent.writeln('ORG:${contact.organizations.first.company}');
+    }
+
     for (var phone in contact.phones) {
-      String typeLabel = '';
-      switch (phone) {}
+      String typeLabel = _getPhoneLabelString(phone.label);
       vcfContent.writeln('TEL;TYPE=$typeLabel:${phone.number}');
     }
 
     for (var email in contact.emails) {
-      String typeLabel = '';
-      switch (email) {}
+      String typeLabel = _getEmailLabelString(email.label);
       vcfContent.writeln('EMAIL;TYPE=$typeLabel:${email.address}');
     }
 
     for (var address in contact.addresses) {
-      String typeLabel = '';
-      switch (address) {}
+      String typeLabel = _getAddressLabelString(address.label);
       vcfContent.writeln(
-        'ADR;TYPE=$typeLabel:;;${address.street};${address.city};$address;${address.postalCode};${address.country}',
+        'ADR;TYPE=$typeLabel:;;${address.street};${address.city};${address.postalCode};${address.country}',
       );
     }
 
@@ -122,201 +179,474 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           String fileName = '${contactName.replaceAll(' ', '_')}.vcf';
           File file = File('${directory.path}/$fileName');
           await file.writeAsString(vcfContent);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('VCF file saved to: ${file.path}')),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Contact exported to: ${file.path}')),
+            );
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error accessing storage.')),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Error accessing storage.')),
+            );
+          }
         }
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error saving VCF file: $e')));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error saving VCF file: $e')),
+          );
+        }
       }
     } else if (status.isDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission denied.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Storage permission denied.')),
+        );
+      }
     } else if (status.isPermanentlyDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Storage permission permanently denied. Please enable in settings.',
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Storage permission permanently denied. Please enable in settings.',
+            ),
+            action: SnackBarAction(label: 'Settings', onPressed: openAppSettings),
           ),
-          action: SnackBarAction(label: 'Settings', onPressed: openAppSettings),
-        ),
-      );
+        );
+      }
+    }
+  }
+
+  String _getPhoneLabelString(PhoneLabel label) {
+    switch (label) {
+      case PhoneLabel.mobile:
+        return 'Mobile';
+      case PhoneLabel.home:
+        return 'Home';
+      case PhoneLabel.work:
+        return 'Work';
+      case PhoneLabel.pager:
+        return 'Pager';
+      case PhoneLabel.other:
+        return 'Other';
+      default:
+        return 'Phone';
+    }
+  }
+
+  String _getEmailLabelString(EmailLabel label) {
+    switch (label) {
+      case EmailLabel.home:
+        return 'Home';
+      case EmailLabel.work:
+        return 'Work';
+      case EmailLabel.other:
+        return 'Other';
+      default:
+        return 'Email';
+    }
+  }
+
+  String _getAddressLabelString(AddressLabel label) {
+    switch (label) {
+      case AddressLabel.home:
+        return 'Home';
+      case AddressLabel.work:
+        return 'Work';
+      case AddressLabel.other:
+        return 'Other';
+      default:
+        return 'Address';
     }
   }
 
   Widget _buildAvatar(Contact contact) {
-    if (contact.photo != null && contact.photo!.isNotEmpty) {
-      return CircleAvatar(
-        radius: 50,
-        backgroundImage: MemoryImage(contact.photo!),
-      );
-    } else {
-      return const Icon(
-        Icons.person_outline,
-        size: 180,
-        color: AppColors.primary,
-      );
-    }
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.primary.withOpacity(0.1),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: contact.photo != null && contact.photo!.isNotEmpty
+          ? ClipOval(
+              child: Image.memory(
+                contact.photo!,
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+              ),
+            )
+          : Center(
+              child: Text(
+                contact.displayName.isNotEmpty
+                    ? contact.displayName[0].toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildActionButton(IconData icon, String label, VoidCallback onTap) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(icon, size: 28, color: AppColors.primary),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionItem(String title, String trailing, VoidCallback onTap) {
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    trailing,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.chevron_right, color: Colors.grey[400]),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final currentContact = _detailedContact ?? widget.contact;
 
+    // Determine what to display under the contact name
+    String? subtitleText;
+    if (currentContact.organizations.isNotEmpty && currentContact.organizations.first.company.isNotEmpty) {
+      subtitleText = currentContact.organizations.first.company;
+    } else if (currentContact.phones.isNotEmpty) {
+      subtitleText = currentContact.phones.first.number;
+    }
+
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+            const SizedBox(width: 8.0),
             const Text(
               'ContactSafe',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
-            const SizedBox(width: 5.0),
-            Image.asset('assets/contactsafe_logo.png', height: 26),
           ],
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/groups');
-            },
-            child: const Text(
-              'Group',
-              style: TextStyle(color: AppColors.primary),
-            ),
-          ),
-          TextButton(
+          IconButton(
+            icon: const Icon(Icons.edit, color: AppColors.primary),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (context) => EditContactScreen(contact: currentContact),
+                  builder: (context) => EditContactScreen(contact: currentContact),
                 ),
+              ).then((_) => _loadContactDetails(currentContact.id));
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              widget.isFavorite ? Icons.star : Icons.star_border,
+              color: AppColors.primary,
+            ),
+            onPressed: () {
+              // TODO: Implement favorite toggle logic
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${currentContact.displayName} favorite status toggled!')),
               );
             },
-            child: const Text(
-              'Edit',
-              style: TextStyle(color: AppColors.primary),
-            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        physics: const BouncingScrollPhysics(),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Contact Details',
-              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Center(child: _buildAvatar(currentContact)),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                currentContact.displayName,
-                style: const TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                color: Colors.white,
               ),
-            ),
-            const SizedBox(height: 24),
-            const Divider(),
-            if (currentContact.phones.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Mobile',
+              child: Column(
+                children: [
+                  _buildAvatar(currentContact),
+                  const SizedBox(height: 16),
+                  Text(
+                    currentContact.displayName,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Display company if available, otherwise display phone number
+                  if (subtitleText != null && subtitleText.isNotEmpty)
+                    Text(
+                      subtitleText,
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.primary,
-                        fontSize: 15,
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Text(
-                      currentContact.phones.first.number,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black87,
-                      ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(Icons.call, 'Call', () {
+                        if (currentContact.phones.isNotEmpty) {
+        _makePhoneCall(currentContact.phones.first.number);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No phone number available')),
+        );
+      }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Calling ${currentContact.displayName}')),
+                        );
+                      }),
+                      const SizedBox(width: 16),
+                      _buildActionButton(Icons.message, 'Message', () {
+                        if (currentContact.phones.isNotEmpty) {
+        _sendSms(currentContact.phones.first.number);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No phone number available')),
+        );
+      }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Messaging ${currentContact.displayName}')),
+                        );
+                      }),
+                      const SizedBox(width: 16),
+                      _buildActionButton(Icons.email, 'Email', () {
+                        if (currentContact.emails.isNotEmpty) {
+        _sendEmail(currentContact.emails.first.address);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No email address available')),
+        );
+      }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Emailing ${currentContact.displayName}')),
+                        );
+                      }),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Contact Details Section
+            if (currentContact.phones.isNotEmpty ||
+                currentContact.emails.isNotEmpty ||
+                currentContact.addresses.isNotEmpty ||
+                currentContact.organizations.isNotEmpty) // Added check for organizations here
+              Container(
+                margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-              ),
-            const Divider(),
-            ListTile(
-              title: const Text('Files'),
-              trailing: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('0', style: TextStyle(fontSize: 20)),
-                  Icon(Icons.chevron_right),
-                ],
-              ),
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/contact_files',
-                  arguments: currentContact,
-                );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              title: const Text('Notes'),
-              trailing: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('0', style: TextStyle(fontSize: 20)),
-                  Icon(Icons.chevron_right),
-                ],
-              ),
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/contact_notes',
-                  arguments: currentContact,
-                );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              title: const Text('Create VCF'),
-              onTap: () async {
-                if (_detailedContact != null) {
-                  String vcfContent = generateVcf(_detailedContact!);
-                  await saveVcfFile(vcfContent, _detailedContact!.displayName);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Contact details are still loading.'),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, top: 8, bottom: 4),
+                      child: Text(
+                        'Contact Information',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
+                      ),
                     ),
-                  );
-                }
-              },
+                    const Divider(indent: 16, endIndent: 16),
+                    // Display organization details in the main section
+                    if (currentContact.phones.isNotEmpty)
+                      ...currentContact.phones.map((phone) =>
+                          _buildDetailItem(
+                            _getPhoneLabelString(phone.label),
+                            phone.number,
+                          )),
+                    if (currentContact.emails.isNotEmpty)
+                      ...currentContact.emails.map((email) =>
+                          _buildDetailItem(
+                            _getEmailLabelString(email.label),
+                            email.address,
+                          )),
+                    if (currentContact.addresses.isNotEmpty)
+                      ...currentContact.addresses.map((address) =>
+                          _buildDetailItem(
+                            _getAddressLabelString(address.label),
+                            '${address.street}, ${address.city}, ${address.postalCode}',
+                          )),
+                  ],
+                ),
+              ),
+
+            // Additional Sections
+            Container(
+              margin: const EdgeInsets.only(top: 16, bottom: 24, left: 16, right: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildSectionItem('Files', '0', () {
+                    Navigator.pushNamed(
+                      context,
+                      '/contact_files',
+                      arguments: currentContact,
+                    );
+                  }),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  _buildSectionItem('Notes', '0', () {
+                    Navigator.pushNamed(
+                      context,
+                      '/contact_notes',
+                      arguments: currentContact,
+                    );
+                  }),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  _buildSectionItem('Export VCF', '', () async {
+                    if (_detailedContact != null) {
+                      String vcfContent = generateVcf(_detailedContact!);
+                      await saveVcfFile(vcfContent, _detailedContact!.displayName);
+                    }
+                  }),
+                ],
+              ),
             ),
-            const Divider(),
           ],
         ),
       ),

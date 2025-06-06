@@ -18,12 +18,13 @@ class _EventsScreenState extends State<EventsScreen> {
   List<Contact> _filteredContacts = [];
   List<Contact> _allContacts = [];
   List<Event> _events = []; // New list for events
+  List<Event> _filteredEvents = []; // New list for filtered events
 
   @override
   void initState() {
     super.initState();
     _fetchContacts();
-    _loadSampleEvents(); // Load some sample events
+    // _loadSampleEvents(); // Load some sample events // Will be called after contacts are fetched
   }
 
   Future<void> _fetchContacts() async {
@@ -37,16 +38,17 @@ class _EventsScreenState extends State<EventsScreen> {
     contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
     setState(() {
       _allContacts = contacts;
-      _filteredContacts = List.from(contacts);
+      _filteredContacts = List.from(contacts); // Keep for now, might be used elsewhere or removed later
     });
+    _loadSampleEvents(); // Load events after contacts are fetched
   }
 
-  void _filterContacts(String query) {
+  void _filterEvents(String query) { // Renamed and modified from _filterContacts
     setState(() {
-      _filteredContacts = query.isEmpty
-          ? List.from(_allContacts)
-          : _allContacts
-              .where((contact) => contact.displayName
+      _filteredEvents = query.isEmpty
+          ? List.from(_events)
+          : _events
+              .where((event) => event.title
                   .toLowerCase()
                   .contains(query.toLowerCase()))
               .toList();
@@ -55,19 +57,24 @@ class _EventsScreenState extends State<EventsScreen> {
 
   void _loadSampleEvents() {
     // TODO: Replace with actual event loading logic
+    // Ensure _allContacts is not empty before using it for participants
+    List<Contact> sampleParticipants1 = _allContacts.length >= 3 ? _allContacts.take(3).toList() : [];
+    List<Contact> sampleParticipants2 = _allContacts.length >= 5 ? _allContacts.take(5).toList() : [];
+
     setState(() {
       _events = [
         Event(
           title: 'Team Meeting',
           date: DateTime.now().add(const Duration(days: 1)),
-          participants: _allContacts.take(3).toList(),
+          participants: sampleParticipants1,
         ),
         Event(
           title: 'Product Launch',
           date: DateTime.now().add(const Duration(days: 7)),
-          participants: _allContacts.take(5).toList(),
+          participants: sampleParticipants2,
         ),
       ];
+      _filteredEvents = List.from(_events); // Initialize filteredEvents
     });
   }
 
@@ -133,16 +140,16 @@ class _EventsScreenState extends State<EventsScreen> {
             const SizedBox(height: 10),
             CustomSearchBar(
               controller: _searchController,
-              onChanged: _filterContacts,
+              onChanged: _filterEvents, // Changed to _filterEvents
             ),
             const SizedBox(height: 16.0),
             Expanded(
-              child: _events.isEmpty
+              child: _filteredEvents.isEmpty // Changed to _filteredEvents
                   ? const Center(child: Text('No events found'))
                   : ListView.builder(
-                      itemCount: _events.length,
+                      itemCount: _filteredEvents.length, // Changed to _filteredEvents.length
                       itemBuilder: (context, index) {
-                        final event = _events[index];
+                        final event = _filteredEvents[index]; // Changed to _filteredEvents[index]
                         return EventCard(event: event);
                       },
                     ),

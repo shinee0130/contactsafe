@@ -23,4 +23,6 @@ class AppColors {
 
   // You can add more custom colors as needed
   static const Color dividerColor = Colors.grey;
+
+  
 }

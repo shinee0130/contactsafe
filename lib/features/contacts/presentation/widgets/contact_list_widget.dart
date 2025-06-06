@@ -23,68 +23,106 @@ class ContactListWidget extends StatelessWidget {
 
     return Stack(
       children: [
+        // Main Contact List
         contacts.isEmpty
-            ? const Center(child: Text('No contacts found.'))
-            : ListView.builder(
-              controller: scrollController,
-              itemCount: sortedKeys.length,
-              itemBuilder: (context, index) {
-                final letter = sortedKeys[index];
-                final contactsForLetter = groupedContacts[letter]!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 0, bottom: 0),
+                    Icon(Icons.contacts, size: 48, color: Colors.grey[400]),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No contacts found',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.separated(
+                controller: scrollController,
+                itemCount: sortedKeys.length,
+                itemBuilder: (context, index) {
+                  final letter = sortedKeys[index];
+                  final contactsForLetter = groupedContacts[letter]!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          top: 8,
+                          bottom: 8,
+                        ),
+                        child: Text(
+                          letter,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.primary.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: contactsForLetter.length,
+                        itemBuilder: (context, contactIndex) {
+                          final contact = contactsForLetter[contactIndex];
+                          return ContactListItem(
+                            contact: contact,
+                            onTap: () => onContactTap(contact),
+                          );
+                        },
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          thickness: 1,
+                          indent: 72,
+                          color: Colors.grey[200],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(
+                  height: 8,
+                  color: Colors.transparent,
+                ),
+              ),
+
+        // Alphabetical Index
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: sortedKeys.map((letter) {
+                  return GestureDetector(
+                    onTap: () => onLetterTap(letter),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2.0),
                       child: Text(
                         letter,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 12,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: contactsForLetter.length,
-                      itemBuilder: (context, contactIndex) {
-                        final contact = contactsForLetter[contactIndex];
-                        return ContactListItem(
-                          contact: contact,
-                          onTap: () => onContactTap(contact),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: SizedBox(
-            width: 0,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: sortedKeys.length,
-              itemBuilder: (context, index) {
-                final letter = sortedKeys[index];
-                return GestureDetector(
-                  onTap: () => onLetterTap(letter),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 1.0),
-                    child: Text(
-                      letter,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                        color: AppColors.primary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              },
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ),
@@ -116,25 +154,73 @@ class ContactListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: _buildLeadingIcon(),
-      title: Text(contact.displayName),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: AppColors.primary.withOpacity(0.1),
+        highlightColor: AppColors.primary.withOpacity(0.05),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              const SizedBox(width: 16),
+              _buildLeadingIcon(),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  contact.displayName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: Colors.grey[400],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildLeadingIcon() {
-    if (contact.photo != null) {
-      return CircleAvatar(backgroundImage: MemoryImage(contact.photo!));
-    } else {
-      return CircleAvatar(
-        child: Text(
-          contact.displayName.isNotEmpty
-              ? contact.displayName[0].toUpperCase()
-              : '',
-        ),
-      );
-    }
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.primary.withOpacity(0.1),
+      ),
+      child: Center(
+        child: contact.photo != null
+            ? ClipOval(
+                child: Image.memory(
+                  contact.photo!,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : Text(
+                contact.displayName.isNotEmpty
+                    ? contact.displayName[0].toUpperCase()
+                    : '',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+      ),
+    );
   }
 }

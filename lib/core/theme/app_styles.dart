@@ -66,11 +66,11 @@ class AppStyles {
   );
 
   // Button Text
-  static final TextStyle buttonText = baseTextStyle.copyWith(
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textLight,
-  );
+  // static final TextStyle buttonText = baseTextStyle.copyWith(
+  //   fontSize: 16,
+  //   fontWeight: FontWeight.w500,
+  //   color: AppColors.textLight,
+  // );
 
   // You can add more custom text styles as needed
 }

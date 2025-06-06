@@ -98,82 +98,162 @@ class _ContactsScreenState extends State<ContactsScreen> {
   void _navigateToGroups() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ContactGroupsScreen()),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => const ContactGroupsScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          );
+        },
+      ),
     );
   }
 
   void _addNewContact() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddContactScreen()),
+      MaterialPageRoute(
+        builder: (context) => const AddContactScreen(),
+        fullscreenDialog: true,
+      ),
     ).then((_) => _loadContacts());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+            const SizedBox(width: 8.0),
             const Text(
               'ContactSafe',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 5.0),
-            Image.asset('assets/contactsafe_logo.png', height: 26),
-          ],
-        ),
-        leadingWidth: 70.0,
-        leading: TextButton(
-          onPressed: _navigateToGroups,
-          child: const Text(
-            'Groups',
-            style: TextStyle(color: AppColors.primary, fontSize: 14),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: AppColors.primary, size: 30),
-            onPressed: _addNewContact,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Contacts',
-              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            CustomSearchBar(
-              controller: _searchController,
-              onChanged: _filterContacts,
-            ),
-            const SizedBox(height: 16.0),
-            Expanded(
-              child: ContactListWidget(
-                contacts: _contactsProvider.contacts,
-                scrollController: _scrollController,
-                onContactTap: (contact) {
-                  Navigator.pushNamed(
-                    context,
-                    '/contact_detail',
-                    arguments: contact,
-                  );
-                },
-                onLetterTap: _scrollToLetter,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
               ),
             ),
           ],
         ),
+        leading: SizedBox(
+        width: 120, // Fixed width
+        child: TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            padding: EdgeInsets.only(left: 16.0), // Remove default padding
+          ),
+        onPressed: _navigateToGroups,
+        child: const Text(
+          'Group',
+          style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.add,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
+              ),
+              onPressed: _addNewContact,
+            ),
+          ),
+        ],
       ),
-      bottomNavigationBar: ContactSafeNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavigationTap,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            const Text(
+              'Contacts',
+              style: TextStyle(
+                fontSize: 32.0,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            CustomSearchBar(
+              controller: _searchController,
+              onChanged: _filterContacts,
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: ContactListWidget(
+                    contacts: _contactsProvider.contacts,
+                    scrollController: _scrollController,
+                    onContactTap: (contact) {
+                      Navigator.pushNamed(
+                        context,
+                        '/contact_detail',
+                        arguments: contact,
+                      );
+                    },
+                    onLetterTap: _scrollToLetter,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: ContactSafeNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onBottomNavigationTap,
+          ),
+        ),
       ),
     );
   }
