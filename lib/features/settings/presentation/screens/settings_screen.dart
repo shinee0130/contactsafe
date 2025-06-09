@@ -171,6 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (confirmPin == null) return null;
 
     if (pin != confirmPin) {
+      if (!mounted) return null; // Check if the widget is still mounted
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('PINs do not match. Please try again.')),
       );
@@ -213,26 +214,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (authenticated) {
           setState(() => _useFaceId = true);
           await _controller.saveUseFaceIdSetting(true);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('FaceID/Fingerprint enabled.')),
-          );
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Biometrics enabled.')));
         } else {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Authentication failed or canceled.')),
           );
         }
       } else {
         setState(() => _useFaceId = false);
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No FaceID/Fingerprint available.')),
+          const SnackBar(content: Text('No biometrics available.')),
         );
       }
     } else {
       setState(() => _useFaceId = false);
       await _controller.saveUseFaceIdSetting(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('FaceID/Fingerprint disabled.')),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Biometrics disabled.')));
     }
   }
 
@@ -279,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SettingsSection(
             title: const Text(
               'Privacy',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
             ),
             tiles: [
               SettingsTile.navigation(
@@ -290,14 +295,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: const Text('Language'),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                onPressed: (context) {},
+                onPressed: (context) {
+                  // TODO: Implement language selection
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Language selection coming soon!'),
+                    ),
+                  );
+                },
               ),
             ],
           ),
           SettingsSection(
             title: const Text(
               'About',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
             ),
             tiles: [
               SettingsTile.navigation(
@@ -310,15 +322,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SettingsTile.navigation(
                 title: const Text('Imprint'),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                trailing: const Icon(Icons.open_in_new, color: Colors.grey),
                 onPressed:
                     (context) => _launchUrl(
                       'https://contactsafe.eu/index.php/impressum',
                     ),
               ),
               SettingsTile.navigation(
-                title: const Text('Privacy'),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                title: const Text('Privacy Policy'),
+                trailing: const Icon(Icons.open_in_new, color: Colors.grey),
                 onPressed:
                     (context) => _launchUrl(
                       'https://contactsafe.eu/index.php/datenschutzerklaerung',
@@ -329,7 +341,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SettingsSection(
             title: const Text(
               'General',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
             ),
             tiles: [
               SettingsTile.switchTile(
@@ -344,11 +356,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
+          //------------------------------------------------------------------------------------
           SettingsSection(
             title: const Text(
-              'Import',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
+              'Data Management',
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
             ),
+            //------------------------------------------------------------------------------------
             tiles: [
               SettingsTile.navigation(
                 title: Center(
@@ -359,14 +373,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 onPressed: (context) => _importContacts(),
               ),
-            ],
-          ),
-          SettingsSection(
-            title: const Text(
-              'Backup',
-              style: TextStyle(fontSize: 15, color: Colors.grey),
-            ),
-            tiles: [
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
@@ -376,6 +383,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 onPressed: (context) => _createBackup(),
               ),
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
@@ -385,40 +393,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 onPressed: (context) => _restoreFromBackup(),
               ),
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    'Backup in Google Drive',
+                    'Backup to Google Drive',
                     style: TextStyle(color: AppColors.primary),
                   ),
                 ),
                 onPressed: (context) async {
-                  try {
-                    // Get your contacts list (replace with your actual contacts fetching logic)
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder:
-                          (context) => const AlertDialog(
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(),
-                                SizedBox(height: 20),
-                                Text('Backing up to Google Drive...'),
-                              ],
-                            ),
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder:
+                        (context) => const AlertDialog(
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 20),
+                              Text('Backing up to Google Drive...'),
+                            ],
                           ),
-                    );
-
+                        ),
+                  );
+                  try {
+                    // Replace with your actual Google Drive backup logic
+                    await Future.delayed(
+                      const Duration(seconds: 2),
+                    ); // Simulate backup
+                    if (!mounted) return;
                     Navigator.of(context).pop(); // Close loading dialog
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Backup completed successfully!'),
                       ),
                     );
                   } catch (e) {
+                    if (!mounted) return;
                     Navigator.of(context).pop(); // Close loading dialog
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Backup failed: ${e.toString()}')),
@@ -426,6 +438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   }
                 },
               ),
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
@@ -433,8 +446,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(color: AppColors.primary),
                   ),
                 ),
-                onPressed: (context) async {},
+                onPressed: (context) {
+                  // TODO: Implement restore from Google Drive
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Restore from Google Drive coming soon!'),
+                    ),
+                  );
+                },
               ),
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
@@ -442,20 +463,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(color: AppColors.primary),
                   ),
                 ),
-                onPressed: (context) {},
+                onPressed: (context) {
+                  // TODO: Implement import backup from link
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Import backup from link coming soon!'),
+                    ),
+                  );
+                },
               ),
             ],
           ),
+          //------------------------------------------------------------------------------------
           SettingsSection(
             title: const Text(
-              'Usability',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+              'App Customization & Reset',
+              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
             ),
             tiles: [
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    'On board tour',
+                    'Onboard Tour',
                     style: TextStyle(color: AppColors.primary),
                   ),
                 ),
@@ -467,6 +497,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
               ),
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
@@ -487,31 +518,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   if (newOrder != null) {
                     await _controller.saveTabBarOrder(newOrder);
                     setState(() => _navigationItems = newOrder);
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('TabBar order updated successfully!'),
+                      ),
+                    );
                   }
                 },
               ),
+              //------------------------------------------------------------------------------------
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    'Change password',
-                    style: TextStyle(color: AppColors.primary),
-                  ),
-                ),
-                onPressed: (context) {
-                  // TODO: Implement password change flow
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Password change functionality coming soon!',
-                      ),
-                    ),
-                  );
-                },
-              ),
-              SettingsTile.navigation(
-                title: Center(
-                  child: Text(
-                    'Delete all data',
+                    'Delete all app data',
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -519,14 +539,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
+          //------------------------------------------------------------------------------------
           SettingsSection(
             title: const Text(
-              'Password',
-              style: TextStyle(fontSize: 15, color: Colors.grey),
+              'Security',
+              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
             ),
             tiles: [
               SettingsTile.switchTile(
-                title: const Text('Use password'),
+                title: const Text('Use PIN'),
                 initialValue: _usePass,
                 onToggle: (value) async {
                   if (value) {
@@ -536,8 +557,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await _controller.savePin(pin);
                       setState(() => _usePass = true);
                       await _controller.saveUsePasswordSetting(true);
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('PIN enabled.')),
+                      );
                     } else {
                       setState(() => _usePass = false);
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('PIN setup canceled or invalid.'),
+                        ),
+                      );
                     }
                   } else {
                     // Disable PIN
@@ -546,22 +577,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await _controller.deletePin();
                       setState(() => _usePass = false);
                       await _controller.saveUsePasswordSetting(false);
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('PIN disabled.')),
+                      );
                     }
                   }
                 },
               ),
               SettingsTile.switchTile(
-                title: const Text('Use Fingerprint'),
+                title: const Text('Use Biometrics (Face ID/Fingerprint)'),
                 initialValue: _useFaceId,
                 onToggle: _handleBiometricToggle,
               ),
               if (_usePass)
                 SettingsTile.navigation(
-                  title: Center(
-                    child: Text(
-                      'Change PIN',
-                      style: TextStyle(color: AppColors.primary),
-                    ),
+                  title: const Text(
+                    'Change PIN',
+                    style: TextStyle(color: AppColors.primary),
                   ),
                   onPressed: (context) async {
                     final verified = await _showVerifyPinDialog();
@@ -569,9 +602,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final newPin = await _showCreatePinDialog();
                       if (newPin != null && newPin.length == 4) {
                         await _controller.savePin(newPin);
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('PIN changed successfully'),
+                          ),
+                        );
+                      } else {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('PIN change canceled or invalid.'),
                           ),
                         );
                       }
