@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class ContactNotesScreen extends StatefulWidget {
   final Contact contact;
@@ -123,7 +122,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: Colors.blue,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -172,7 +171,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: Colors.blue,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -212,12 +211,12 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, size: 30, color: AppColors.primary),
+            icon: const Icon(Icons.add, size: 30, color: Colors.blue),
             onPressed: () {
               _noteController.clear();
               _editingIndex = -1;

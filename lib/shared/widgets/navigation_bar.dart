@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/core/theme/app_colors.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -17,8 +16,11 @@ class ContactSafeNavigationBar extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(
+        context,
+      ).colorScheme.onSurface.withOpacity(0.6),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),

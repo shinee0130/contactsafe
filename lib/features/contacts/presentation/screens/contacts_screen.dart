@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'add_contact_screen.dart';
 
@@ -128,19 +127,19 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.background,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'ContactSafe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onBackground,
               ),
             ),
             const SizedBox(width: 8.0),
@@ -151,13 +150,19 @@ class _ContactsScreenState extends State<ContactsScreen> {
           width: 120, // Fixed width
           child: TextButton(
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              padding: EdgeInsets.only(left: 16.0), // Remove default padding
+              foregroundColor: Theme.of(context).colorScheme.primary,
+              padding: const EdgeInsets.only(
+                left: 16.0,
+              ), // Remove default padding
             ),
             onPressed: _navigateToGroups,
             child: const Text(
               'Group',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.blue,
+              ),
             ),
           ),
         ),
@@ -168,10 +173,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.add, color: AppColors.primary, size: 24),
+                child: Icon(Icons.add, color: Colors.blue, size: 24),
               ),
               onPressed: _addNewContact,
             ),
@@ -184,12 +189,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Contacts',
               style: TextStyle(
                 fontSize: 32.0,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onBackground,
               ),
             ),
             const SizedBox(height: 16),
@@ -201,7 +206,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(

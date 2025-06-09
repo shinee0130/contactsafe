@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class ContactFilesScreen extends StatefulWidget {
   final Contact contact;
@@ -149,7 +148,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                   title: Text(_getSortOptionName(option)),
                   trailing:
                       _sortOption == option
-                          ? const Icon(Icons.check, color: AppColors.primary)
+                          ? const Icon(Icons.check, color: Colors.blue)
                           : null,
                   onTap: () {
                     setState(() {
@@ -228,7 +227,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       case 'txt':
         return Colors.grey;
       default:
-        return AppColors.primary;
+        return Colors.blue;
     }
   }
 
@@ -248,16 +247,12 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.swap_vert,
-              size: 30,
-              color: AppColors.primary,
-            ),
+            icon: const Icon(Icons.swap_vert, size: 30, color: Colors.blue),
             onPressed: _showSortDialog,
           ),
           _editMode
@@ -277,14 +272,14 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                 child: const Text(
                   'Edit',
                   style: TextStyle(
-                    color: AppColors.primary,
+                    color: Colors.blue,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
           IconButton(
-            icon: const Icon(Icons.add, size: 30, color: AppColors.primary),
+            icon: const Icon(Icons.add, size: 30, color: Colors.blue),
             onPressed: _pickFiles,
           ),
         ],
@@ -323,8 +318,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: BorderSide(
-                        color:
-                            isSelected ? AppColors.primary : Colors.grey[300]!,
+                        color: isSelected ? Colors.blue : Colors.grey[300]!,
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
@@ -358,7 +352,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                               ? Checkbox(
                                 value: isSelected,
                                 onChanged: (value) => _toggleSelection(index),
-                                activeColor: AppColors.primary,
+                                activeColor: Colors.blue,
                               )
                               : IconButton(
                                 icon: const Icon(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -17,7 +16,7 @@ class CustomSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
@@ -30,39 +29,56 @@ class CustomSearchBar extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
-        style: const TextStyle(
-          color: Colors.black,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 16.0,
           fontWeight: FontWeight.normal,
         ),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(
-            color: Colors.grey,
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontWeight: FontWeight.normal,
             fontSize: 16.0,
           ),
-          prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 24.0),
-          suffixIcon: controller.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey, size: 24.0),
-                  onPressed: () {
-                    controller.clear();
-                    onChanged('');
-                    FocusScope.of(context).unfocus();
-                  },
-                )
-              : null,
+          prefixIcon: Icon(
+            Icons.search,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            size: 24.0,
+          ),
+          suffixIcon:
+              controller.text.isNotEmpty
+                  ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.5),
+                      size: 24.0,
+                    ),
+                    onPressed: () {
+                      controller.clear();
+                      onChanged('');
+                      FocusScope.of(context).unfocus();
+                    },
+                  )
+                  : null,
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 14.0,
+            horizontal: 16.0,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(color: AppColors.primary, width: 2.0),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2.0,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),

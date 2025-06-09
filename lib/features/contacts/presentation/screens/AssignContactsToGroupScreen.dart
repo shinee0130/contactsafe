@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:contactsafe/core/theme/app_colors.dart';
 
 final Map<String, List<String>> globalContactGroupsMap = {
   'Alice Smith': ['Family', 'Friends'],
@@ -139,11 +138,11 @@ class _AssignContactsToGroupScreenState
           style: const TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Colors.blue,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: const Icon(Icons.arrow_back, color: Colors.blue),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -154,7 +153,7 @@ class _AssignContactsToGroupScreenState
             child: const Text(
               'Save',
               style: TextStyle(
-                color: AppColors.primary,
+                color: Colors.blue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -201,7 +200,7 @@ class _AssignContactsToGroupScreenState
                                 onChanged: (bool? value) {
                                   _toggleContactSelection(contact);
                                 },
-                                activeColor: AppColors.primary,
+                                activeColor: Colors.blue,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4.0),
                                 ),
@@ -214,6 +213,7 @@ class _AssignContactsToGroupScreenState
                                   contact.thumbnail != null
                                       ? MemoryImage(contact.thumbnail!)
                                       : null,
+                              backgroundColor: Colors.blue.withOpacity(0.7),
                               child:
                                   contact.thumbnail == null
                                       ? Text(
@@ -226,10 +226,7 @@ class _AssignContactsToGroupScreenState
                                           fontSize: 18,
                                         ),
                                       )
-                                      : null,
-                              backgroundColor: AppColors.primary.withOpacity(
-                                0.7,
-                              ), // Fallback color
+                                      : null, // Fallback color
                             ),
                             const SizedBox(width: 16.0),
                             Expanded(
@@ -237,7 +234,7 @@ class _AssignContactsToGroupScreenState
                                 contact.displayName,
                                 style: TextStyle(
                                   fontSize: 17.0,
-                                  color: AppColors.textPrimary,
+                                  color: Colors.blue,
                                   fontWeight:
                                       isSelected
                                           ? FontWeight.w600

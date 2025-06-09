@@ -1,4 +1,3 @@
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'AssignContactsToGroupScreen.dart';
 
@@ -64,52 +63,64 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),
-          title: const Text(
+          title: Text(
             'New Group',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Enter the name for your new group:',
-                style: TextStyle(fontSize: 15.0, color: AppColors.textPrimary),
+                style: TextStyle(
+                  fontSize: 15.0,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 16.0),
               TextField(
                 controller: newGroupController,
                 decoration: InputDecoration(
                   hintText: 'Group name',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(
-                      color: AppColors.primary,
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2,
                     ),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: Theme.of(context).colorScheme.surface,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 12.0,
                     horizontal: 16.0,
                   ),
                 ),
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ],
           ),
@@ -118,10 +129,12 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -138,10 +151,10 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                 }
                 Navigator.of(context).pop(); // Close dialog
               },
-              child: const Text(
+              child: Text(
                 'OK', // Changed text from "Add Group" to "OK" for general add
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -158,10 +171,10 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                 }
                 Navigator.of(context).pop(); // Close dialog
               },
-              child: const Text(
+              child: Text(
                 'Ok & add contacts',
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -205,17 +218,17 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0.5,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Groups',
           style: TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         leading: Padding(
@@ -224,10 +237,10 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
             onPressed: () {
               Navigator.pop(context, _selectedGroups);
             },
-            child: const Text(
+            child: Text(
               'Done',
               style: TextStyle(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
               ),
@@ -237,7 +250,11 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
         leadingWidth: 70.0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: AppColors.primary, size: 28),
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+              size: 28,
+            ),
             onPressed: () => _addNewGroup(context),
             splashRadius: 24,
           ),
@@ -248,6 +265,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
         padding: const EdgeInsets.all(16.0),
         children: [
           Card(
+            color: Theme.of(context).colorScheme.surface,
             margin: const EdgeInsets.only(bottom: 16.0),
             elevation: 1,
             shape: RoundedRectangleBorder(
@@ -273,20 +291,20 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                             _toggleSelectAll();
                           }
                         },
-                        activeColor: AppColors.primary,
+                        activeColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4.0),
                         ),
                       ),
                     ),
                     const SizedBox(width: 16.0),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Select all groups',
                         style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -297,6 +315,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
           ),
           ..._groups.map(
             (group) => Card(
+              color: Theme.of(context).colorScheme.surface,
               margin: const EdgeInsets.only(bottom: 12.0),
               elevation: 0.5,
               shape: RoundedRectangleBorder(
@@ -322,7 +341,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                               _toggleGroupSelection(group);
                             }
                           },
-                          activeColor: AppColors.primary,
+                          activeColor: Theme.of(context).colorScheme.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4.0),
                           ),
@@ -334,7 +353,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                           group,
                           style: TextStyle(
                             fontSize: 17.0,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight:
                                 _selectedGroups.contains(group)
                                     ? FontWeight.w600

@@ -1,4 +1,3 @@
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -26,71 +25,83 @@ class ContactListWidget extends StatelessWidget {
         // Main Contact List
         contacts.isEmpty
             ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.contacts,
+                    size: 48,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No contacts found',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+            )
+            : ListView.separated(
+              controller: scrollController,
+              itemCount: sortedKeys.length,
+              itemBuilder: (context, index) {
+                final letter = sortedKeys[index];
+                final contactsForLetter = groupedContacts[letter]!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.contacts, size: 48, color: Colors.grey[400]),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No contacts found',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey[600],
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        top: 8,
+                        bottom: 8,
+                      ),
+                      child: Text(
+                        letter,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.7),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              )
-            : ListView.separated(
-                controller: scrollController,
-                itemCount: sortedKeys.length,
-                itemBuilder: (context, index) {
-                  final letter = sortedKeys[index];
-                  final contactsForLetter = groupedContacts[letter]!;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          top: 8,
-                          bottom: 8,
-                        ),
-                        child: Text(
-                          letter,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: AppColors.primary.withOpacity(0.7),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: contactsForLetter.length,
+                      itemBuilder: (context, contactIndex) {
+                        final contact = contactsForLetter[contactIndex];
+                        return ContactListItem(
+                          contact: contact,
+                          onTap: () => onContactTap(contact),
+                        );
+                      },
+                      separatorBuilder:
+                          (context, index) => Divider(
+                            height: 1,
+                            thickness: 1,
+                            indent: 72,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withOpacity(0.2),
                           ),
-                        ),
-                      ),
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: contactsForLetter.length,
-                        itemBuilder: (context, contactIndex) {
-                          final contact = contactsForLetter[contactIndex];
-                          return ContactListItem(
-                            contact: contact,
-                            onTap: () => onContactTap(contact),
-                          );
-                        },
-                        separatorBuilder: (context, index) => Divider(
-                          height: 1,
-                          thickness: 1,
-                          indent: 72,
-                          color: Colors.grey[200],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-                separatorBuilder: (context, index) => const Divider(
-                  height: 8,
-                  color: Colors.transparent,
-                ),
-              ),
+                    ),
+                  ],
+                );
+              },
+              separatorBuilder:
+                  (context, index) =>
+                      const Divider(height: 8, color: Colors.transparent),
+            ),
 
         // Alphabetical Index
         Positioned(
@@ -100,28 +111,29 @@ class ContactListWidget extends StatelessWidget {
           child: Center(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: sortedKeys.map((letter) {
-                  return GestureDetector(
-                    onTap: () => onLetterTap(letter),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: Text(
-                        letter,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: AppColors.primary,
+                children:
+                    sortedKeys.map((letter) {
+                      return GestureDetector(
+                        onTap: () => onLetterTap(letter),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                          child: Text(
+                            letter,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: Colors.blue,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
               ),
             ),
           ),
@@ -155,24 +167,25 @@ class ContactListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         onTap: onTap,
-        splashColor: AppColors.primary.withOpacity(0.1),
-        highlightColor: AppColors.primary.withOpacity(0.05),
+        splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
               const SizedBox(width: 16),
-              _buildLeadingIcon(),
+              _buildLeadingIcon(context),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   contact.displayName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -182,7 +195,9 @@ class ContactListItem extends StatelessWidget {
                 child: Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: Colors.grey[400],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
                 ),
               ),
             ],
@@ -192,34 +207,35 @@ class ContactListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildLeadingIcon() {
+  Widget _buildLeadingIcon(BuildContext context) {
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       ),
       child: Center(
-        child: contact.photo != null
-            ? ClipOval(
-                child: Image.memory(
-                  contact.photo!,
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
+        child:
+            contact.photo != null
+                ? ClipOval(
+                  child: Image.memory(
+                    contact.photo!,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                : Text(
+                  contact.displayName.isNotEmpty
+                      ? contact.displayName[0].toUpperCase()
+                      : '',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
-              )
-            : Text(
-                contact.displayName.isNotEmpty
-                    ? contact.displayName[0].toUpperCase()
-                    : '',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
       ),
     );
   }

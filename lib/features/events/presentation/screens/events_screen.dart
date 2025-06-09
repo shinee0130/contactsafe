@@ -1,4 +1,3 @@
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -110,13 +109,18 @@ class _EventsScreenState extends State<EventsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(width: 10.0),
-            const Text(
+            Text(
               'ContactSafe',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(width: 5.0),
             Image.asset('assets/contactsafe_logo.png', height: 26),
@@ -125,26 +129,35 @@ class _EventsScreenState extends State<EventsScreen> {
         actions: [
           IconButton(
             onPressed: () {}, // TODO: Implement sort functionality
-            icon: const Icon(
+            icon: Icon(
               Icons.swap_vert,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
               size: 30,
             ),
           ),
           IconButton(
             onPressed: _addNewEvent,
-            icon: const Icon(Icons.add, color: AppColors.primary, size: 30),
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+              size: 30,
+            ),
           ),
         ],
       ),
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Events',
-              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 31.0,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
             ),
             const SizedBox(height: 10),
             CustomSearchBar(
@@ -155,7 +168,14 @@ class _EventsScreenState extends State<EventsScreen> {
             Expanded(
               child:
                   _filteredEvents.isEmpty
-                      ? const Center(child: Text('No events found'))
+                      ? Center(
+                        child: Text(
+                          'No events found',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      )
                       : ListView.builder(
                         itemCount: _filteredEvents.length,
                         itemBuilder: (context, index) {
@@ -213,6 +233,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -220,15 +241,24 @@ class EventCard extends StatelessWidget {
           children: [
             Text(
               event.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Date: ${DateFormat.yMMMd().format(event.date)}',
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
             const SizedBox(height: 8),
-            Text('Participants: ${event.participants.length}'),
+            Text(
+              'Participants: ${event.participants.length}',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
           ],
         ),
       ),

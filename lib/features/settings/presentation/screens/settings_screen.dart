@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:contactsafe/features/settings/presentation/widgets/onboarding_screen.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
@@ -123,10 +122,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Navigator.of(context).pop();
                 _deleteAllApplicationData();
               },
-              style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: Text(
                 'Delete All',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onError),
               ),
             ),
           ],
@@ -244,13 +245,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'ContactSafe',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(width: 5.0),
             Image.asset('assets/contactsafe_logo.png', height: 26),
@@ -258,6 +265,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       body: SettingsList(
+        lightTheme: SettingsThemeData(
+          settingsListBackground: Theme.of(context).colorScheme.background,
+          settingsSectionBackground: Theme.of(context).colorScheme.surface,
+          titleTextColor: Theme.of(context).colorScheme.primary,
+          settingsTileTextColor: Theme.of(context).colorScheme.onSurface,
+          tileDescriptionTextColor: Theme.of(
+            context,
+          ).colorScheme.onSurface.withOpacity(0.6),
+          dividerColor: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+        darkTheme: SettingsThemeData(
+          settingsListBackground: Theme.of(context).colorScheme.background,
+          settingsSectionBackground: Theme.of(context).colorScheme.surface,
+          titleTextColor: Theme.of(context).colorScheme.primary,
+          settingsTileTextColor: Theme.of(context).colorScheme.onSurface,
+          tileDescriptionTextColor: Theme.of(
+            context,
+          ).colorScheme.onSurface.withOpacity(0.6),
+          dividerColor: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
         sections: [
           CustomSettingsSection(
             child: Padding(
@@ -269,11 +296,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Settings',
                     style: TextStyle(
                       fontSize: 31.0,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onBackground,
                     ),
                   ),
                   const SizedBox(height: 30.0),
@@ -282,19 +310,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           SettingsSection(
-            title: const Text(
+            title: Text(
               'Privacy',
-              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                fontWeight: FontWeight.w500,
+              ),
             ),
             tiles: [
               SettingsTile.navigation(
                 title: const Text('Open in "Settings" app'),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
                 onPressed: (context) async => await openAppSettings(),
               ),
               SettingsTile.navigation(
                 title: const Text('Language'),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
                 onPressed: (context) {
                   // TODO: Implement language selection
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -307,22 +348,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           SettingsSection(
-            title: const Text(
+            title: Text(
               'About',
-              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                fontWeight: FontWeight.w500,
+              ),
             ),
             tiles: [
               SettingsTile.navigation(
                 title: const Text('Version'),
-                trailing: const Text(
+                trailing: Text(
                   '1.0.1 (90)',
-                  style: TextStyle(color: Colors.grey, fontSize: 15.0),
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                    fontSize: 15.0,
+                  ),
                 ),
                 onPressed: (context) {},
               ),
               SettingsTile.navigation(
                 title: const Text('Imprint'),
-                trailing: const Icon(Icons.open_in_new, color: Colors.grey),
+                trailing: Icon(
+                  Icons.open_in_new,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
                 onPressed:
                     (context) => _launchUrl(
                       'https://contactsafe.eu/index.php/impressum',
@@ -330,7 +384,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SettingsTile.navigation(
                 title: const Text('Privacy Policy'),
-                trailing: const Icon(Icons.open_in_new, color: Colors.grey),
+                trailing: Icon(
+                  Icons.open_in_new,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.4),
+                ),
                 onPressed:
                     (context) => _launchUrl(
                       'https://contactsafe.eu/index.php/datenschutzerklaerung',
@@ -339,9 +398,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           SettingsSection(
-            title: const Text(
+            title: Text(
               'General',
-              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                fontWeight: FontWeight.w500,
+              ),
             ),
             tiles: [
               SettingsTile.switchTile(
@@ -358,9 +420,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           //------------------------------------------------------------------------------------
           SettingsSection(
-            title: const Text(
+            title: Text(
               'Data Management',
-              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                fontWeight: FontWeight.w500,
+              ),
             ),
             //------------------------------------------------------------------------------------
             tiles: [
@@ -368,7 +433,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Import contacts',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) => _importContacts(),
@@ -378,7 +445,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Create backup',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) => _createBackup(),
@@ -388,7 +457,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Restore from backup',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) => _restoreFromBackup(),
@@ -398,7 +469,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Backup to Google Drive',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) async {
@@ -443,7 +516,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Restore from Google Drive',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) {
@@ -460,7 +535,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Import backup from link',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) {
@@ -476,9 +553,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           //------------------------------------------------------------------------------------
           SettingsSection(
-            title: const Text(
+            title: Text(
               'App Customization & Reset',
-              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
             tiles: [
               //------------------------------------------------------------------------------------
@@ -486,7 +566,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Onboard Tour',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed:
@@ -502,7 +584,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Select TabBar order',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
                 onPressed: (context) async {
@@ -532,7 +616,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Delete all app data',
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
                 onPressed: (context) => _showDeleteConfirmationDialog(),
@@ -541,9 +627,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           //------------------------------------------------------------------------------------
           SettingsSection(
-            title: const Text(
+            title: Text(
               'Security',
-              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
             tiles: [
               SettingsTile.switchTile(
@@ -592,9 +681,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               if (_usePass)
                 SettingsTile.navigation(
-                  title: const Text(
+                  title: Text(
                     'Change PIN',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   onPressed: (context) async {
                     final verified = await _showVerifyPinDialog();
@@ -622,11 +713,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           CustomSettingsSection(
-            child: const Padding(
-              padding: EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 16.0,
+                bottom: 8.0,
+                left: 16.0,
+              ),
               child: Text(
                 'Powered by InAppSettingKit',
-                style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
             ),
           ),

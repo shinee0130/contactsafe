@@ -3,7 +3,6 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import '../../../../core/theme/app_colors.dart';
 import 'dart:typed_data';
 
 class AddContactScreen extends StatefulWidget {
@@ -186,8 +185,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.grey[200],
-              border: Border.all(color: Colors.grey[300]!, width: 1),
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+                width: 1,
+              ),
             ),
             child:
                 _selectedPhoto != null
@@ -202,7 +204,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     : Icon(
                       Icons.add_a_photo_outlined,
                       size: 48,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
           ),
         ),
@@ -210,7 +212,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         Text(
           _selectedPhoto != null ? 'Change picture' : 'Add picture',
           style: TextStyle(
-            color: Colors.grey[700],
+            color: Colors.blue,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -237,24 +239,34 @@ class _AddContactScreenState extends State<AddContactScreen> {
           alignLabelWithHint: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Colors.grey[300]!),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Colors.grey[300]!),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: AppColors.primary, width: 2),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).colorScheme.surface,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 16.0,
             horizontal: 16.0,
           ),
         ),
-        style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+        style: TextStyle(
+          fontSize: 16,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }
@@ -316,7 +328,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
         children: [
           Text(
             'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
           ),
           ListView.builder(
             shrinkWrap: true,
@@ -335,21 +350,25 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           hintText: 'Enter phone number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide(
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                               width: 2,
                             ),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).colorScheme.surface,
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 16.0,
                             horizontal: 16.0,
@@ -359,25 +378,25 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         onChanged: (phone) {
                           _phoneNumbers[index] = phone.number;
                         },
-                        dropdownIcon: const Icon(
+                        dropdownIcon: Icon(
                           Icons.arrow_drop_down,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        dropdownTextStyle: const TextStyle(
+                        dropdownTextStyle: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     if (_phoneNumbers.length > 1)
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.remove_circle_outline,
-                          color: Colors.red,
+                          color: Theme.of(context).colorScheme.error,
                           size: 28,
                         ),
                         onPressed: () {
@@ -401,14 +420,16 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   _phoneLabels.add(PhoneLabel.other);
                 });
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.add_circle_outline,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ), // Grey icon
-              label: const Text(
+              label: Text(
                 'Add phone',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -423,19 +444,25 @@ class _AddContactScreenState extends State<AddContactScreen> {
     required IconData icon,
     required String text,
     required VoidCallback onPressed,
-    Color backgroundColor = AppColors.primary,
+    Color? backgroundColor,
     bool isSpecial = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSpecial ? Colors.blue[50] : backgroundColor,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor:
+              isSpecial
+                  ? Theme.of(context).colorScheme.secondaryContainer
+                  : backgroundColor ?? Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
-            side: BorderSide(color: Colors.blue[100]!, width: 1),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 1,
+            ),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
           minimumSize: const Size(double.infinity, 50),
@@ -444,7 +471,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.primary),
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 16),
             Text(
               text,
@@ -476,13 +503,13 @@ class _AddContactScreenState extends State<AddContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.primary),
+          icon: Icon(Icons.close, color: Colors.blue),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -490,12 +517,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'ContactSafe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 8.0),
@@ -505,10 +532,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
         actions: [
           TextButton(
             onPressed: _saveContact,
-            child: const Text(
+            child: Text(
               'Save',
               style: TextStyle(
-                color: AppColors.primary,
+                color: Colors.blue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -527,12 +554,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: const Text(
+                child: Text(
                   'Create contact',
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -607,19 +634,27 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.cake_outlined, color: AppColors.primary),
+                    Icon(
+                      Icons.cake_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         'Birthday: ${MaterialLocalizations.of(context).formatFullDate(_selectedBirthday!)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      icon: Icon(
+                        Icons.clear,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                       onPressed: () {
                         setState(() {
                           _selectedBirthday = null;
@@ -703,11 +738,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       child: Text(_getEmailLabelString(value)),
                     );
                   }).toList(),
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
               ),
-              dropdownColor: Colors.white,
+              dropdownColor: Theme.of(context).colorScheme.surface,
             ),
           ),
         );
@@ -735,11 +770,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       child: Text(_getAddressLabelString(value)),
                     );
                   }).toList(),
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
               ),
-              dropdownColor: Colors.white,
+              dropdownColor: Theme.of(context).colorScheme.surface,
             ),
           ),
         );
@@ -785,36 +820,40 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         alignLabelWithHint: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
                             width: 2,
                           ),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 16.0,
                           horizontal: 16.0,
                         ),
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.remove_circle_outline,
-                      color: Colors.red,
+                      color: Theme.of(context).colorScheme.error,
                       size: 28,
                     ),
                     onPressed: () {
@@ -848,14 +887,16 @@ class _AddContactScreenState extends State<AddContactScreen> {
             padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
             child: TextButton.icon(
               onPressed: onAdd,
-              icon: const Icon(
+              icon: Icon(
                 Icons.add_circle_outline,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ), // Grey icon
               label: Text(
                 'Add $label',
-                style: const TextStyle(
-                  color: Colors.grey,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),

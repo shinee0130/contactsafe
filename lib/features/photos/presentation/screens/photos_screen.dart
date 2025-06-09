@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
 class PhotosScreen extends StatefulWidget {
@@ -117,21 +116,34 @@ class _PhotosScreenState extends State<PhotosScreen> {
       context: context,
       builder:
           (context) => Container(
+            color: Theme.of(context).colorScheme.surface,
             padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   'Sort Photos By',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ...SortOption.values.map(
                   (option) => ListTile(
-                    title: Text(_getSortOptionName(option)),
+                    title: Text(
+                      _getSortOptionName(option),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                     trailing:
                         _sortOption == option
-                            ? const Icon(Icons.check, color: AppColors.primary)
+                            ? Icon(
+                              Icons.check,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
                             : null,
                     onTap: () {
                       setState(() => _sortOption = option);
@@ -166,13 +178,19 @@ class _PhotosScreenState extends State<PhotosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'ContactSafe',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(width: 5.0),
             Image.asset('assets/contactsafe_logo.png', height: 26),
@@ -182,10 +200,10 @@ class _PhotosScreenState extends State<PhotosScreen> {
           _editMode && _selectedIndices.isNotEmpty
               ? TextButton(
                 onPressed: _deleteSelectedPhotos,
-                child: const Text(
+                child: Text(
                   'Delete',
                   style: TextStyle(
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                     fontSize: 16.5,
                     fontWeight: FontWeight.bold,
                   ),
@@ -195,17 +213,17 @@ class _PhotosScreenState extends State<PhotosScreen> {
                 onPressed: _toggleEditMode,
                 child: Text(
                   _editMode ? 'Cancel' : 'Edit',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16.5,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
           IconButton(
             icon: Icon(
               _editMode ? Icons.done : Icons.swap_vert,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
               size: 30,
             ),
             onPressed: _editMode ? _toggleEditMode : _showSortOptions,
@@ -214,17 +232,21 @@ class _PhotosScreenState extends State<PhotosScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _uploadPhotos,
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Photos',
-              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 31.0,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -232,29 +254,35 @@ class _PhotosScreenState extends State<PhotosScreen> {
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : _photos.isEmpty
-                      ? const Center(
+                      ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.photo_library,
                               size: 64,
-                              color: Colors.grey,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.4),
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             Text(
                               'No photos yet',
                               style: TextStyle(
                                 fontSize: 18,
-                                color: Colors.grey,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.6),
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               'Tap the + button to add photos',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.6),
                               ),
                             ),
                           ],
@@ -298,7 +326,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                           (value) =>
                                               _togglePhotoSelection(index),
                                       fillColor: MaterialStateProperty.all(
-                                        AppColors.primary,
+                                        Theme.of(context).colorScheme.primary,
                                       ),
                                     ),
                                   ),

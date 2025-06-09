@@ -1,4 +1,3 @@
-import 'package:contactsafe/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -260,8 +259,11 @@ class _EditContactScreenState extends State<EditContactScreen> {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.grey[200],
-              border: Border.all(color: Colors.grey[300]!, width: 1),
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline,
+                width: 1,
+              ),
             ),
             child:
                 _selectedPhoto != null
@@ -276,7 +278,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
                     : Icon(
                       Icons.person_outline,
                       size: 48,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
           ),
         ),
@@ -284,7 +286,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         Text(
           _selectedPhoto != null ? 'Change picture' : 'Add picture',
           style: TextStyle(
-            color: Colors.grey[700],
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -306,7 +308,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
         children: [
           Text(
             labelText,
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
           ),
           const SizedBox(height: 4),
           TextField(
@@ -318,24 +323,34 @@ class _EditContactScreenState extends State<EditContactScreen> {
               alignLabelWithHint: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: AppColors.primary, width: 2),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Theme.of(context).colorScheme.surface,
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 16.0,
                 horizontal: 16.0,
               ),
             ),
-            style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -399,7 +414,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
         children: [
           Text(
             'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
           ),
           ListView.builder(
             shrinkWrap: true,
@@ -417,21 +435,25 @@ class _EditContactScreenState extends State<EditContactScreen> {
                           hintText: 'Enter phone number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide(
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                               width: 2,
                             ),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).colorScheme.surface,
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 16.0,
                             horizontal: 16.0,
@@ -441,25 +463,25 @@ class _EditContactScreenState extends State<EditContactScreen> {
                         onChanged: (phone) {
                           _phoneNumbers[index] = phone.number;
                         },
-                        dropdownIcon: const Icon(
+                        dropdownIcon: Icon(
                           Icons.arrow_drop_down,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        dropdownTextStyle: const TextStyle(
+                        dropdownTextStyle: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     if (_phoneNumbers.length > 1)
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.remove_circle_outline,
-                          color: Colors.red,
+                          color: Theme.of(context).colorScheme.error,
                           size: 28,
                         ),
                         onPressed: () {
@@ -483,11 +505,16 @@ class _EditContactScreenState extends State<EditContactScreen> {
                   _phoneLabels.add(PhoneLabel.other);
                 });
               },
-              icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
-              label: const Text(
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
+              label: Text(
                 'Add phone',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -502,19 +529,26 @@ class _EditContactScreenState extends State<EditContactScreen> {
     required IconData icon,
     required String text,
     required VoidCallback onPressed,
-    Color backgroundColor = AppColors.primary,
+    Color? backgroundColor,
     bool isSpecial = false,
   }) {
+    final bgColor = backgroundColor ?? Theme.of(context).colorScheme.primary;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSpecial ? Colors.blue[50] : backgroundColor,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor:
+              isSpecial
+                  ? Theme.of(context).colorScheme.secondaryContainer
+                  : bgColor,
+          foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
-            side: BorderSide(color: Colors.blue[100]!, width: 1),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 1,
+            ),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
           minimumSize: const Size(double.infinity, 50),
@@ -523,7 +557,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.primary),
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 16),
             Text(
               text,
@@ -579,7 +613,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
                         ? '$label (${label == 'Email' ? _getEmailLabelString(_emailLabels[index]) : _getAddressLabelString(_addressLabels[index])})'
                         : label +
                             (controllers.length > 1 ? ' ${index + 1}' : ''),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -597,36 +636,40 @@ class _EditContactScreenState extends State<EditContactScreen> {
                             alignLabelWithHint: true,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
-                              borderSide: const BorderSide(
-                                color: AppColors.primary,
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
                                 width: 2,
                               ),
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: Theme.of(context).colorScheme.surface,
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 16.0,
                               horizontal: 16.0,
                             ),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.remove_circle_outline,
-                          color: Colors.red,
+                          color: Theme.of(context).colorScheme.error,
                           size: 28,
                         ),
                         onPressed: () {
@@ -662,11 +705,16 @@ class _EditContactScreenState extends State<EditContactScreen> {
             padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
             child: TextButton.icon(
               onPressed: onAdd,
-              icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
               label: Text(
                 'Add $label',
-                style: const TextStyle(
-                  color: Colors.grey,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -680,13 +728,13 @@ class _EditContactScreenState extends State<EditContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.primary),
+          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.primary),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -694,12 +742,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'ContactSafe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 8.0),
@@ -709,10 +757,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
         actions: [
           TextButton(
             onPressed: _saveContact,
-            child: const Text(
+            child: Text(
               'Save',
               style: TextStyle(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -731,12 +779,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: const Text(
+                child: Text(
                   'Edit contact',
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -813,19 +861,27 @@ class _EditContactScreenState extends State<EditContactScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.cake_outlined, color: AppColors.primary),
+                    Icon(
+                      Icons.cake_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         'Birthday: ${MaterialLocalizations.of(context).formatFullDate(_selectedBirthday!)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      icon: Icon(
+                        Icons.clear,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                       onPressed: () {
                         setState(() {
                           _selectedBirthday = null;
@@ -878,12 +934,17 @@ class _EditContactScreenState extends State<EditContactScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[50],
-                    foregroundColor: Colors.red,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.errorContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onErrorContainer,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      side: BorderSide(color: Colors.red[100]!, width: 1),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.error,
+                        width: 1,
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                   ),
