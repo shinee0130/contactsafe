@@ -26,11 +26,23 @@ class ContactDetailScreen extends StatefulWidget {
 
 class _ContactDetailScreenState extends State<ContactDetailScreen> {
   Contact? _detailedContact;
+  int _filesCount = 0;
+  int _notesCount = 0;
 
   @override
   void initState() {
     super.initState();
     _loadContactDetails(widget.contact.id);
+    _loadCounts();
+  }
+
+  Future<void> _loadCounts() async {
+    // final files = await YourFileService.getCount(widget.contact.id);
+    // final notes = await YourNoteService.getCount(widget.contact.id);
+    setState(() {
+      _filesCount = 3; // Example count - replace with real implementation
+      _notesCount = 2; // Example count - replace with real implementation
+    });
   }
 
   Future<void> _loadContactDetails(String contactId) async {
@@ -57,56 +69,47 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-  final Uri launchUri = Uri(
-    scheme: 'tel',
-    path: phoneNumber,
-  );
-  if (await canLaunchUrl(launchUri)) {
-    await launchUrl(launchUri);
-  } else {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch phone call')),
-      );
+    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch phone call')),
+        );
+      }
     }
   }
-}
 
-Future<void> _sendSms(String phoneNumber) async {
-  final Uri launchUri = Uri(
-    scheme: 'sms',
-    path: phoneNumber,
-  );
-  if (await canLaunchUrl(launchUri)) {
-    await launchUrl(launchUri);
-  } else {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch messaging app')),
-      );
+  Future<void> _sendSms(String phoneNumber) async {
+    final Uri launchUri = Uri(scheme: 'sms', path: phoneNumber);
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch messaging app')),
+        );
+      }
     }
   }
-}
 
-Future<void> _sendEmail(String emailAddress) async {
-  final Uri launchUri = Uri(
-    scheme: 'mailto',
-    path: emailAddress,
-    queryParameters: {
-      'subject': 'Regarding our contact', 
-      'body': 'Hello,',
-    },
-  );
-  if (await canLaunchUrl(launchUri)) {
-    await launchUrl(launchUri);
-  } else {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch email app')),
-      );
+  Future<void> _sendEmail(String emailAddress) async {
+    final Uri launchUri = Uri(
+      scheme: 'mailto',
+      path: emailAddress,
+      queryParameters: {'subject': 'Regarding our contact', 'body': 'Hello,'},
+    );
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch email app')),
+        );
+      }
     }
   }
-}
 
   String generateVcf(Contact contact) {
     StringBuffer vcfContent = StringBuffer();
@@ -193,9 +196,9 @@ Future<void> _sendEmail(String emailAddress) async {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error saving VCF file: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error saving VCF file: $e')));
         }
       }
     } else if (status.isDenied) {
@@ -211,7 +214,10 @@ Future<void> _sendEmail(String emailAddress) async {
             content: const Text(
               'Storage permission permanently denied. Please enable in settings.',
             ),
-            action: SnackBarAction(label: 'Settings', onPressed: openAppSettings),
+            action: SnackBarAction(
+              label: 'Settings',
+              onPressed: openAppSettings,
+            ),
           ),
         );
       }
@@ -261,6 +267,24 @@ Future<void> _sendEmail(String emailAddress) async {
     }
   }
 
+  Widget _buildCountBadge(int count) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        '$count',
+        style: TextStyle(
+          fontSize: 14,
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
   Widget _buildAvatar(Contact contact) {
     return Container(
       width: 120,
@@ -268,32 +292,30 @@ Future<void> _sendEmail(String emailAddress) async {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: AppColors.primary.withOpacity(0.1),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
-          width: 2,
-        ),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
       ),
-      child: contact.photo != null && contact.photo!.isNotEmpty
-          ? ClipOval(
-              child: Image.memory(
-                contact.photo!,
-                width: 120,
-                height: 120,
-                fit: BoxFit.cover,
-              ),
-            )
-          : Center(
-              child: Text(
-                contact.displayName.isNotEmpty
-                    ? contact.displayName[0].toUpperCase()
-                    : '?',
-                style: const TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+      child:
+          contact.photo != null && contact.photo!.isNotEmpty
+              ? ClipOval(
+                child: Image.memory(
+                  contact.photo!,
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                ),
+              )
+              : Center(
+                child: Text(
+                  contact.displayName.isNotEmpty
+                      ? contact.displayName[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
-            ),
     );
   }
 
@@ -365,7 +387,7 @@ Future<void> _sendEmail(String emailAddress) async {
     );
   }
 
-  Widget _buildSectionItem(String title, String trailing, VoidCallback onTap) {
+  Widget _buildSectionItem(String title, int count, VoidCallback onTap) {
     return Material(
       color: Colors.white,
       child: InkWell(
@@ -386,13 +408,7 @@ Future<void> _sendEmail(String emailAddress) async {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    trailing,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                  _buildCountBadge(count),
                   const SizedBox(width: 4),
                   Icon(Icons.chevron_right, color: Colors.grey[400]),
                 ],
@@ -410,7 +426,8 @@ Future<void> _sendEmail(String emailAddress) async {
 
     // Determine what to display under the contact name
     String? subtitleText;
-    if (currentContact.organizations.isNotEmpty && currentContact.organizations.first.company.isNotEmpty) {
+    if (currentContact.organizations.isNotEmpty &&
+        currentContact.organizations.first.company.isNotEmpty) {
       subtitleText = currentContact.organizations.first.company;
     } else if (currentContact.phones.isNotEmpty) {
       subtitleText = currentContact.phones.first.number;
@@ -448,9 +465,12 @@ Future<void> _sendEmail(String emailAddress) async {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditContactScreen(contact: currentContact),
+                  builder:
+                      (context) => EditContactScreen(contact: currentContact),
                 ),
-              ).then((_) => _loadContactDetails(currentContact.id));
+              ).then(
+                (_) => {_loadContactDetails(currentContact.id), _loadCounts()},
+              );
             },
           ),
           IconButton(
@@ -461,7 +481,11 @@ Future<void> _sendEmail(String emailAddress) async {
             onPressed: () {
               // TODO: Implement favorite toggle logic
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${currentContact.displayName} favorite status toggled!')),
+                SnackBar(
+                  content: Text(
+                    '${currentContact.displayName} favorite status toggled!',
+                  ),
+                ),
               );
             },
           ),
@@ -474,9 +498,7 @@ Future<void> _sendEmail(String emailAddress) async {
             // Header Section
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
+              decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                 children: [
                   _buildAvatar(currentContact),
@@ -491,7 +513,6 @@ Future<void> _sendEmail(String emailAddress) async {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Display company if available, otherwise display phone number
                   if (subtitleText != null && subtitleText.isNotEmpty)
                     Text(
                       subtitleText,
@@ -507,40 +528,58 @@ Future<void> _sendEmail(String emailAddress) async {
                     children: [
                       _buildActionButton(Icons.call, 'Call', () {
                         if (currentContact.phones.isNotEmpty) {
-        _makePhoneCall(currentContact.phones.first.number);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No phone number available')),
-        );
-      }
+                          _makePhoneCall(currentContact.phones.first.number);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No phone number available'),
+                            ),
+                          );
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Calling ${currentContact.displayName}')),
+                          SnackBar(
+                            content: Text(
+                              'Calling ${currentContact.displayName}',
+                            ),
+                          ),
                         );
                       }),
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.message, 'Message', () {
                         if (currentContact.phones.isNotEmpty) {
-        _sendSms(currentContact.phones.first.number);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No phone number available')),
-        );
-      }
+                          _sendSms(currentContact.phones.first.number);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No phone number available'),
+                            ),
+                          );
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Messaging ${currentContact.displayName}')),
+                          SnackBar(
+                            content: Text(
+                              'Messaging ${currentContact.displayName}',
+                            ),
+                          ),
                         );
                       }),
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.email, 'Email', () {
                         if (currentContact.emails.isNotEmpty) {
-        _sendEmail(currentContact.emails.first.address);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No email address available')),
-        );
-      }
+                          _sendEmail(currentContact.emails.first.address);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No email address available'),
+                            ),
+                          );
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Emailing ${currentContact.displayName}')),
+                          SnackBar(
+                            content: Text(
+                              'Emailing ${currentContact.displayName}',
+                            ),
+                          ),
                         );
                       }),
                     ],
@@ -553,7 +592,7 @@ Future<void> _sendEmail(String emailAddress) async {
             if (currentContact.phones.isNotEmpty ||
                 currentContact.emails.isNotEmpty ||
                 currentContact.addresses.isNotEmpty ||
-                currentContact.organizations.isNotEmpty) // Added check for organizations here
+                currentContact.organizations.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -572,7 +611,11 @@ Future<void> _sendEmail(String emailAddress) async {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 16, top: 8, bottom: 4),
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        top: 8,
+                        bottom: 4,
+                      ),
                       child: Text(
                         'Contact Information',
                         style: TextStyle(
@@ -583,32 +626,38 @@ Future<void> _sendEmail(String emailAddress) async {
                       ),
                     ),
                     const Divider(indent: 16, endIndent: 16),
-                    // Display organization details in the main section
                     if (currentContact.phones.isNotEmpty)
-                      ...currentContact.phones.map((phone) =>
-                          _buildDetailItem(
-                            _getPhoneLabelString(phone.label),
-                            phone.number,
-                          )),
+                      ...currentContact.phones.map(
+                        (phone) => _buildDetailItem(
+                          _getPhoneLabelString(phone.label),
+                          phone.number,
+                        ),
+                      ),
                     if (currentContact.emails.isNotEmpty)
-                      ...currentContact.emails.map((email) =>
-                          _buildDetailItem(
-                            _getEmailLabelString(email.label),
-                            email.address,
-                          )),
+                      ...currentContact.emails.map(
+                        (email) => _buildDetailItem(
+                          _getEmailLabelString(email.label),
+                          email.address,
+                        ),
+                      ),
                     if (currentContact.addresses.isNotEmpty)
-                      ...currentContact.addresses.map((address) =>
-                          _buildDetailItem(
-                            _getAddressLabelString(address.label),
-                            '${address.street}, ${address.city}, ${address.postalCode}',
-                          )),
+                      ...currentContact.addresses.map(
+                        (address) => _buildDetailItem(
+                          _getAddressLabelString(address.label),
+                          '${address.street}, ${address.city}, ${address.postalCode}',
+                        ),
+                      ),
                   ],
                 ),
               ),
 
-            // Additional Sections
             Container(
-              margin: const EdgeInsets.only(top: 16, bottom: 24, left: 16, right: 16),
+              margin: const EdgeInsets.only(
+                top: 16,
+                bottom: 24,
+                left: 16,
+                right: 16,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -622,26 +671,29 @@ Future<void> _sendEmail(String emailAddress) async {
               ),
               child: Column(
                 children: [
-                  _buildSectionItem('Files', '0', () {
+                  _buildSectionItem('Files', _filesCount, () {
                     Navigator.pushNamed(
                       context,
                       '/contact_files',
                       arguments: currentContact,
-                    );
+                    ).then((_) => _loadCounts());
                   }),
                   const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildSectionItem('Notes', '0', () {
+                  _buildSectionItem('Notes', _notesCount, () {
                     Navigator.pushNamed(
                       context,
                       '/contact_notes',
                       arguments: currentContact,
-                    );
+                    ).then((_) => _loadCounts());
                   }),
                   const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildSectionItem('Export VCF', '', () async {
+                  _buildSectionItem('Export VCF', 0, () async {
                     if (_detailedContact != null) {
                       String vcfContent = generateVcf(_detailedContact!);
-                      await saveVcfFile(vcfContent, _detailedContact!.displayName);
+                      await saveVcfFile(
+                        vcfContent,
+                        _detailedContact!.displayName,
+                      );
                     }
                   }),
                 ],

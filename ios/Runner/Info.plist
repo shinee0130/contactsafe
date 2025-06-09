@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need photos permission to upload images</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Need camera permission to take pictures</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Need microphone permission to record videos</string>
 	<key>NSContactsUsageDescription</key>
 	<string>This app needs access to your contacts to display your contact list.</string>
 	<key>CFBundleDevelopmentRegion</key>

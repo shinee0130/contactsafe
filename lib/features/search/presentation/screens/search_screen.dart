@@ -1,7 +1,7 @@
-import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../../shared/widgets/navigation_bar.dart';
+import 'package:contactsafe/shared/widgets/customsearchbar.dart';
+import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -14,72 +14,142 @@ class _SearchScreenState extends State<SearchScreen> {
   int _currentIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   List<Contact> _allContacts = [];
-
-  void _onBottomNavigationTap(int index) {
-    setState(() {
-      _currentIndex = index;
-      print('Bottom navigation tapped: $index');
-      switch (index) {
-        case 0:
-          Navigator.pushReplacementNamed(context, '/contacts');
-          break;
-        case 1:
-          Navigator.pushReplacementNamed(context, '/search');
-          break;
-        case 2:
-          Navigator.pushReplacementNamed(context, '/events');
-          break;
-        case 3:
-          Navigator.pushReplacementNamed(context, '/photos');
-          break;
-        case 4:
-          Navigator.pushReplacementNamed(context, '/settings');
-          break;
-      }
-    });
-  }
+  List<dynamic> _searchResults = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchContacts();
+    _fetchAllData();
   }
 
-  Future<void> _fetchContacts() async {
+  Future<void> _fetchAllData() async {
     try {
+      // Fetch contacts
       bool isGranted = await FlutterContacts.requestPermission();
-      print('Permission Granted: $isGranted');
       if (isGranted) {
         List<Contact> contacts = await FlutterContacts.getContacts(
           withProperties: true,
           withPhoto: true,
-        ); // Fetch with photo
+        );
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
         setState(() {
-          _allContacts = List.from(contacts);
+          _allContacts = contacts;
+          _isLoading = false;
         });
-        print('Fetched ${contacts.length} contacts.');
-      } else {
-        print('Contact permission not granted.');
       }
+
+      // TODO: Add calls to fetch files, photos, events from your data sources
+      // Example:
+      // _allFiles = await FileService.getAllFiles();
+      // _allEvents = await EventService.getAllEvents();
+      // _allPhotos = await PhotoService.getAllPhotos();
     } catch (e) {
-      print('Error requesting contact permission: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching data: $e');
     }
   }
 
-  void _filterContacts(String query) {
+  void _filterContent(String query) {
     if (query.isEmpty) {
-      setState(() {});
-    } else {
-      _allContacts
-          .where(
-            (contact) =>
-                contact.displayName.toLowerCase().contains(query.toLowerCase()),
-          )
-          .toList();
-      setState(() {});
+      setState(() {
+        _searchResults = [];
+      });
+      return;
     }
+
+    final lowerQuery = query.toLowerCase();
+    final results = <dynamic>[];
+
+    // Search contacts
+    results.addAll(
+      _allContacts.where(
+        (contact) =>
+            contact.displayName.toLowerCase().contains(lowerQuery) ||
+            (contact.phones.isNotEmpty &&
+                contact.phones.any(
+                  (phone) => phone.number.toLowerCase().contains(lowerQuery),
+                )) ||
+            (contact.emails.isNotEmpty &&
+                contact.emails.any(
+                  (email) => email.address.toLowerCase().contains(lowerQuery),
+                )),
+      ),
+    );
+
+    // TODO: Add search for other content types
+    // Example:
+    // results.addAll(_allFiles.where((file) =>
+    //     file.name.toLowerCase().contains(lowerQuery)));
+    // results.addAll(_allEvents.where((event) =>
+    //     event.title.toLowerCase().contains(lowerQuery)));
+    // results.addAll(_allPhotos.where((photo) =>
+    //     photo.caption?.toLowerCase().contains(lowerQuery) ?? false));
+
+    setState(() {
+      _searchResults = results;
+    });
   }
+
+  Widget _buildSearchResults() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_searchResults.isEmpty) {
+      return const Center(child: Text('No results found'));
+    }
+
+    return ListView.builder(
+      itemCount: _searchResults.length,
+      itemBuilder: (context, index) {
+        final item = _searchResults[index];
+
+        if (item is Contact) {
+          return _buildContactItem(item);
+        }
+        // TODO: Add builders for other content types
+        // else if (item is File) {
+        //   return _buildFileItem(item);
+        // } else if (item is Event) {
+        //   return _buildEventItem(item);
+        // } else if (item is Photo) {
+        //   return _buildPhotoItem(item);
+        // }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildContactItem(Contact contact) {
+    return ListTile(
+      leading:
+          contact.photo != null && contact.photo!.isNotEmpty
+              ? CircleAvatar(backgroundImage: MemoryImage(contact.photo!))
+              : CircleAvatar(
+                child: Text(
+                  contact.displayName.isNotEmpty
+                      ? contact.displayName[0].toUpperCase()
+                      : '?',
+                ),
+              ),
+      title: Text(contact.displayName),
+      subtitle:
+          contact.phones.isNotEmpty ? Text(contact.phones.first.number) : null,
+      onTap: () {
+        // Navigate to contact details
+        Navigator.pushNamed(context, '/contact_detail', arguments: contact);
+      },
+    );
+  }
+
+  // TODO: Add builders for other content types
+  // Widget _buildFileItem(File file) { ... }
+  // Widget _buildEventItem(Event event) { ... }
+  // Widget _buildPhotoItem(Photo photo) { ... }
 
   @override
   Widget build(BuildContext context) {
@@ -109,16 +179,37 @@ class _SearchScreenState extends State<SearchScreen> {
             const SizedBox(height: 10),
             CustomSearchBar(
               controller: _searchController,
-              onChanged: _filterContacts,
+              onChanged: _filterContent,
             ),
             const SizedBox(height: 16.0),
-            const Expanded(child: Center(child: Text(''))),
+            Expanded(child: _buildSearchResults()),
           ],
         ),
       ),
       bottomNavigationBar: ContactSafeNavigationBar(
         currentIndex: _currentIndex,
-        onTap: _onBottomNavigationTap,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/contacts');
+              break;
+            case 1:
+              // Already on search screen
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/events');
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, '/photos');
+              break;
+            case 4:
+              Navigator.pushReplacementNamed(context, '/settings');
+              break;
+          }
+        },
       ),
     );
   }

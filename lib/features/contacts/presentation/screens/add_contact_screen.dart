@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:intl_phone_field/intl_phone_field.dart'; // Import for phone number input
-import '../../../../core/theme/app_colors.dart'; // Assuming this path is correct
+import 'package:intl_phone_field/intl_phone_field.dart';
+import '../../../../core/theme/app_colors.dart';
 import 'dart:typed_data';
 
 class AddContactScreen extends StatefulWidget {
@@ -19,17 +19,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
 
-  // For phone numbers, we'll manage a list of Phone objects (or just numbers)
-  // The IntlPhoneField handles its own internal controller.
-  List<String> _phoneNumbers = ['']; // Start with one empty phone field
-  List<PhoneLabel> _phoneLabels = [PhoneLabel.mobile]; // Corresponding labels
+  List<String> _phoneNumbers = [''];
+  List<PhoneLabel> _phoneLabels = [PhoneLabel.mobile];
 
   final List<TextEditingController> _emailControllers = [
     TextEditingController(),
   ];
   final List<EmailLabel> _emailLabels = [EmailLabel.home];
 
-  // The image doesn't show websites, but we'll keep the functionality
   final List<TextEditingController> _websiteControllers = [
     TextEditingController(),
   ];
@@ -179,7 +176,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
     }
   }
 
-  // New avatar style
   Widget _buildAvatar() {
     return Column(
       children: [
@@ -190,7 +186,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.grey[200], // Light grey background
+              color: Colors.grey[200],
               border: Border.all(color: Colors.grey[300]!, width: 1),
             ),
             child:
@@ -204,7 +200,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       ),
                     )
                     : Icon(
-                      Icons.add_a_photo_outlined, // Add photo icon
+                      Icons.add_a_photo_outlined,
                       size: 48,
                       color: Colors.grey[600],
                     ),
@@ -212,9 +208,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          _selectedPhoto != null
-              ? 'Change picture'
-              : 'Add picture', // Change text
+          _selectedPhoto != null ? 'Change picture' : 'Add picture',
           style: TextStyle(
             color: Colors.grey[700],
             fontSize: 16,
@@ -225,7 +219,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
     );
   }
 
-  // Custom TextField widget to match the UI
   Widget _buildTextField({
     required String labelText,
     required TextEditingController controller,
@@ -240,11 +233,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: labelText,
-          floatingLabelBehavior:
-              FloatingLabelBehavior.never, // Label stays as hint
-          alignLabelWithHint: true, // Align label with hint
+          floatingLabelBehavior: FloatingLabelBehavior.never,
+          alignLabelWithHint: true,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0), // Rounded corners
+            borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide(color: Colors.grey[300]!),
           ),
           enabledBorder: OutlineInputBorder(
@@ -253,13 +245,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(
-              color: AppColors.primary,
-              width: 2,
-            ), // Highlight on focus
+            borderSide: BorderSide(color: AppColors.primary, width: 2),
           ),
           filled: true,
-          fillColor: Colors.white, // White background for text fields
+          fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 16.0,
             horizontal: 16.0,
@@ -270,7 +259,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
     );
   }
 
-  // Helper functions to convert labels to strings
   String _getPhoneLabelString(PhoneLabel label) {
     switch (label) {
       case PhoneLabel.mobile:
@@ -320,7 +308,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
     }
   }
 
-  // The new phone input with country code
   Widget _buildPhoneInputList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -328,7 +315,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Phone (${_getPhoneLabelString(_phoneLabels[0])})', // Display current label
+            'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           ListView.builder(
@@ -344,8 +331,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       child: IntlPhoneField(
                         initialValue: _phoneNumbers[index],
                         decoration: InputDecoration(
-                          // labelText: 'Phone Number', // No labelText, use hintText
-                          hintText: 'Enter phone number', // Hint to match image
+                          labelText: 'Phone Number',
+                          hintText: 'Enter phone number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide(color: Colors.grey[300]!),
@@ -368,12 +355,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
                             horizontal: 16.0,
                           ),
                         ),
-                        initialCountryCode: 'US', // Default country code
+                        initialCountryCode: 'US',
                         onChanged: (phone) {
                           _phoneNumbers[index] = phone.number;
                         },
-                        // Optionally, you can add dropdown for labels if you want to allow changing labels
-                        // like 'Mobile', 'Work', 'Home'
                         dropdownIcon: const Icon(
                           Icons.arrow_drop_down,
                           color: Colors.grey,
@@ -388,8 +373,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         ),
                       ),
                     ),
-                    if (_phoneNumbers.length >
-                        1) // Only show remove button if more than one
+                    if (_phoneNumbers.length > 1)
                       IconButton(
                         icon: const Icon(
                           Icons.remove_circle_outline,
@@ -409,12 +393,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
             },
           ),
           Align(
-            alignment: Alignment.centerLeft, // Align "Add phone" to left
+            alignment: Alignment.centerLeft,
             child: TextButton.icon(
               onPressed: () {
                 setState(() {
                   _phoneNumbers.add('');
-                  _phoneLabels.add(PhoneLabel.other); // Add default label
+                  _phoneLabels.add(PhoneLabel.other);
                 });
               },
               icon: const Icon(
@@ -435,44 +419,32 @@ class _AddContactScreenState extends State<AddContactScreen> {
     );
   }
 
-  // Reusable button for "Add email", "Add birthday", "Add address"
   Widget _buildAddButton({
     required IconData icon,
     required String text,
     required VoidCallback onPressed,
-    Color backgroundColor =
-        AppColors.primary, // Default to primary for consistency
-    Color textColor = Colors.white,
-    Color iconColor = Colors.white,
-    bool isSpecial = false, // For buttons like Email, Birthday, Address
+    Color backgroundColor = AppColors.primary,
+    bool isSpecial = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isSpecial
-                  ? Colors.blue[50]
-                  : backgroundColor, // Light blue for these buttons
-          foregroundColor:
-              AppColors.textPrimary, // Darker text for light background
-          elevation: 0, // No shadow
+          backgroundColor: isSpecial ? Colors.blue[50] : backgroundColor,
+          foregroundColor: AppColors.textPrimary,
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
-            side: BorderSide(
-              color: Colors.blue[100]!,
-              width: 1,
-            ), // Light blue border
+            side: BorderSide(color: Colors.blue[100]!, width: 1),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
-          minimumSize: const Size(double.infinity, 50), // Full width
+          minimumSize: const Size(double.infinity, 50),
         ),
         onPressed: onPressed,
         child: Row(
-          mainAxisAlignment:
-              MainAxisAlignment.start, // Align icon and text to start
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.primary), // Primary color for icon
+            Icon(icon, color: AppColors.primary),
             const SizedBox(width: 16),
             Text(
               text,
@@ -584,15 +556,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
               controller: _companyController,
             ),
 
-            const SizedBox(height: 16), // Space before phone input
-            // Phone input section (new style)
+            const SizedBox(height: 16),
             _buildPhoneInputList(),
             const SizedBox(height: 16),
 
-            // Dynamic "Add" buttons
-            if (_emailControllers.every(
-              (c) => c.text.isEmpty,
-            )) // Show button if no email added
+            if (_emailControllers.every((c) => c.text.isEmpty))
               _buildAddButton(
                 icon: Icons.email_outlined,
                 text: 'Add email',
@@ -604,9 +572,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 },
                 isSpecial: true,
               ),
-            if (_emailControllers.any(
-              (c) => c.text.isNotEmpty,
-            )) // Show list if emails exist
+            if (_emailControllers.any((c) => c.text.isNotEmpty))
               _buildEditableTextFieldList(
                 label: 'Email',
                 controllers: _emailControllers,
@@ -626,14 +592,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
               ),
             const SizedBox(height: 8),
 
-            if (_selectedBirthday == null) // Show button if no birthday added
+            if (_selectedBirthday == null)
               _buildAddButton(
                 icon: Icons.cake_outlined,
                 text: 'Add birthday',
                 onPressed: _pickBirthday,
                 isSpecial: true,
               )
-            else // Show birthday text if picked
+            else
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
@@ -666,9 +632,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
             const SizedBox(height: 8),
 
-            if (_addressControllers.every(
-              (c) => c.text.isEmpty,
-            )) // Show button if no address added
+            if (_addressControllers.every((c) => c.text.isEmpty))
               _buildAddButton(
                 icon: Icons.location_on_outlined,
                 text: 'Add address',
@@ -680,9 +644,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 },
                 isSpecial: true,
               ),
-            if (_addressControllers.any(
-              (c) => c.text.isNotEmpty,
-            )) // Show list if addresses exist
+            if (_addressControllers.any((c) => c.text.isNotEmpty))
               _buildEditableTextFieldList(
                 label: 'Address',
                 controllers: _addressControllers,
@@ -701,26 +663,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 },
               ),
             const SizedBox(height: 24),
-
-            // You can keep websites if you want, but they are not in the sample image
-            // _buildEditableTextFieldList(
-            //   label: 'Website',
-            //   controllers: _websiteControllers,
-            //   onAdd: () {
-            //     setState(() {
-            //       _websiteControllers.add(TextEditingController());
-            //     });
-            //   },
-            //   keyboardType: TextInputType.url,
-            // ),
           ],
         ),
       ),
     );
   }
 
-  // This _buildEditableTextFieldList is adapted from your previous response
-  // It's used for Email and Address fields to maintain consistency
   Widget _buildEditableTextFieldList({
     required String label,
     required List<TextEditingController> controllers,
@@ -730,14 +678,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
     List<dynamic>? labels,
     Function(int, dynamic)? onLabelChanged,
   }) {
-    // Helper function to get the correct label string (already defined above)
-    // Removed duplicate helper functions to keep code clean.
-    // Ensure _getPhoneLabelString, _getEmailLabelString, _getAddressLabelString are defined once.
-
-    // Dropdown for labels (similar to EditContactScreen)
     Widget _buildLabelDropdown(int index) {
       if (label == 'Email') {
-        // Only for email and address in this context
         return Expanded(
           flex: 2,
           child: DropdownButtonHideUnderline(
