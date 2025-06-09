@@ -10,12 +10,18 @@ import 'package:contactsafe/features/search/presentation/screens/search_screen.d
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:contactsafe/features/settings/presentation/screens/pin_verification_screen.dart';
 import 'package:contactsafe/features/settings/presentation/screens/settings_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:contactsafe/app.dart';
+import 'package:contactsafe/firebase_options.dart'; // <--- THIS IS THE MISSING IMPORT!
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // You have this line twice. You only need it once at the very beginning of main.
+  // WidgetsFlutterBinding.ensureInitialized(); // <-- This line can be removed
 
   final settingsController = SettingsController();
   final pinEnabled = await settingsController.hasPinEnabled();
