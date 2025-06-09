@@ -4,9 +4,9 @@ class NavigationItem {
   final String label;
   final IconData icon;
   final String routeName;
-  final int initialIndex; // To map back to original indices for navigation
+  final int initialIndex;
 
-  NavigationItem({
+  const NavigationItem({
     required this.label,
     required this.icon,
     required this.routeName,
@@ -27,9 +27,9 @@ class NavigationItem {
   factory NavigationItem.fromJson(Map<String, dynamic> json) => NavigationItem(
     label: json['label'],
     icon: IconData(
-      json['iconCodePoint'],
-      fontFamily: json['fontFamily'],
-      fontPackage: json['fontPackage'],
+      json['iconCodePoint'] as int, // Ensure type safety with 'as int'
+      fontFamily: json['fontFamily'] as String?,
+      fontPackage: json['fontPackage'] as String?,
     ),
     routeName: json['routeName'],
     initialIndex: json['initialIndex'],
@@ -37,7 +37,7 @@ class NavigationItem {
 
   // Helper to get all default items (this list will be reordered)
   static List<NavigationItem> defaultItems() {
-    return [
+    return const [
       NavigationItem(
         label: 'Contacts',
         icon: Icons.person,
