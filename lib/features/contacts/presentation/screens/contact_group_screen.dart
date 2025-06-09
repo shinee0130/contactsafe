@@ -132,9 +132,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
               child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  color: Colors.red,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -154,7 +152,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
               child: Text(
                 'OK', // Changed text from "Add Group" to "OK" for general add
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Colors.blue,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -174,7 +172,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
               child: Text(
                 'Ok & add contacts',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Colors.blue,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -240,7 +238,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
             child: Text(
               'Done',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.blue,
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
               ),
@@ -250,11 +248,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
         leadingWidth: 70.0,
         actions: [
           IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Theme.of(context).colorScheme.primary,
-              size: 28,
-            ),
+            icon: Icon(Icons.add, color: Colors.blue, size: 28),
             onPressed: () => _addNewGroup(context),
             splashRadius: 24,
           ),
@@ -341,7 +335,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                               _toggleGroupSelection(group);
                             }
                           },
-                          activeColor: Theme.of(context).colorScheme.primary,
+                          activeColor: Colors.blue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4.0),
                           ),

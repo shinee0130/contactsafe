@@ -140,10 +140,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                     ),
                     trailing:
                         _sortOption == option
-                            ? Icon(
-                              Icons.check,
-                              color: Theme.of(context).colorScheme.primary,
-                            )
+                            ? Icon(Icons.check, color: Colors.blue)
                             : null,
                     onTap: () {
                       setState(() => _sortOption = option);
@@ -216,14 +213,14 @@ class _PhotosScreenState extends State<PhotosScreen> {
                   style: TextStyle(
                     fontSize: 16.5,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Colors.blue,
                   ),
                 ),
               ),
           IconButton(
             icon: Icon(
               _editMode ? Icons.done : Icons.swap_vert,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.blue,
               size: 30,
             ),
             onPressed: _editMode ? _toggleEditMode : _showSortOptions,
@@ -232,7 +229,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _uploadPhotos,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.blue,
         child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
       body: Padding(

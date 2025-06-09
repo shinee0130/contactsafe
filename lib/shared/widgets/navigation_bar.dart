@@ -16,7 +16,7 @@ class ContactSafeNavigationBar extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Theme.of(context).colorScheme.primary,
+      selectedItemColor: Colors.blue,
       unselectedItemColor: Theme.of(
         context,
       ).colorScheme.onSurface.withOpacity(0.6),

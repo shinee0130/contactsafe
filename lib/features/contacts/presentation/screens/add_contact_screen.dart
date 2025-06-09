@@ -459,10 +459,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
-            side: BorderSide(
-              color: Theme.of(context).colorScheme.secondary,
-              width: 1,
-            ),
+            side: BorderSide(color: Colors.blue, width: 1),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
           minimumSize: const Size(double.infinity, 50),
@@ -471,7 +468,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
+            Icon(icon, color: Colors.blue),
             const SizedBox(width: 16),
             Text(
               text,

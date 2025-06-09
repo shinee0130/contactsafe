@@ -129,19 +129,11 @@ class _EventsScreenState extends State<EventsScreen> {
         actions: [
           IconButton(
             onPressed: () {}, // TODO: Implement sort functionality
-            icon: Icon(
-              Icons.swap_vert,
-              color: Theme.of(context).colorScheme.primary,
-              size: 30,
-            ),
+            icon: Icon(Icons.swap_vert, color: Colors.blue, size: 30),
           ),
           IconButton(
             onPressed: _addNewEvent,
-            icon: Icon(
-              Icons.add,
-              color: Theme.of(context).colorScheme.primary,
-              size: 30,
-            ),
+            icon: Icon(Icons.add, color: Colors.blue, size: 30),
           ),
         ],
       ),

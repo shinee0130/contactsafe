@@ -286,7 +286,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         Text(
           _selectedPhoto != null ? 'Change picture' : 'Add picture',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
+            color: Colors.blue,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -734,7 +734,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(Icons.close, color: Colors.blue),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -760,7 +760,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             child: Text(
               'Save',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.blue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -934,15 +934,17 @@ class _EditContactScreenState extends State<EditContactScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.errorContainer,
-                    foregroundColor:
-                        Theme.of(context).colorScheme.onErrorContainer,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       side: BorderSide(
-                        color: Theme.of(context).colorScheme.error,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                         width: 1,
                       ),
                     ),
@@ -951,7 +953,11 @@ class _EditContactScreenState extends State<EditContactScreen> {
                   onPressed: _deleteContact,
                   child: const Text(
                     'Delete Contact',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.red,
+                    ),
                   ),
                 ),
               ),

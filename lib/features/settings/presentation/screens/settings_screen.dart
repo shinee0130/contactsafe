@@ -433,9 +433,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Import contacts',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) => _importContacts(),
@@ -445,9 +443,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Create backup',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) => _createBackup(),
@@ -457,9 +453,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Restore from backup',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) => _restoreFromBackup(),
@@ -469,9 +463,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Backup to Google Drive',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) async {
@@ -516,9 +508,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Restore from Google Drive',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) {
@@ -535,9 +525,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Import backup from link',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) {
@@ -566,9 +554,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Onboard Tour',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed:
@@ -584,9 +570,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Select TabBar order',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
                 onPressed: (context) async {
@@ -616,9 +600,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Center(
                   child: Text(
                     'Delete all app data',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
+                    style: TextStyle(color: Colors.red),
                   ),
                 ),
                 onPressed: (context) => _showDeleteConfirmationDialog(),
