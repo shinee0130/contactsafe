@@ -18,11 +18,10 @@ import 'package:contactsafe/app.dart';
 import 'package:contactsafe/firebase_options.dart';
 
 void main() async {
+  // 1. Ensure Flutter binding is initialized (only once)
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   await FirebaseAppCheck.instance.activate(
     // You can also use a `ReCaptchaEnterpriseProvider` provider instance as an
     // argument for `webProvider`
@@ -41,10 +40,6 @@ void main() async {
     // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
     appleProvider: AppleProvider.appAttest,
   );
-  runApp(ContactSafeApp());
-
-  // You have this line twice. You only need it once at the very beginning of main.
-  // WidgetsFlutterBinding.ensureInitialized(); // <-- This line can be removed
 
   final settingsController = SettingsController();
   final pinEnabled = await settingsController.hasPinEnabled();
@@ -63,9 +58,10 @@ void main() async {
                 pinEnabled
                     ? PinVerificationGate(
                       controller: settingsController,
-                      child: ContactSafeApp(),
+                      child:
+                          ContactSafeApp(), // Your main app wrapped by PinVerificationGate
                     )
-                    : ContactSafeApp(),
+                    : ContactSafeApp(), // Your main app if PIN is not enabled
         '/contacts': (context) => const ContactsScreen(),
         '/search': (context) => const SearchScreen(),
         '/events': (context) => const EventsScreen(),

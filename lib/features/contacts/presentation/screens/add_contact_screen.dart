@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart'; // <<< ADD THIS IMPORT
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({super.key});
@@ -37,6 +38,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   DateTime? _selectedBirthday;
 
+  // Firestore instance
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance; // <<< ADD THIS LINE
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -55,7 +60,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   }
 
   Future<void> _saveContact() async {
-    // Filter out empty entries before saving
+    // --- Data preparation for flutter_contacts (existing logic) ---
     final List<Phone> phonesToSave = [];
     for (int i = 0; i < _phoneNumbers.length; i++) {
       if (_phoneNumbers[i].trim().isNotEmpty) {
@@ -97,7 +102,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
             )
             .toList();
 
-    Contact newContact = Contact(
+    // Create a Contact object for saving to device (if needed)
+    Contact newDeviceContact = Contact(
       name: Name(
         first: _firstNameController.text.trim(),
         last: _lastNameController.text.trim(),
@@ -111,29 +117,73 @@ class _AddContactScreenState extends State<AddContactScreen> {
       websites: websitesToSave,
       addresses: addressesToSave,
       photo: _selectedPhoto,
+      // You can add birthday here too if FlutterContacts supports it
+      // birthday: _selectedBirthday, // Check flutter_contacts docs for exact usage
     );
 
+    // --- Prepare data for Firestore ---
+    Map<String, dynamic> firestoreContactData = {
+      'firstName': _firstNameController.text.trim(),
+      'lastName': _lastNameController.text.trim(),
+      'company': _companyController.text.trim(),
+      'phones':
+          phonesToSave
+              .map((p) => {'number': p.number, 'label': p.label.toString()})
+              .toList(),
+      'emails':
+          emailsToSave
+              .map((e) => {'address': e.address, 'label': e.label.toString()})
+              .toList(),
+      'websites': websitesToSave.map((w) => w.url).toList(),
+      'addresses':
+          addressesToSave
+              .map((a) => {'address': a.address, 'label': a.label.toString()})
+              .toList(),
+      'birthday':
+          _selectedBirthday != null
+              ? Timestamp.fromDate(_selectedBirthday!)
+              : null, // Store as Firestore Timestamp
+      // For photo, you would typically upload it to Firebase Storage and save the URL here.
+      // For now, we'll just acknowledge it.
+      'photoUrl':
+          null, // We'll add Firebase Storage logic for photos later if needed
+      'createdAt': FieldValue.serverTimestamp(), // Timestamp of creation
+    };
+
     try {
+      // 1. Save to device contacts (optional, based on your app's needs)
       if (await FlutterContacts.requestPermission()) {
-        await newContact.insert();
+        await newDeviceContact.insert();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Contact saved successfully!')),
+            const SnackBar(content: Text('Contact saved to device!')),
           );
-          Navigator.pop(context, true);
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Contact permission denied. Cannot save contact.'),
+              content: Text(
+                'Contact permission denied. Cannot save to device.',
+              ),
             ),
           );
         }
       }
+
+      // 2. Save to Cloud Firestore
+      await _firestore
+          .collection('contacts')
+          .add(firestoreContactData); // <<< SAVE TO FIRESTORE
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Contact saved to Cloud Firestore!')),
+        );
+        Navigator.pop(context, true); // Pop back after successful save
+      }
     } catch (e) {
       if (mounted) {
-        print('Error saving contact: $e');
+        print('Error saving contact to device or Firestore: $e');
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Failed to save contact: $e')));
