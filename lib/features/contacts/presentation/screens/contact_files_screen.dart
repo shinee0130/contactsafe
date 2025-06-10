@@ -1,7 +1,74 @@
+// lib/features/contact/presentation/screens/contact_files_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// --- Custom Model for Contact File Metadata (NO CHANGES HERE) ---
+class ContactFile {
+  final String id;
+  final String name;
+  final int size;
+  final String downloadUrl;
+  final DateTime uploadDate;
+  final String storagePath;
+
+  ContactFile({
+    required this.id,
+    required this.name,
+    required this.size,
+    required this.downloadUrl,
+    required this.uploadDate,
+    required this.storagePath,
+  });
+
+  factory ContactFile.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>;
+    return ContactFile(
+      id: doc.id,
+      name: data['name'] ?? 'Unknown File',
+      size: data['size'] ?? 0,
+      downloadUrl: data['downloadUrl'] ?? '',
+      uploadDate: (data['uploadDate'] as Timestamp).toDate(),
+      storagePath: data['storagePath'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'size': size,
+      'downloadUrl': downloadUrl,
+      'uploadDate': Timestamp.fromDate(uploadDate),
+      'storagePath': storagePath,
+    };
+  }
+}
+
+// Add copyWith to ContactFile for easy ID update after Firestore add (NO CHANGES HERE)
+extension ContactFileExtension on ContactFile {
+  ContactFile copyWith({
+    String? id,
+    String? name,
+    int? size,
+    String? downloadUrl,
+    DateTime? uploadDate,
+    String? storagePath,
+  }) {
+    return ContactFile(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      size: size ?? this.size,
+      downloadUrl: downloadUrl ?? this.downloadUrl,
+      uploadDate: uploadDate ?? this.uploadDate,
+      storagePath: storagePath ?? this.storagePath,
+    );
+  }
+}
+// ----------------------------------------------
 
 class ContactFilesScreen extends StatefulWidget {
   final Contact contact;
@@ -13,45 +80,61 @@ class ContactFilesScreen extends StatefulWidget {
 }
 
 class _ContactFilesScreenState extends State<ContactFilesScreen> {
-  List<PlatformFile> _files = [];
+  List<ContactFile> _files = [];
   bool _editMode = false;
-  List<int> _selectedIndices = [];
+  List<String> _selectedFileIds = [];
   FileSortOption _sortOption = FileSortOption.dateDesc;
+  bool _isLoading = false;
+
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    // Load dummy data for demonstration
-    _loadDummyFiles();
+    // Log the contact ID to ensure it's valid
+    print('Loading files for contact ID: ${widget.contact.id}');
+    _loadFiles();
   }
 
-  void _loadDummyFiles() {
-    // In a real app, you would load files from storage
+  CollectionReference<ContactFile> _contactFilesCollection() {
+    // Ensure widget.contact.id is not null or empty
+    if (widget.contact.id == null || widget.contact.id.isEmpty) {
+      throw Exception(
+        "Contact ID is null or empty, cannot access Firestore collection.",
+      );
+    }
+    return _firestore
+        .collection('contact_files_metadata')
+        .doc(widget.contact.id)
+        .collection('files')
+        .withConverter<ContactFile>(
+          fromFirestore: (snapshot, _) => ContactFile.fromFirestore(snapshot),
+          toFirestore: (file, _) => file.toFirestore(),
+        );
+  }
+
+  Future<void> _loadFiles() async {
     setState(() {
-      _files = [
-        PlatformFile(
-          name: "Contract.pdf",
-          size: 2400000,
-          path: null,
-          bytes: null,
-        ),
-        PlatformFile(
-          name: "Profile.jpg",
-          size: 1200000,
-          path: null,
-          bytes: null,
-        ),
-        PlatformFile(
-          name: "Meeting Notes.docx",
-          size: 350000,
-          path: null,
-          bytes: null,
-        ),
-      ];
+      _isLoading = true;
     });
+    try {
+      final querySnapshot = await _contactFilesCollection().get();
+      setState(() {
+        _files = querySnapshot.docs.map((doc) => doc.data()).toList();
+        _sortFiles();
+      });
+    } catch (e) {
+      print('Error loading files: $e');
+      _showSnackBar('Failed to load files: ${e.toString()}'); // Show full error
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  Future<void> _pickFiles() async {
+  Future<void> _pickAndUploadFiles() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
@@ -70,37 +153,166 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
 
     if (result != null) {
       setState(() {
-        _files.addAll(result.files);
-        _sortFiles();
+        _isLoading = true; // Start loading for the entire upload process
+      });
+
+      int successfulUploads = 0;
+      int failedUploads = 0;
+
+      // START OF THE MISSING 'TRY' BLOCK
+      try {
+        for (PlatformFile platformFile in result.files) {
+          if (platformFile.bytes == null) {
+            _showSnackBar(
+              'Skipping ${platformFile.name}: File bytes not available. Try another file type or read method.',
+            );
+            failedUploads++;
+            continue;
+          }
+
+          try {
+            final fileName = platformFile.name;
+            final storagePath = 'contact_files/${widget.contact.id}/$fileName';
+            final ref = _storage.ref().child(storagePath);
+
+            // 1. Upload file to Firebase Storage
+            print('Attempting to upload ${fileName} to Storage...');
+            await ref.putData(platformFile.bytes!);
+            final downloadUrl = await ref.getDownloadURL();
+            print(
+              'Successfully uploaded ${fileName} to Storage. Download URL: $downloadUrl',
+            );
+
+            // 2. Save metadata to Firestore
+            print(
+              'Attempting to save metadata for ${fileName} to Firestore...',
+            );
+            final newFile = ContactFile(
+              id: '', // Will be set by Firestore after doc.add
+              name: fileName,
+              size: platformFile.size,
+              downloadUrl: downloadUrl,
+              uploadDate: DateTime.now(),
+              storagePath: storagePath,
+            );
+
+            // Add document to Firestore and get its ID
+            final docRef = await _contactFilesCollection().add(newFile);
+            print(
+              'Successfully saved metadata for ${fileName} to Firestore. Doc ID: ${docRef.id}',
+            );
+
+            // 3. Update local state ONLY AFTER BOTH OPERATIONS SUCCEED
+            setState(() {
+              _files.add(newFile.copyWith(id: docRef.id));
+              _sortFiles();
+            });
+            successfulUploads++;
+          } catch (e) {
+            print(
+              'Error uploading or saving metadata for ${platformFile.name}: $e',
+            );
+            _showSnackBar(
+              'Failed to upload ${platformFile.name}: ${e.toString()}',
+            );
+            failedUploads++;
+            // Important: If a file fails, we don't want it in the local list
+          }
+        } // End of for loop
+
+        // Final summary message
+        String summaryMessage = '';
+        if (successfulUploads > 0) {
+          summaryMessage += '$successfulUploads file(s) uploaded successfully.';
+        }
+        if (failedUploads > 0) {
+          if (summaryMessage.isNotEmpty) summaryMessage += '\n';
+          summaryMessage += '$failedUploads file(s) failed to upload.';
+        }
+        if (summaryMessage.isEmpty) {
+          summaryMessage = 'No files selected or processed.';
+        }
+        _showSnackBar(summaryMessage);
+
+        // Reload files after all attempts, to ensure consistency
+        _loadFiles(); // Re-fetch the true state from Firestore
+      } catch (e) {
+        // <--- Corresponding catch block for the outer try
+        print('Overall error during file picking or processing: $e');
+        _showSnackBar(
+          'An overall error occurred during file picking or processing: ${e.toString()}',
+        );
+      } finally {
+        // <--- This 'finally' now has a 'try' block
+        setState(() {
+          _isLoading = false; // End loading regardless of success/failure
+        });
+      }
+    }
+  }
+
+  Future<void> _deleteSelectedFiles() async {
+    if (_selectedFileIds.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final deleteFutures =
+          _selectedFileIds.map((fileId) async {
+            final fileToDelete = _files.firstWhere(
+              (file) => file.id == fileId,
+              orElse:
+                  () =>
+                      throw Exception(
+                        'File not found locally for ID: $fileId',
+                      ), // More robust error
+            );
+            print(
+              'Attempting to delete ${fileToDelete.name} from Storage and Firestore...',
+            );
+            // Delete from Firebase Storage
+            await _storage.ref().child(fileToDelete.storagePath).delete();
+            // Delete metadata from Firestore
+            await _contactFilesCollection().doc(fileId).delete();
+            print('Successfully deleted ${fileToDelete.name}.');
+          }).toList();
+
+      await Future.wait(deleteFutures);
+
+      setState(() {
+        _files.removeWhere((file) => _selectedFileIds.contains(file.id));
+        _selectedFileIds.clear();
+        _editMode = false;
+      });
+      _showSnackBar('Selected files deleted successfully!');
+    } catch (e) {
+      print('Error deleting files: $e');
+      _showSnackBar('Failed to delete selected files: ${e.toString()}');
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
 
+  // --- UI and Helper Functions (mostly retained, minor tweaks) ---
+
   void _toggleEditMode() {
     setState(() {
       _editMode = !_editMode;
-      if (!_editMode) _selectedIndices.clear();
+      if (!_editMode) _selectedFileIds.clear();
     });
   }
 
-  void _toggleSelection(int index) {
+  void _toggleSelection(String fileId) {
     setState(() {
-      if (_selectedIndices.contains(index)) {
-        _selectedIndices.remove(index);
+      if (_selectedFileIds.contains(fileId)) {
+        _selectedFileIds.remove(fileId);
       } else {
-        _selectedIndices.add(index);
+        _selectedFileIds.add(fileId);
       }
-    });
-  }
-
-  void _deleteSelected() {
-    setState(() {
-      _selectedIndices.sort((a, b) => b.compareTo(a));
-      for (var index in _selectedIndices) {
-        _files.removeAt(index);
-      }
-      _selectedIndices.clear();
-      _editMode = false;
     });
   }
 
@@ -114,10 +326,10 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           _files.sort((a, b) => b.name.compareTo(a.name));
           break;
         case FileSortOption.dateAsc:
-          // Using modification date for sorting
+          _files.sort((a, b) => a.uploadDate.compareTo(b.uploadDate));
           break;
         case FileSortOption.dateDesc:
-          // Using modification date for sorting
+          _files.sort((a, b) => b.uploadDate.compareTo(a.uploadDate));
           break;
         case FileSortOption.sizeAsc:
           _files.sort((a, b) => a.size.compareTo(b.size));
@@ -216,6 +428,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         return Colors.red;
       case 'jpg':
       case 'jpeg':
+        return Colors.blue;
       case 'png':
         return Colors.blue;
       case 'doc':
@@ -228,6 +441,14 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         return Colors.grey;
       default:
         return Colors.blue;
+    }
+  }
+
+  void _showSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -255,37 +476,41 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             icon: const Icon(Icons.swap_vert, size: 30, color: Colors.blue),
             onPressed: _showSortDialog,
           ),
-          _editMode
-              ? TextButton(
-                onPressed: _deleteSelected,
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-              : TextButton(
-                onPressed: _toggleEditMode,
-                child: const Text(
-                  'Edit',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
+          if (_editMode)
+            TextButton(
+              onPressed:
+                  _selectedFileIds.isNotEmpty ? _deleteSelectedFiles : null,
+              child: Text(
+                'Delete (${_selectedFileIds.length})',
+                style: TextStyle(
+                  color: _selectedFileIds.isNotEmpty ? Colors.red : Colors.grey,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+            )
+          else
+            TextButton(
+              onPressed: _toggleEditMode,
+              child: const Text(
+                'Edit',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.add, size: 30, color: Colors.blue),
-            onPressed: _pickFiles,
+            onPressed: _isLoading ? null : _pickAndUploadFiles,
           ),
         ],
       ),
       body:
-          _files.isEmpty
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _files.isEmpty
               ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -297,9 +522,9 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                       style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Tap the + button to add files',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -309,7 +534,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                 itemCount: _files.length,
                 itemBuilder: (context, index) {
                   final file = _files[index];
-                  final isSelected = _selectedIndices.contains(index);
+                  final isSelected = _selectedFileIds.contains(file.id);
 
                   return Card(
                     elevation: 2,
@@ -327,13 +552,13 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: _getFileIconColor(
-                            file.extension,
+                            file.name.split('.').last,
                           ).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
-                          _getFileIcon(file.extension),
-                          color: _getFileIconColor(file.extension),
+                          _getFileIcon(file.name.split('.').last),
+                          color: _getFileIconColor(file.name.split('.').last),
                           size: 28,
                         ),
                       ),
@@ -344,14 +569,14 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Text(
-                        '${_formatFileSize(file.size)} • ${DateFormat('MMM d, y').format(DateTime.now())}',
+                        '${_formatFileSize(file.size)} • ${DateFormat('MMM d, y').format(file.uploadDate)}',
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       trailing:
                           _editMode
                               ? Checkbox(
                                 value: isSelected,
-                                onChanged: (value) => _toggleSelection(index),
+                                onChanged: (value) => _toggleSelection(file.id),
                                 activeColor: Colors.blue,
                               )
                               : IconButton(
@@ -360,21 +585,26 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                                   color: Colors.grey,
                                 ),
                                 onPressed: () {
-                                  // Show file options menu
+                                  // TODO: Show file options menu (e.g., share, download)
+                                  _showSnackBar('Options for ${file.name}');
                                 },
                               ),
                       onTap: () {
                         if (_editMode) {
-                          _toggleSelection(index);
+                          _toggleSelection(file.id);
                         } else {
-                          // Open file preview
+                          // TODO: Implement file preview/opening (requires more packages)
+                          _showSnackBar(
+                            'Opening file: ${file.name} (Not implemented)',
+                          );
+                          print('Download URL: ${file.downloadUrl}');
                         }
                       },
                       onLongPress: () {
                         if (!_editMode) {
                           setState(() {
                             _editMode = true;
-                            _selectedIndices.add(index);
+                            _selectedFileIds.add(file.id);
                           });
                         }
                       },
