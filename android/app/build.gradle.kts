@@ -47,6 +47,6 @@ flutter {
 dependencies{
     implementation (
         platform(
-            "com.google.firebase:firebase-bom:32.7.2"
+            "com.google.firebase:firebase-bom:33.15.0"
             ))
 }
