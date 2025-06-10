@@ -1,13 +1,15 @@
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
-import '../../../../shared/widgets/navigation_bar.dart';
-import 'package:contactsafe/features/events/data/models/event_model.dart'; // Import your AppEvent model
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:location/location.dart';
-import 'package:geocoding/geocoding.dart' as geo;
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../../../../shared/widgets/navigation_bar.dart';
+import 'package:contactsafe/features/events/data/models/event_model.dart';
+import 'package:contactsafe/features/events/presentation/widgets/location_picker_screen.dart';
+import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -33,6 +35,7 @@ class _EventsScreenState extends State<EventsScreen> {
     _fetchContacts().then((_) {
       _fetchEvents();
     });
+    _requestLocationPermission(); // Request location permission on screen init
   }
 
   @override
@@ -41,15 +44,53 @@ class _EventsScreenState extends State<EventsScreen> {
     super.dispose();
   }
 
+  // Requests location permissions (for the 'My Location' button and current location)
+  Future<void> _requestLocationPermission() async {
+    final status =
+        await Permission.locationWhenInUse
+            .request(); // Or .location if you need background location
+
+    if (status.isGranted) {
+      print('Location permission granted');
+    } else if (status.isDenied) {
+      print('Location permission denied');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Location permission is recommended for map features.',
+            ),
+          ),
+        );
+      }
+    } else if (status.isPermanentlyDenied) {
+      print('Location permission permanently denied');
+      if (mounted) {
+        openAppSettings(); // Direct the user to app settings
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Location permission permanently denied. Please enable it in app settings.',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   // Fetches contacts from the device
   Future<void> _fetchContacts() async {
     if (!await FlutterContacts.requestPermission()) {
       print('Contacts permission denied');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Contacts permission is required to add participants.'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Contacts permission is required to add participants.',
+            ),
+          ),
+        );
+      }
       return;
     }
 
@@ -64,9 +105,11 @@ class _EventsScreenState extends State<EventsScreen> {
       });
     } catch (e) {
       print('Error fetching contacts: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching contacts: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching contacts: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -94,11 +137,13 @@ class _EventsScreenState extends State<EventsScreen> {
             },
             onError: (error) {
               print("Error fetching events: $error");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error fetching events: ${error.toString()}'),
-                ),
-              );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error fetching events: ${error.toString()}'),
+                  ),
+                );
+              }
             },
           );
     } catch (e) {
@@ -143,8 +188,8 @@ class _EventsScreenState extends State<EventsScreen> {
     final TextEditingController descriptionController = TextEditingController();
     DateTime? selectedDate;
     List<Contact> selectedParticipants = [];
-    LatLng? selectedLocation; // Store the selected LatLng
-    String? selectedAddress; // Store the selected address (optional)
+    LatLng? selectedLocation;
+    String? selectedAddress; // This will hold the address string
 
     showDialog(
       context: context,
@@ -229,6 +274,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                         value: tempSelected.contains(contact),
                                         onChanged: (bool? value) {
                                           setStateSB(() {
+                                            // Use setStateSB to update dialog state
                                             if (value == true) {
                                               tempSelected.add(contact);
                                             } else {
@@ -287,80 +333,42 @@ class _EventsScreenState extends State<EventsScreen> {
                                 .toList(),
                       ),
 
-                      // Google Maps Integration
                       const SizedBox(height: 20),
-                      const Text('Select Event Location (Tap on map):'),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        height: 300,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: GoogleMap(
-                            initialCameraPosition: const CameraPosition(
-                              target: LatLng(
-                                47.9189,
-                                106.9172,
-                              ), // Default: Ulaanbaatar, Mongolia
-                              zoom: 12,
+                      // New "Choose Location" button
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => LocationPickerScreen(
+                                    initialLocation: selectedLocation,
+                                    initialAddress: selectedAddress,
+                                  ),
                             ),
-                            markers:
-                                selectedLocation == null
-                                    ? {}
-                                    : {
-                                      Marker(
-                                        markerId: const MarkerId(
-                                          'selected-location',
-                                        ),
-                                        position: selectedLocation!,
-                                        infoWindow: InfoWindow(
-                                          title: 'Event Location',
-                                          snippet:
-                                              selectedAddress ??
-                                              'Selected Location',
-                                        ),
-                                      ),
-                                    },
-                            onTap: (LatLng tappedLocation) async {
-                              String? address;
-                              try {
-                                final placemarks = await geo
-                                    .placemarkFromCoordinates(
-                                      tappedLocation.latitude,
-                                      tappedLocation.longitude,
-                                    );
-                                if (placemarks.isNotEmpty) {
-                                  final p = placemarks.first;
-                                  address =
-                                      '${p.street}, ${p.subLocality}, ${p.locality}';
-                                  if (p.locality != null &&
-                                      p.locality!.isNotEmpty) {
-                                    address = address ?? p.locality;
-                                  }
-                                }
-                              } catch (e) {
-                                print('Error during geocoding: $e');
-                                address =
-                                    null; // Ensure it's null if geocoding fails
-                              }
+                          );
 
-                              setStateSB(() {
-                                selectedLocation = tappedLocation;
-                                selectedAddress =
-                                    address; // Store the resolved address
-                              });
-                            },
-                          ),
+                          if (result != null && result['location'] != null) {
+                            setStateSB(() {
+                              // Use setStateSB to update dialog state
+                              selectedLocation = result['location'];
+                              selectedAddress = result['address'];
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.map),
+                        label: const Text('Choose Location on Map'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Theme color
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
                         ),
                       ),
                       if (selectedLocation != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                          padding: const EdgeInsets.only(top: 10.0),
                           child: Text(
-                            'Selected Location: ${selectedAddress ?? '${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)}'}',
+                            'Location: ${selectedAddress ?? '${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)}'}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -406,21 +414,25 @@ class _EventsScreenState extends State<EventsScreen> {
                             .collection('events')
                             .add(newAppEvent.toFirestore());
                         print('Event added to Firestore!');
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Event added successfully!'),
-                          ),
-                        );
+                        if (mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Event added successfully!'),
+                            ),
+                          );
+                        }
                       } catch (e) {
                         print('Error adding event: $e');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Failed to add event: ${e.toString()}',
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Failed to add event: ${e.toString()}',
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       }
                     },
                     child: const Text('Create'),
@@ -551,7 +563,6 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Resolve participants using the helper method in AppEvent model
     final List<Contact> eventParticipants = event.getParticipants(
       allDeviceContacts,
     );
@@ -563,55 +574,75 @@ class EventCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       color: Theme.of(context).colorScheme.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              event.title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+      // Make the card tappable to view details
+      child: InkWell(
+        // Use InkWell for tap feedback
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => EventsDetailScreen(
+                    event: event,
+                    allDeviceContacts: allDeviceContacts,
+                  ),
             ),
-            const SizedBox(height: 8),
-            if (event.location != null && event.location!.isNotEmpty)
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                'Location: ${event.location}',
+                event.title,
                 style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-            const SizedBox(height: 8),
-            Text(
-              'Date: ${DateFormat.yMMMd().format(event.date)}',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Participants: $participantNames',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            if (event.description != null && event.description!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  'Description: ${event.description}',
+              const SizedBox(height: 8),
+              if (event.location != null && event.location!.isNotEmpty)
+                Text(
+                  'Location: ${event.location}',
                   style: TextStyle(
-                    fontStyle: FontStyle.italic,
                     color: Theme.of(
                       context,
                     ).colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
+              const SizedBox(height: 8),
+              Text(
+                'Date: ${DateFormat.yMMMd().format(event.date)}',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Participants: $participantNames',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              if (event.description != null && event.description!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Description: ${event.description}',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
