@@ -3,7 +3,6 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'dart:typed_data';
-
 import 'package:permission_handler/permission_handler.dart';
 
 class EditContactScreen extends StatefulWidget {
@@ -152,6 +151,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             )
             .toList();
 
+    // Create updated contact while preserving all necessary fields
     Contact updatedContact = Contact(
       id: widget.contact.id,
       name: Name(
@@ -168,6 +168,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
       addresses: addressesToSave,
       photo: _selectedPhoto,
     );
+
+    // Preserve critical fields from original contact
+    // updatedContact.rawId = widget.contact.rawId;
+    // updatedContact.accounts = widget.contact.accounts;
+    // updatedContact.isDeleted = widget.contact.isDeleted;
+    // updatedContact.displayName = widget.contact.displayName;
 
     try {
       if (await FlutterContacts.requestPermission()) {
@@ -191,10 +197,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
       }
     } catch (e) {
       if (mounted) {
-        print('Error updating contact: $e');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to update contact: $e')));
+        debugPrint('Error updating contact: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update contact: ${e.toString()}')),
+        );
       }
     }
   }
@@ -208,9 +214,9 @@ class _EditContactScreenState extends State<EditContactScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to delete contact: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete contact: ${e.toString()}')),
+        );
       }
     }
   }
@@ -734,7 +740,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.blue),
+          icon: const Icon(Icons.close, color: Colors.blue),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -757,7 +763,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         actions: [
           TextButton(
             onPressed: _saveContact,
-            child: Text(
+            child: const Text(
               'Save',
               style: TextStyle(
                 color: Colors.blue,

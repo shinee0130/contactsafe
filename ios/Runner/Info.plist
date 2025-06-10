@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<string>NSLocationWhenInUseUsageDescription</string>
+	<key>Want to display location on map, and track it.</key>
+	<string>NSLocationAlwaysUsageDescription</string>
+	<key>Want to display location on map, and track it.</key>
+	<string>NSLocationAlwaysAndWhenInUseUsageDescription</string>
+	<key>Want to display location on map, and track it.</key>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Need photos permission to upload images</string>
 	<key>NSCameraUsageDescription</key>

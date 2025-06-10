@@ -2,7 +2,12 @@ import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import '../../../../shared/widgets/navigation_bar.dart';
+import 'package:contactsafe/features/events/data/models/event_model.dart'; // Import your AppEvent model
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -14,93 +19,415 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen> {
   int _currentIndex = 2;
   final TextEditingController _searchController = TextEditingController();
-  // List<Contact> _filteredContacts = [];
-  List<Contact> _allContacts = [];
-  List<Event> _events = [];
-  List<Event> _filteredEvents = [];
+  List<Contact> _allContacts = []; // Stores all device contacts
+  List<AppEvent> _events = []; // Stores events fetched from Firestore
+  List<AppEvent> _filteredEvents =
+      []; // Stores events after applying search filter
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance; // Firestore instance
 
   @override
   void initState() {
     super.initState();
-    _fetchContacts();
-    // _loadSampleEvents(); // Load some sample events // Will be called after contacts are fetched
-  }
-
-  Future<void> _fetchContacts() async {
-    if (!await FlutterContacts.requestPermission()) return;
-
-    final contacts = await FlutterContacts.getContacts(
-      withProperties: true,
-      withPhoto: true,
-    );
-
-    contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
-    setState(() {
-      _allContacts = contacts;
-      // _filteredContacts = List.from(contacts); // Keep for now, might be used elsewhere or removed later
+    // Fetch contacts first, then fetch events (as events depend on contact data)
+    _fetchContacts().then((_) {
+      _fetchEvents();
     });
-    _loadSampleEvents();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // Fetches contacts from the device
+  Future<void> _fetchContacts() async {
+    if (!await FlutterContacts.requestPermission()) {
+      print('Contacts permission denied');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Contacts permission is required to add participants.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final contacts = await FlutterContacts.getContacts(
+        withProperties: true,
+        withPhoto: true,
+      );
+      contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+      setState(() {
+        _allContacts = contacts;
+      });
+    } catch (e) {
+      print('Error fetching contacts: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching contacts: ${e.toString()}')),
+      );
+    }
+  }
+
+  // Fetches events from Firestore in real-time
+  Future<void> _fetchEvents() async {
+    try {
+      _firestore
+          .collection('events')
+          .withConverter(
+            fromFirestore: AppEvent.fromFirestore,
+            toFirestore: (AppEvent event, options) => event.toFirestore(),
+          )
+          .snapshots()
+          .listen(
+            (snapshot) {
+              final fetchedEvents =
+                  snapshot.docs.map((doc) => doc.data() as AppEvent).toList();
+
+              setState(() {
+                _events = fetchedEvents;
+                _filterEvents(
+                  _searchController.text,
+                ); // Re-filter when new events arrive
+              });
+            },
+            onError: (error) {
+              print("Error fetching events: $error");
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error fetching events: ${error.toString()}'),
+                ),
+              );
+            },
+          );
+    } catch (e) {
+      print("Failed to set up event listener: $e");
+    }
+  }
+
+  // Filters the events based on the search query
   void _filterEvents(String query) {
     setState(() {
       _filteredEvents =
           query.isEmpty
-              ? List.from(_events)
+              ? List.from(_events) // If query is empty, show all events
               : _events
                   .where(
                     (event) =>
-                        event.title.toLowerCase().contains(query.toLowerCase()),
+                        event.title.toLowerCase().contains(
+                          query.toLowerCase(),
+                        ) ||
+                        (event.location?.toLowerCase() ?? '').contains(
+                          query.toLowerCase(),
+                        ) ||
+                        (event.description?.toLowerCase() ?? '').contains(
+                          query.toLowerCase(),
+                        ) ||
+                        // Search by participant names
+                        event
+                            .getParticipants(_allContacts)
+                            .any(
+                              (p) => p.displayName.toLowerCase().contains(
+                                query.toLowerCase(),
+                              ),
+                            ),
                   )
                   .toList();
     });
   }
 
-  void _loadSampleEvents() {
-    // TODO: Replace with actual event loading logic
-    // Ensure _allContacts is not empty before using it for participants
-    List<Contact> sampleParticipants1 =
-        _allContacts.length >= 3 ? _allContacts.take(3).toList() : [];
-    List<Contact> sampleParticipants2 =
-        _allContacts.length >= 5 ? _allContacts.take(5).toList() : [];
-
-    setState(() {
-      _events = [
-        Event(
-          title: 'Team Meeting',
-          date: DateTime.now().add(const Duration(days: 1)),
-          participants: sampleParticipants1,
-        ),
-        Event(
-          title: 'Product Launch',
-          date: DateTime.now().add(const Duration(days: 7)),
-          participants: sampleParticipants2,
-        ),
-      ];
-      _filteredEvents = List.from(_events);
-    });
-  }
-
+  // Shows a dialog to add a new event with name, date, participants, and location
   void _addNewEvent() {
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+    DateTime? selectedDate;
+    List<Contact> selectedParticipants = [];
+    LatLng? selectedLocation; // Store the selected LatLng
+    String? selectedAddress; // Store the selected address (optional)
+
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text('New Event'),
-            content: const Text('Event creation dialog will go here'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // TODO: Implement actual event creation
-                  Navigator.pop(context);
-                },
-                child: const Text('Create'),
-              ),
-            ],
+          (context) => StatefulBuilder(
+            builder: (context, setStateSB) {
+              return AlertDialog(
+                title: const Text('New Event'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Event Title',
+                        ),
+                      ),
+                      TextField(
+                        controller: descriptionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Description (Optional)',
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 10),
+                      ListTile(
+                        title: Text(
+                          selectedDate == null
+                              ? 'Select Date'
+                              : 'Date: ${DateFormat.yMMMd().format(selectedDate!)}',
+                        ),
+                        trailing: const Icon(Icons.calendar_today),
+                        onTap: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365 * 5),
+                            ),
+                          );
+                          if (picked != null) {
+                            setStateSB(() {
+                              selectedDate = picked;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_allContacts.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No contacts available to add.'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          final List<Contact>?
+                          chosenContacts = await showDialog<List<Contact>>(
+                            context: context,
+                            builder: (BuildContext dialogContext) {
+                              List<Contact> tempSelected = List.from(
+                                selectedParticipants,
+                              );
+                              return AlertDialog(
+                                title: const Text('Select Participants'),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  height:
+                                      MediaQuery.of(dialogContext).size.height *
+                                      0.6,
+                                  child: ListView.builder(
+                                    itemCount: _allContacts.length,
+                                    itemBuilder: (context, index) {
+                                      final contact = _allContacts[index];
+                                      return CheckboxListTile(
+                                        title: Text(contact.displayName),
+                                        value: tempSelected.contains(contact),
+                                        onChanged: (bool? value) {
+                                          setStateSB(() {
+                                            if (value == true) {
+                                              tempSelected.add(contact);
+                                            } else {
+                                              tempSelected.remove(contact);
+                                            }
+                                          });
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () =>
+                                            Navigator.pop(dialogContext, null),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(
+                                          dialogContext,
+                                          tempSelected,
+                                        ),
+                                    child: const Text('Select'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (chosenContacts != null) {
+                            setStateSB(() {
+                              selectedParticipants = chosenContacts;
+                            });
+                          }
+                        },
+                        child: Text(
+                          'Add Participants (${selectedParticipants.length})',
+                        ),
+                      ),
+                      Wrap(
+                        spacing: 8.0,
+                        children:
+                            selectedParticipants
+                                .map(
+                                  (contact) => Chip(
+                                    label: Text(contact.displayName),
+                                    onDeleted: () {
+                                      setStateSB(() {
+                                        selectedParticipants.remove(contact);
+                                      });
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                      ),
+
+                      // Google Maps Integration
+                      const SizedBox(height: 20),
+                      const Text('Select Event Location (Tap on map):'),
+                      const SizedBox(height: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        height: 300,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: GoogleMap(
+                            initialCameraPosition: const CameraPosition(
+                              target: LatLng(
+                                47.9189,
+                                106.9172,
+                              ), // Default: Ulaanbaatar, Mongolia
+                              zoom: 12,
+                            ),
+                            markers:
+                                selectedLocation == null
+                                    ? {}
+                                    : {
+                                      Marker(
+                                        markerId: const MarkerId(
+                                          'selected-location',
+                                        ),
+                                        position: selectedLocation!,
+                                        infoWindow: InfoWindow(
+                                          title: 'Event Location',
+                                          snippet:
+                                              selectedAddress ??
+                                              'Selected Location',
+                                        ),
+                                      ),
+                                    },
+                            onTap: (LatLng tappedLocation) async {
+                              String? address;
+                              try {
+                                final placemarks = await geo
+                                    .placemarkFromCoordinates(
+                                      tappedLocation.latitude,
+                                      tappedLocation.longitude,
+                                    );
+                                if (placemarks.isNotEmpty) {
+                                  final p = placemarks.first;
+                                  address =
+                                      '${p.street}, ${p.subLocality}, ${p.locality}';
+                                  if (p.locality != null &&
+                                      p.locality!.isNotEmpty) {
+                                    address = address ?? p.locality;
+                                  }
+                                }
+                              } catch (e) {
+                                print('Error during geocoding: $e');
+                                address =
+                                    null; // Ensure it's null if geocoding fails
+                              }
+
+                              setStateSB(() {
+                                selectedLocation = tappedLocation;
+                                selectedAddress =
+                                    address; // Store the resolved address
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      if (selectedLocation != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Selected Location: ${selectedAddress ?? '${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)}'}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      if (titleController.text.isEmpty ||
+                          selectedDate == null ||
+                          selectedLocation == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please enter a title, select a date, and select a location.',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final newAppEvent = AppEvent(
+                        title: titleController.text,
+                        date: selectedDate!,
+                        location:
+                            selectedAddress ??
+                            '${selectedLocation!.latitude}, ${selectedLocation!.longitude}', // Store address or coordinates
+                        description:
+                            descriptionController.text.isEmpty
+                                ? null
+                                : descriptionController.text,
+                        participantContactIds:
+                            selectedParticipants.map((c) => c.id).toList(),
+                      );
+
+                      try {
+                        await _firestore
+                            .collection('events')
+                            .add(newAppEvent.toFirestore());
+                        print('Event added to Firestore!');
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Event added successfully!'),
+                          ),
+                        );
+                      } catch (e) {
+                        print('Error adding event: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Failed to add event: ${e.toString()}',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text('Create'),
+                  ),
+                ],
+              );
+            },
           ),
     );
   }
@@ -159,10 +486,10 @@ class _EventsScreenState extends State<EventsScreen> {
             const SizedBox(height: 16.0),
             Expanded(
               child:
-                  _filteredEvents.isEmpty
+                  _filteredEvents.isEmpty && _events.isEmpty
                       ? Center(
                         child: Text(
-                          'No events found',
+                          'No events found. Create one!',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -171,8 +498,12 @@ class _EventsScreenState extends State<EventsScreen> {
                       : ListView.builder(
                         itemCount: _filteredEvents.length,
                         itemBuilder: (context, index) {
-                          final event = _filteredEvents[index];
-                          return EventCard(event: event);
+                          final appEvent = _filteredEvents[index];
+                          // Pass _allContacts to the EventCard to resolve participant names
+                          return EventCard(
+                            event: appEvent,
+                            allDeviceContacts: _allContacts,
+                          );
                         },
                       ),
             ),
@@ -192,7 +523,7 @@ class _EventsScreenState extends State<EventsScreen> {
               Navigator.pushReplacementNamed(context, '/search');
               break;
             case 2:
-              Navigator.pushReplacementNamed(context, '/events');
+              // Already on events screen, no need to navigate
               break;
             case 3:
               Navigator.pushReplacementNamed(context, '/photos');
@@ -207,24 +538,30 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 }
 
-// New Event model class
-class Event {
-  final String title;
-  final DateTime date;
-  final List<Contact> participants;
-
-  Event({required this.title, required this.date, required this.participants});
-}
-
-// New EventCard widget
+// EventCard widget (updated to accept AppEvent and resolve participant names)
 class EventCard extends StatelessWidget {
-  final Event event;
+  final AppEvent event; // Now uses AppEvent
+  final List<Contact> allDeviceContacts; // To resolve participant names
 
-  const EventCard({super.key, required this.event});
+  const EventCard({
+    super.key,
+    required this.event,
+    required this.allDeviceContacts,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Resolve participants using the helper method in AppEvent model
+    final List<Contact> eventParticipants = event.getParticipants(
+      allDeviceContacts,
+    );
+    final String participantNames =
+        eventParticipants.isEmpty
+            ? 'None'
+            : eventParticipants.map((c) => c.displayName).join(', ');
+
     return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -240,6 +577,16 @@ class EventCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
+            if (event.location != null && event.location!.isNotEmpty)
+              Text(
+                'Location: ${event.location}',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+            const SizedBox(height: 8),
             Text(
               'Date: ${DateFormat.yMMMd().format(event.date)}',
               style: TextStyle(
@@ -248,9 +595,22 @@ class EventCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Participants: ${event.participants.length}',
+              'Participants: $participantNames',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
+            if (event.description != null && event.description!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Description: ${event.description}',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
