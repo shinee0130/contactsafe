@@ -1,4 +1,4 @@
-// pin_verification_gate.dart
+// pin_verification_screen.dart
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:contactsafe/features/settings/presentation/screens/pin_dialog.dart';
 import 'package:flutter/material.dart';
