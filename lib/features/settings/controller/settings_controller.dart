@@ -219,5 +219,11 @@ class SettingsController {
     return '${dateTime.year}${twoDigits(dateTime.month)}${twoDigits(dateTime.day)}_${twoDigits(dateTime.hour)}${twoDigits(dateTime.minute)}${twoDigits(dateTime.second)}';
   }
 
-  Future<void> saveUsePasswordSetting(bool value) async {}
+  Future<void> saveUsePasswordSetting(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_usePasswordKey, value);
+    if (kDebugMode) {
+      print('Saved usePassword: $value');
+    }
+  }
 }
