@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'AssignContactsToGroupScreen.dart';
+import 'AssignContactsToGroupScreen.dart'
+    show AssignContactsToGroupScreen, globalGroups, globalContactGroupsMap;
 
 class ContactGroupsScreen extends StatefulWidget {
   const ContactGroupsScreen({super.key});
@@ -10,19 +11,12 @@ class ContactGroupsScreen extends StatefulWidget {
 
 class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
   bool _selectAll = false;
-  final List<String> _groups = [
-    'Family',
-    'Friends',
-    'Work',
-    'Emergency',
-    'Not assigned',
-  ];
   final List<String> _selectedGroups = [];
 
   @override
   void initState() {
     super.initState();
-    if (_groups.contains('Not assigned') &&
+    if (globalGroups.contains('Not assigned') &&
         !_selectedGroups.contains('Not assigned')) {
       _selectedGroups.add('Not assigned');
     }
@@ -31,7 +25,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
 
   void _updateSelectAllStatus() {
     setState(() {
-      _selectAll = _selectedGroups.length == _groups.length;
+      _selectAll = _selectedGroups.length == globalGroups.length;
     });
   }
 
@@ -40,7 +34,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
       _selectAll = !_selectAll;
       _selectedGroups.clear();
       if (_selectAll) {
-        _selectedGroups.addAll(_groups);
+        _selectedGroups.addAll(globalGroups);
       }
       _updateSelectAllStatus();
     });
@@ -187,9 +181,9 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
     String newGroupName, {
     required bool shouldNavigateToAddContacts,
   }) {
-    if (newGroupName.isNotEmpty && !_groups.contains(newGroupName)) {
+    if (newGroupName.isNotEmpty && !globalGroups.contains(newGroupName)) {
       setState(() {
-        _groups.add(newGroupName);
+        globalGroups.add(newGroupName);
         _selectedGroups.add(newGroupName); // Automatically select new group
         _updateSelectAllStatus();
       });
@@ -205,11 +199,22 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
           ),
         );
       }
-    } else if (newGroupName.isNotEmpty && _groups.contains(newGroupName)) {
+    } else if (newGroupName.isNotEmpty && globalGroups.contains(newGroupName)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Group "$newGroupName" already exists.')),
       );
     }
+  }
+
+  void _deleteGroup(String groupName) {
+    setState(() {
+      globalGroups.remove(groupName);
+      _selectedGroups.remove(groupName);
+      for (final groups in globalContactGroupsMap.values) {
+        groups.remove(groupName);
+      }
+      _updateSelectAllStatus();
+    });
   }
 
   // ... rest of your ContactGroupsScreen code remains the same ...
@@ -307,7 +312,7 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
               ),
             ),
           ),
-          ..._groups.map(
+          ...globalGroups.map(
             (group) => Card(
               color: Theme.of(context).colorScheme.surface,
               margin: const EdgeInsets.only(bottom: 12.0),
@@ -354,6 +359,12 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                                     : FontWeight.normal,
                           ),
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: group == 'Not assigned'
+                            ? null
+                            : () => _deleteGroup(group),
                       ),
                     ],
                   ),

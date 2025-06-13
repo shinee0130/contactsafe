@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
+// Global storage for contact groups and their assignments.
+final List<String> globalGroups = [
+  'Family',
+  'Friends',
+  'Work',
+  'Emergency',
+  'Not assigned',
+];
+
 final Map<String, List<String>> globalContactGroupsMap = {
   'Alice Smith': ['Family', 'Friends'],
   'Bob Johnson': ['Work'],
