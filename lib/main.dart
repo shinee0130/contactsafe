@@ -10,7 +10,7 @@ import 'package:contactsafe/features/search/presentation/screens/search_screen.d
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:contactsafe/features/settings/presentation/screens/pin_verification_screen.dart';
 import 'package:contactsafe/features/settings/presentation/screens/settings_screen.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+// import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
@@ -21,11 +21,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.appAttest,
-  );
+  // await FirebaseAppCheck.instance.activate(
+  //   webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+  //   androidProvider: AndroidProvider.debug,
+  //   appleProvider: AppleProvider.appAttest,
+  // );
 
   final settingsController = SettingsController();
   final pinEnabled = await settingsController.hasPinEnabled();
