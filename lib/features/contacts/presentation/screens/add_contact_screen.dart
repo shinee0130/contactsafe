@@ -3,6 +3,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:flutter/services.dart';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart'; // <<< ADD THIS IMPORT
 
@@ -425,6 +426,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           ),
                         ),
                         initialCountryCode: 'US',
+                        inputFormatters: const [
+                          LengthLimitingTextInputFormatter(20),
+                        ],
                         onChanged: (phone) {
                           _phoneNumbers[index] = phone.number;
                         },
