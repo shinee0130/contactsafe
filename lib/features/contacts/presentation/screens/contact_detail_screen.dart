@@ -50,6 +50,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         Contact? fetchedContact = await FlutterContacts.getContact(
           contactId,
           withAccounts: true,
+          withProperties: true,
           withPhoto: true,
         );
         setState(() {
