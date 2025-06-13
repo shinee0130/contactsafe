@@ -1,7 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:contactsafe/features/events/data/models/event_model.dart';
+import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
+
+class _FileResult {
+  final String id;
+  final String name;
+  final String contactId;
+  final String contactName;
+
+  _FileResult({
+    required this.id,
+    required this.name,
+    required this.contactId,
+    required this.contactName,
+  });
+}
+
+class _NoteResult {
+  final String id;
+  final String content;
+  final String contactId;
+  final String contactName;
+
+  _NoteResult({
+    required this.id,
+    required this.content,
+    required this.contactId,
+    required this.contactName,
+  });
+}
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -14,6 +46,9 @@ class _SearchScreenState extends State<SearchScreen> {
   int _currentIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   List<Contact> _allContacts = [];
+  List<_FileResult> _allFiles = [];
+  List<_NoteResult> _allNotes = [];
+  List<AppEvent> _allEvents = [];
   List<dynamic> _searchResults = [];
   bool _isLoading = true;
 
@@ -35,15 +70,63 @@ class _SearchScreenState extends State<SearchScreen> {
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
         setState(() {
           _allContacts = contacts;
-          _isLoading = false;
         });
       }
 
-      // TODO: Add calls to fetch files, photos, events from your data sources
-      // Example:
-      // _allFiles = await FileService.getAllFiles();
-      // _allEvents = await EventService.getAllEvents();
-      // _allPhotos = await PhotoService.getAllPhotos();
+      // Fetch files across all contacts
+      final fileSnapshots = await FirebaseFirestore.instance
+          .collectionGroup('files')
+          .get();
+      final files = fileSnapshots.docs.map((doc) {
+        final data = doc.data();
+        final contactId = doc.reference.parent.parent!.id;
+        final contact = _allContacts.firstWhere(
+          (c) => c.id == contactId,
+          orElse: () => Contact(id: contactId, displayName: 'Unknown'),
+        );
+        return _FileResult(
+          id: doc.id,
+          name: data['name'] ?? '',
+          contactId: contactId,
+          contactName: contact.displayName,
+        );
+      }).toList();
+
+      // Fetch notes across all contacts
+      final noteSnapshots = await FirebaseFirestore.instance
+          .collectionGroup('notes')
+          .get();
+      final notes = noteSnapshots.docs.map((doc) {
+        final data = doc.data();
+        final contactId = doc.reference.parent.parent!.id;
+        final contact = _allContacts.firstWhere(
+          (c) => c.id == contactId,
+          orElse: () => Contact(id: contactId, displayName: 'Unknown'),
+        );
+        return _NoteResult(
+          id: doc.id,
+          content: data['content'] ?? '',
+          contactId: contactId,
+          contactName: contact.displayName,
+        );
+      }).toList();
+
+      // Fetch events
+      final eventSnapshot = await FirebaseFirestore.instance
+          .collection('events')
+          .withConverter(
+            fromFirestore: AppEvent.fromFirestore,
+            toFirestore: (AppEvent event, options) => event.toFirestore(),
+          )
+          .get();
+      final events = eventSnapshot.docs.map((doc) => doc.data()).toList();
+
+      setState(() {
+        _allFiles = files;
+        _allNotes = notes;
+        _allEvents = events;
+        _isLoading = false;
+      });
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -79,14 +162,33 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
 
-    // TODO: Add search for other content types
-    // Example:
-    // results.addAll(_allFiles.where((file) =>
-    //     file.name.toLowerCase().contains(lowerQuery)));
-    // results.addAll(_allEvents.where((event) =>
-    //     event.title.toLowerCase().contains(lowerQuery)));
-    // results.addAll(_allPhotos.where((photo) =>
-    //     photo.caption?.toLowerCase().contains(lowerQuery) ?? false));
+    // Search files
+    results.addAll(
+      _allFiles.where(
+        (file) =>
+            file.name.toLowerCase().contains(lowerQuery) ||
+            file.contactName.toLowerCase().contains(lowerQuery),
+      ),
+    );
+
+    // Search notes
+    results.addAll(
+      _allNotes.where(
+        (note) =>
+            note.content.toLowerCase().contains(lowerQuery) ||
+            note.contactName.toLowerCase().contains(lowerQuery),
+      ),
+    );
+
+    // Search events
+    results.addAll(
+      _allEvents.where(
+        (event) =>
+            event.title.toLowerCase().contains(lowerQuery) ||
+            (event.description?.toLowerCase().contains(lowerQuery) ?? false) ||
+            (event.location?.toLowerCase().contains(lowerQuery) ?? false),
+      ),
+    );
 
     setState(() {
       _searchResults = results;
@@ -109,15 +211,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
         if (item is Contact) {
           return _buildContactItem(item);
+        } else if (item is _FileResult) {
+          return _buildFileItem(item);
+        } else if (item is _NoteResult) {
+          return _buildNoteItem(item);
+        } else if (item is AppEvent) {
+          return _buildEventItem(item);
         }
-        // TODO: Add builders for other content types
-        // else if (item is File) {
-        //   return _buildFileItem(item);
-        // } else if (item is Event) {
-        //   return _buildEventItem(item);
-        // } else if (item is Photo) {
-        //   return _buildPhotoItem(item);
-        // }
 
         return const SizedBox.shrink();
       },
@@ -146,10 +246,47 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // TODO: Add builders for other content types
-  // Widget _buildFileItem(File file) { ... }
-  // Widget _buildEventItem(Event event) { ... }
-  // Widget _buildPhotoItem(Photo photo) { ... }
+  Widget _buildFileItem(_FileResult file) {
+    return ListTile(
+      leading: const Icon(Icons.insert_drive_file),
+      title: Text(file.name),
+      subtitle: Text('From: ${file.contactName}'),
+      onTap: () {
+        // No dedicated file view, so do nothing
+      },
+    );
+  }
+
+  Widget _buildNoteItem(_NoteResult note) {
+    final preview = note.content.length > 50
+        ? '${note.content.substring(0, 50)}...'
+        : note.content;
+    return ListTile(
+      leading: const Icon(Icons.note),
+      title: Text(preview),
+      subtitle: Text('From: ${note.contactName}'),
+    );
+  }
+
+  Widget _buildEventItem(AppEvent event) {
+    return ListTile(
+      leading: const Icon(Icons.event),
+      title: Text(event.title),
+      subtitle: Text(DateFormat.yMMMd().format(event.date)),
+      onTap: () {
+        // Navigate to event detail screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EventsDetailScreen(
+              event: event,
+              allDeviceContacts: _allContacts,
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
