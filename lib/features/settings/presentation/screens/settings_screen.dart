@@ -22,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _lastNameFirst = false;
   bool _usePass = false;
   bool _useFaceId = false;
+  String _currentLanguage = 'en';
   List<NavigationItem> _navigationItems = NavigationItem.defaultItems();
   final SettingsController _controller = SettingsController();
 
@@ -38,6 +39,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _useFaceId = settings['useFaceId'] ?? false;
       _navigationItems =
           settings['tabBarOrder'] ?? NavigationItem.defaultItems();
+      _currentLanguage = settings['language'] ?? 'en';
+      _sortByFirstName = settings['sortByFirstName'] ?? false;
+      _lastNameFirst = settings['lastNameFirst'] ?? false;
     });
   }
 
@@ -242,6 +246,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  String _languageLabel(String code) {
+    switch (code) {
+      case 'de':
+        return 'German';
+      case 'mn':
+        return 'Mongolian';
+      default:
+        return 'English';
+    }
+  }
+
+  Future<void> _showLanguageDialog() async {
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Select Language'),
+        children: [
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, 'en'),
+            child: const Text('English'),
+          ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, 'de'),
+            child: const Text('German'),
+          ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, 'mn'),
+            child: const Text('Mongolian'),
+          ),
+        ],
+      ),
+    );
+    if (selected != null) {
+      setState(() => _currentLanguage = selected);
+      await _controller.saveLanguage(selected);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -330,20 +372,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SettingsTile.navigation(
                 title: const Text('Language'),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.4),
+                trailing: Text(
+                  _languageLabel(_currentLanguage),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
-                onPressed: (context) {
-                  // TODO: Implement language selection
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Language selection coming soon!'),
-                    ),
-                  );
-                },
+                onPressed: (context) => _showLanguageDialog(),
               ),
             ],
           ),
@@ -409,12 +444,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.switchTile(
                 title: const Text('Sort by first name'),
                 initialValue: _sortByFirstName,
-                onToggle: (value) => setState(() => _sortByFirstName = value),
+                onToggle: (value) async {
+                  setState(() => _sortByFirstName = value);
+                  await _controller.saveSortByFirstName(value);
+                },
               ),
               SettingsTile.switchTile(
                 title: const Text('Last name first'),
                 initialValue: _lastNameFirst,
-                onToggle: (value) => setState(() => _lastNameFirst = value),
+                onToggle: (value) async {
+                  setState(() => _lastNameFirst = value);
+                  await _controller.saveLastNameFirst(value);
+                },
               ),
             ],
           ),

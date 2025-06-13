@@ -1,5 +1,6 @@
 import 'package:contactsafe/features/contacts/presentation/provider/contacts_provider.dart';
 import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
+import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/AssignContactsToGroupScreen.dart'
@@ -20,14 +21,27 @@ class _ContactsScreenState extends State<ContactsScreen> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final ContactsProvider _contactsProvider = ContactsProvider();
+  late ContactsProvider _contactsProvider;
   final List<String> _selectedGroups = [];
   List<Contact> _displayedContacts = [];
+  final SettingsController _settingsController = SettingsController();
+  bool _lastNameFirst = false;
+  bool _sortByFirstName = false;
 
   @override
   void initState() {
     super.initState();
-    _loadContacts();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    _sortByFirstName = await _settingsController.loadSortByFirstName();
+    _lastNameFirst = await _settingsController.loadLastNameFirst();
+    _contactsProvider = ContactsProvider(
+      sortByFirstName: _sortByFirstName,
+      lastNameFirst: _lastNameFirst,
+    );
+    await _loadContacts();
   }
 
   Future<void> _loadContacts() async {
@@ -257,6 +271,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                       );
                     },
                     onLetterTap: _scrollToLetter,
+                    lastNameFirst: _lastNameFirst,
                   ),
                 ),
               ),

@@ -20,6 +20,9 @@ class SettingsController {
       'usePassword': prefs.getBool('usePassword') ?? false,
       'useFaceId': prefs.getBool('useFaceId') ?? false,
       'tabBarOrder': await _loadTabBarOrder(prefs),
+      'language': prefs.getString('language') ?? 'en',
+      'sortByFirstName': prefs.getBool('sortByFirstName') ?? false,
+      'lastNameFirst': prefs.getBool('lastNameFirst') ?? false,
     };
   }
 
@@ -58,6 +61,36 @@ class SettingsController {
     if (kDebugMode) {
       print('Saved useFaceId: $value');
     }
+  }
+
+  Future<void> saveLanguage(String language) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', language);
+  }
+
+  Future<String> loadLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('language') ?? 'en';
+  }
+
+  Future<void> saveSortByFirstName(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sortByFirstName', value);
+  }
+
+  Future<bool> loadSortByFirstName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('sortByFirstName') ?? false;
+  }
+
+  Future<void> saveLastNameFirst(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('lastNameFirst', value);
+  }
+
+  Future<bool> loadLastNameFirst() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('lastNameFirst') ?? false;
   }
 
   // Load TabBar order
@@ -120,8 +153,12 @@ class SettingsController {
   Future<String> createBackup() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
+      final backupDir = Directory('${directory.path}/ContactSafe');
+      if (!await backupDir.exists()) {
+        await backupDir.create(recursive: true);
+      }
       final String filePath =
-          '${directory.path}/contactsafe_backup_${_formatDateTime(DateTime.now())}.json';
+          '${backupDir.path}/backup_${_formatDateTime(DateTime.now())}.json';
       final File file = File(filePath);
 
       final List<Map<String, dynamic>> dummyContactsData = [
