@@ -107,6 +107,87 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _backupToGoogleDrive() async {
+    try {
+      await _controller.backupToGoogleDrive();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Backup uploaded to Google Drive')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Backup failed: $e')),
+      );
+    }
+  }
+
+  Future<void> _restoreFromGoogleDrive() async {
+    try {
+      final count = await _controller.restoreFromGoogleDrive();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Restored $count contacts from Google Drive')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Restore failed: $e')),
+      );
+    }
+  }
+
+  Future<void> _importBackupFromLink(String url) async {
+    try {
+      final count = await _controller.importBackupFromLink(url);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Imported $count contacts from link')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Import failed: $e')),
+      );
+    }
+  }
+
+  Future<String?> _promptForLink() async {
+    String? url;
+    await showDialog(
+      context: context,
+      builder: (context) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: const Text('Enter backup link'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'https://...'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                url = controller.text.trim();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Import'),
+            ),
+          ],
+        );
+      },
+    );
+    if (url != null && url!.isEmpty) {
+      url = null;
+    }
+    return url;
+  }
+
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
@@ -507,42 +588,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(color: Colors.blue),
                   ),
                 ),
-                onPressed: (context) async {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder:
-                        (context) => const AlertDialog(
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 20),
-                              Text('Backing up to Google Drive...'),
-                            ],
-                          ),
-                        ),
-                  );
-                  try {
-                    // Replace with your actual Google Drive backup logic
-                    await Future.delayed(
-                      const Duration(seconds: 2),
-                    ); // Simulate backup
-                    if (!mounted) return;
-                    Navigator.of(context).pop(); // Close loading dialog
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Backup completed successfully!'),
-                      ),
-                    );
-                  } catch (e) {
-                    if (!mounted) return;
-                    Navigator.of(context).pop(); // Close loading dialog
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Backup failed: ${e.toString()}')),
-                    );
-                  }
-                },
+                onPressed: (context) => _backupToGoogleDrive(),
               ),
               //------------------------------------------------------------------------------------
               SettingsTile.navigation(
@@ -552,14 +598,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(color: Colors.blue),
                   ),
                 ),
-                onPressed: (context) {
-                  // TODO: Implement restore from Google Drive
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Restore from Google Drive coming soon!'),
-                    ),
-                  );
-                },
+                onPressed: (context) => _restoreFromGoogleDrive(),
               ),
               //------------------------------------------------------------------------------------
               SettingsTile.navigation(
@@ -569,13 +608,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(color: Colors.blue),
                   ),
                 ),
-                onPressed: (context) {
-                  // TODO: Implement import backup from link
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Import backup from link coming soon!'),
-                    ),
-                  );
+                onPressed: (context) async {
+                  final url = await _promptForLink();
+                  if (url != null) {
+                    _importBackupFromLink(url);
+                  }
                 },
               ),
             ],
