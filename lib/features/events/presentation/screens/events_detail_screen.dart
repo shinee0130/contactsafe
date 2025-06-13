@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart'
     as geo; // For geocoding the address back to LatLng
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 
@@ -95,6 +96,28 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
     }
   }
 
+  Future<void> _openGoogleMapsDirections() async {
+    Uri? uri;
+    if (_eventLatLng != null) {
+      uri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=${_eventLatLng!.latitude},${_eventLatLng!.longitude}',
+      );
+    } else if (widget.event.location != null && widget.event.location!.isNotEmpty) {
+      final encoded = Uri.encodeComponent(widget.event.location!);
+      uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$encoded');
+    }
+
+    if (uri != null) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch Google Maps')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Contact> eventParticipants = widget.event.getParticipants(
@@ -140,6 +163,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                     icon: Icons.location_on,
                     label: 'Location',
                     value: widget.event.location!,
+                    onTap: _openGoogleMapsDirections,
                   ),
                   const SizedBox(height: 10),
                   // Embedded Google Map
@@ -182,6 +206,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                                       _mapController = controller;
                                       _updateMapCamera(); // Ensure camera updates if controller was null before
                                     },
+                                    onTap: (_) => _openGoogleMapsDirections(),
                                     zoomControlsEnabled: true,
                                     scrollGesturesEnabled: true,
                                     rotateGesturesEnabled: true,
@@ -272,8 +297,9 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
     required IconData icon,
     required String label,
     required String value,
+    VoidCallback? onTap,
   }) {
-    return Row(
+    final row = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
@@ -287,9 +313,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onBackground.withOpacity(0.8),
+                  color: Theme.of(context).colorScheme.onBackground.withOpacity(0.8),
                 ),
               ),
               Text(
@@ -304,5 +328,13 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
         ),
       ],
     );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        child: row,
+      );
+    }
+    return row;
   }
 }
