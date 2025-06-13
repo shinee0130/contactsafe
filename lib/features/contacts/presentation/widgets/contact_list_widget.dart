@@ -6,6 +6,7 @@ class ContactListWidget extends StatelessWidget {
   final ScrollController scrollController;
   final Function(Contact) onContactTap;
   final Function(String) onLetterTap;
+  final bool lastNameFirst;
 
   const ContactListWidget({
     super.key,
@@ -13,6 +14,7 @@ class ContactListWidget extends StatelessWidget {
     required this.scrollController,
     required this.onContactTap,
     required this.onLetterTap,
+    required this.lastNameFirst,
   });
 
   @override
@@ -81,6 +83,7 @@ class ContactListWidget extends StatelessWidget {
                         return ContactListItem(
                           contact: contact,
                           onTap: () => onContactTap(contact),
+                          lastNameFirst: lastNameFirst,
                         );
                       },
                       separatorBuilder:
@@ -143,8 +146,11 @@ class ContactListWidget extends StatelessWidget {
   Map<String, List<Contact>> _groupContacts(List<Contact> contacts) {
     final Map<String, List<Contact>> groupedContacts = {};
     for (final contact in contacts) {
-      if (contact.displayName.isNotEmpty) {
-        final firstLetter = contact.displayName[0].toUpperCase();
+      final String displayName = lastNameFirst && contact.name.last.isNotEmpty
+          ? '${contact.name.last} ${contact.name.first}'
+          : contact.displayName;
+      if (displayName.isNotEmpty) {
+        final firstLetter = displayName[0].toUpperCase();
         groupedContacts.putIfAbsent(firstLetter, () => []).add(contact);
       }
     }
@@ -155,11 +161,13 @@ class ContactListWidget extends StatelessWidget {
 class ContactListItem extends StatelessWidget {
   final Contact contact;
   final VoidCallback onTap;
+  final bool lastNameFirst;
 
   const ContactListItem({
     super.key,
     required this.contact,
     required this.onTap,
+    required this.lastNameFirst,
   });
 
   @override
@@ -179,7 +187,9 @@ class ContactListItem extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  contact.displayName,
+                  lastNameFirst && contact.name.last.isNotEmpty
+                      ? '${contact.name.last} ${contact.name.first}'
+                      : contact.displayName,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
@@ -225,8 +235,14 @@ class ContactListItem extends StatelessWidget {
                   ),
                 )
                 : Text(
-                  contact.displayName.isNotEmpty
-                      ? contact.displayName[0].toUpperCase()
+                  (lastNameFirst && contact.name.last.isNotEmpty
+                          ? '${contact.name.last} ${contact.name.first}'
+                          : contact.displayName)
+                      .isNotEmpty
+                      ? (lastNameFirst && contact.name.last.isNotEmpty
+                              ? contact.name.last[0]
+                              : contact.displayName[0])
+                          .toUpperCase()
                       : '',
                   style: TextStyle(
                     fontSize: 16,

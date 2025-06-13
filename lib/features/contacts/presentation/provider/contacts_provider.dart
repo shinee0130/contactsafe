@@ -1,6 +1,11 @@
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactsProvider {
+  final bool sortByFirstName;
+  final bool lastNameFirst;
+
+  ContactsProvider({this.sortByFirstName = false, this.lastNameFirst = false});
+
   List<Contact> _contacts = [];
   List<Contact> _allContacts = [];
 
@@ -16,7 +21,15 @@ class ContactsProvider {
           withPhoto: true,
           withAccounts: true,
         );
-        contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+        contacts.sort((a, b) {
+          String keyA = sortByFirstName
+              ? a.name.first
+              : (a.name.last.isNotEmpty ? a.name.last : a.displayName);
+          String keyB = sortByFirstName
+              ? b.name.first
+              : (b.name.last.isNotEmpty ? b.name.last : b.displayName);
+          return keyA.compareTo(keyB);
+        });
         _contacts = contacts;
         _allContacts = List.from(contacts);
       }
@@ -44,8 +57,11 @@ class ContactsProvider {
   Map<String, List<Contact>> groupContacts(List<Contact> contacts) {
     final Map<String, List<Contact>> groupedContacts = {};
     for (final contact in contacts) {
-      if (contact.displayName.isNotEmpty) {
-        final firstLetter = contact.displayName[0].toUpperCase();
+      final String displayName = lastNameFirst && contact.name.last.isNotEmpty
+          ? '${contact.name.last} ${contact.name.first}'
+          : contact.displayName;
+      if (displayName.isNotEmpty) {
+        final firstLetter = displayName[0].toUpperCase();
         groupedContacts.putIfAbsent(firstLetter, () => []).add(contact);
       }
     }
