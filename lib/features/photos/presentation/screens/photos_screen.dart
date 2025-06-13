@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
 class PhotosScreen extends StatefulWidget {
@@ -22,33 +23,60 @@ class _PhotosScreenState extends State<PhotosScreen> {
   @override
   void initState() {
     super.initState();
-    // _loadPhotos();
+    _loadPhotos();
   }
 
-  // Future<void> _loadPhotos() async {
-  //   setState(() => _isLoading = true);
-  //   // TODO: Replace with actual photo loading logic from storage
-  //   await Future.delayed(const Duration(seconds: 1)); // Simulate loading
-  //   setState(() => _isLoading = false);
-  // }
-
-  Future<void> _uploadPhotos() async {
-    final status = await Permission.photos.request();
-    if (status.isGranted) {
-      final picker = ImagePicker();
-      final pickedFiles = await picker.pickMultiImage();
-      if (pickedFiles.isNotEmpty) {
-        setState(() {
-          _photos.addAll(pickedFiles.map((file) => File(file.path)));
-          _sortPhotos();
-        });
+  Future<void> _loadPhotos() async {
+    final status = await Permission.storage.request();
+    if (!status.isGranted) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Storage permission denied')),
+        );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Photo library permission denied')),
-      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      Directory baseDir;
+      if (Platform.isAndroid) {
+        baseDir = (await getExternalStorageDirectory())!;
+      } else {
+        baseDir = await getApplicationDocumentsDirectory();
+      }
+
+      final photosDir = Directory('${baseDir.path}/photos');
+      if (!await photosDir.exists()) {
+        await photosDir.create(recursive: true);
+      }
+
+      final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+      final files = photosDir.listSync();
+      _photos = files
+          .whereType<File>()
+          .where(
+            (f) => imageExtensions.any(
+              (ext) => f.path.toLowerCase().endsWith(ext),
+            ),
+          )
+          .toList();
+
+      _sortPhotos();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load photos: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
+
 
   void _toggleEditMode() {
     setState(() {
@@ -67,12 +95,80 @@ class _PhotosScreenState extends State<PhotosScreen> {
     });
   }
 
+  Future<void> _copySelectedPhotos() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final copyDir = Directory('${dir.path}/photos_copied');
+    if (!await copyDir.exists()) {
+      await copyDir.create(recursive: true);
+    }
+    for (var index in _selectedIndices) {
+      final file = _photos[index];
+      await file.copy('${copyDir.path}/${file.path.split('/').last}');
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Copied ${_selectedIndices.length} photo(s)')),
+      );
+    }
+  }
+
+  Future<void> _cutSelectedPhotos() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final cutDir = Directory('${dir.path}/photos_cut');
+    if (!await cutDir.exists()) {
+      await cutDir.create(recursive: true);
+    }
+    for (var index in _selectedIndices) {
+      final file = _photos[index];
+      final newPath = '${cutDir.path}/${file.path.split('/').last}';
+      await file.rename(newPath);
+      _photos[index] = File(newPath);
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Moved ${_selectedIndices.length} photo(s)')),
+      );
+    }
+    setState(() {});
+  }
+
+  Future<void> _shareSelectedPhotos() async {
+    final files = _selectedIndices.map((i) => XFile(_photos[i].path)).toList();
+    if (files.isNotEmpty) {
+      await Share.shareXFiles(files);
+    }
+  }
+
+  Future<void> _archiveSelectedPhotos() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final archiveDir = Directory('${dir.path}/photos_archive');
+    if (!await archiveDir.exists()) {
+      await archiveDir.create(recursive: true);
+    }
+    for (var index in _selectedIndices) {
+      final file = _photos[index];
+      final newPath = '${archiveDir.path}/${file.path.split('/').last}';
+      await file.rename(newPath);
+      _photos[index] = File(newPath);
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Archived ${_selectedIndices.length} photo(s)')),
+      );
+    }
+    setState(() {});
+  }
+
   void _deleteSelectedPhotos() {
-    setState(() {
-      _selectedIndices.sort((a, b) => b.compareTo(a));
-      for (var index in _selectedIndices) {
-        _photos.removeAt(index);
+    _selectedIndices.sort((a, b) => b.compareTo(a));
+    for (var index in _selectedIndices) {
+      final file = _photos[index];
+      if (file.existsSync()) {
+        file.deleteSync();
       }
+      _photos.removeAt(index);
+    }
+    setState(() {
       _selectedIndices.clear();
       _editMode = false;
     });
@@ -227,11 +323,6 @@ class _PhotosScreenState extends State<PhotosScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _uploadPhotos,
-        backgroundColor: Colors.blue,
-        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -274,7 +365,8 @@ class _PhotosScreenState extends State<PhotosScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Tap the + button to add photos',
+                              'Add image files to the app documents folder to view them',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Theme.of(
@@ -333,6 +425,35 @@ class _PhotosScreenState extends State<PhotosScreen> {
                         },
                       ),
             ),
+            if (_editMode && _selectedIndices.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: _copySelectedPhotos,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.content_cut),
+                      onPressed: _cutSelectedPhotos,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _shareSelectedPhotos,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.archive),
+                      onPressed: _archiveSelectedPhotos,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: _deleteSelectedPhotos,
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
