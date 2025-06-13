@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_auth/local_auth.dart';
@@ -161,22 +164,24 @@ class SettingsController {
           '${backupDir.path}/backup_${_formatDateTime(DateTime.now())}.json';
       final File file = File(filePath);
 
-      final List<Map<String, dynamic>> dummyContactsData = [
-        {
-          'id': '1',
-          'name': 'John Doe',
-          'phone': '123-456-7890',
-          'email': 'john.doe@example.com',
-        },
-        {
-          'id': '2',
-          'name': 'Jane Smith',
-          'phone': '987-654-3210',
-          'email': 'jane.smith@example.com',
-        },
-      ];
+      List<Contact> contacts = [];
+      if (await FlutterContacts.requestPermission()) {
+        contacts = await FlutterContacts.getContacts(
+          withProperties: true,
+          withPhoto: true,
+        );
+      }
 
-      await file.writeAsString(jsonEncode(dummyContactsData));
+      final List<Map<String, dynamic>> contactsData = contacts.map((c) {
+        return {
+          'id': c.id,
+          'displayName': c.displayName,
+          'phones': c.phones.map((p) => p.number).toList(),
+          'emails': c.emails.map((e) => e.address).toList(),
+        };
+      }).toList();
+
+      await file.writeAsString(jsonEncode(contactsData));
       return file.path.split('/').last;
     } catch (e) {
       if (kDebugMode) {
@@ -198,6 +203,21 @@ class SettingsController {
         File file = File(result.files.single.path!);
         String fileContent = await file.readAsString();
         final List<dynamic> decodedData = jsonDecode(fileContent);
+        if (await FlutterContacts.requestPermission()) {
+          for (final item in decodedData) {
+            try {
+              final contact = Contact()
+                ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
+                ..phones = (item['phones'] as List?)
+                        ?.map((p) => Phone(p.toString()))
+                        .toList() ?? []
+                ..emails = (item['emails'] as List?)
+                        ?.map((e) => Email(e.toString()))
+                        .toList() ?? [];
+              await contact.insert();
+            } catch (_) {}
+          }
+        }
         return decodedData.length;
       }
       return 0;
@@ -206,6 +226,97 @@ class SettingsController {
         print('Error restoring backup: $e');
       }
       throw Exception('Failed to restore backup: $e');
+    }
+  }
+
+  // Backup to Google Drive
+  Future<void> backupToGoogleDrive() async {
+    final fileName = await createBackup();
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/ContactSafe/$fileName');
+    final GoogleSignInAccount? account = await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
+    if (account == null) throw Exception('Google sign in failed');
+    final authHeaders = await account.authHeaders;
+    final client = GoogleAuthClient(authHeaders);
+    final driveApi = drive.DriveApi(client);
+    final driveFile = drive.File()..name = fileName;
+    await driveApi.files.create(
+      driveFile,
+      uploadMedia: drive.Media(file.openRead(), await file.length()),
+    );
+  }
+
+  // Restore from Google Drive (downloads the most recent backup)
+  Future<int> restoreFromGoogleDrive() async {
+    final GoogleSignInAccount? account = await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
+    if (account == null) throw Exception('Google sign in failed');
+    final authHeaders = await account.authHeaders;
+    final client = GoogleAuthClient(authHeaders);
+    final driveApi = drive.DriveApi(client);
+    final fileList = await driveApi.files.list(q: "name contains 'backup_'", spaces: 'drive', orderBy: 'createdTime desc');
+    if (fileList.files == null || fileList.files!.isEmpty) {
+      throw Exception('No backup file found');
+    }
+    final fileId = fileList.files!.first.id;
+    if (fileId == null) throw Exception('Invalid file id');
+    final media = await driveApi.files.get(fileId, downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
+    final bytes = await media.stream.toBytes();
+    final directory = await getApplicationDocumentsDirectory();
+    final backupDir = Directory('${directory.path}/ContactSafe');
+    if (!await backupDir.exists()) {
+      await backupDir.create(recursive: true);
+    }
+    final path = '${backupDir.path}/restored_${_formatDateTime(DateTime.now())}.json';
+    final file = File(path);
+    await file.writeAsBytes(bytes);
+    final data = jsonDecode(utf8.decode(bytes)) as List<dynamic>;
+    if (await FlutterContacts.requestPermission()) {
+      for (final item in data) {
+        try {
+          final contact = Contact()
+            ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
+            ..phones = (item['phones'] as List?)?.map((p) => Phone(p.toString())).toList() ?? []
+            ..emails = (item['emails'] as List?)?.map((e) => Email(e.toString())).toList() ?? [];
+          await contact.insert();
+        } catch (_) {}
+      }
+    }
+    return data.length;
+  }
+
+  // Import backup from link
+  Future<int> importBackupFromLink(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        throw Exception('Failed to download file');
+      }
+      final directory = await getApplicationDocumentsDirectory();
+      final backupDir = Directory('${directory.path}/ContactSafe');
+      if (!await backupDir.exists()) {
+        await backupDir.create(recursive: true);
+      }
+      final path = '${backupDir.path}/imported_${_formatDateTime(DateTime.now())}.json';
+      final file = File(path);
+      await file.writeAsBytes(response.bodyBytes);
+      final data = jsonDecode(response.body) as List<dynamic>;
+      if (await FlutterContacts.requestPermission()) {
+        for (final item in data) {
+          try {
+            final contact = Contact()
+              ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
+              ..phones = (item['phones'] as List?)?.map((p) => Phone(p.toString())).toList() ?? []
+              ..emails = (item['emails'] as List?)?.map((e) => Email(e.toString())).toList() ?? [];
+            await contact.insert();
+          } catch (_) {}
+        }
+      }
+      return data.length;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error importing from link: $e');
+      }
+      throw Exception('Failed to import backup from link: $e');
     }
   }
 
@@ -262,5 +373,22 @@ class SettingsController {
     if (kDebugMode) {
       print('Saved usePassword: $value');
     }
+  }
+}
+
+class GoogleAuthClient extends http.BaseClient {
+  final Map<String, String> _headers;
+  final http.Client _client = http.Client();
+
+  GoogleAuthClient(this._headers);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    return _client.send(request..headers.addAll(_headers));
+  }
+
+  @override
+  void close() {
+    _client.close();
   }
 }
