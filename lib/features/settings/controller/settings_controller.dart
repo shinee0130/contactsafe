@@ -175,6 +175,8 @@ class SettingsController {
       final List<Map<String, dynamic>> contactsData = contacts.map((c) {
         return {
           'id': c.id,
+          'firstName': c.name.first,
+          'lastName': c.name.last,
           'displayName': c.displayName,
           'phones': c.phones.map((p) => p.number).toList(),
           'emails': c.emails.map((e) => e.address).toList(),
@@ -206,8 +208,14 @@ class SettingsController {
         if (await FlutterContacts.requestPermission()) {
           for (final item in decodedData) {
             try {
+              final first = item['firstName'] ?? '';
+              final last = item['lastName'] ?? '';
+              final display = item['displayName'] ?? '';
               final contact = Contact()
-                ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
+                ..name = Name(
+                  first: first.isNotEmpty ? first : display,
+                  last: last,
+                )
                 ..phones = (item['phones'] as List?)
                         ?.map((p) => Phone(p.toString()))
                         .toList() ?? []
@@ -279,8 +287,14 @@ class SettingsController {
     if (await FlutterContacts.requestPermission()) {
       for (final item in data) {
         try {
+          final first = item['firstName'] ?? '';
+          final last = item['lastName'] ?? '';
+          final display = item['displayName'] ?? '';
           final contact = Contact()
-            ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
+            ..name = Name(
+              first: first.isNotEmpty ? first : display,
+              last: last,
+            )
             ..phones = (item['phones'] as List?)?.map((p) => Phone(p.toString())).toList() ?? []
             ..emails = (item['emails'] as List?)?.map((e) => Email(e.toString())).toList() ?? [];
           await contact.insert();
@@ -309,8 +323,14 @@ class SettingsController {
       if (await FlutterContacts.requestPermission()) {
         for (final item in data) {
           try {
+            final first = item['firstName'] ?? '';
+            final last = item['lastName'] ?? '';
+            final display = item['displayName'] ?? '';
             final contact = Contact()
-              ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
+              ..name = Name(
+                first: first.isNotEmpty ? first : display,
+                last: last,
+              )
               ..phones = (item['phones'] as List?)?.map((p) => Phone(p.toString())).toList() ?? []
               ..emails = (item['emails'] as List?)?.map((e) => Email(e.toString())).toList() ?? [];
             await contact.insert();
@@ -333,7 +353,7 @@ class SettingsController {
       if (await directory.exists()) {
         final List<FileSystemEntity> files = directory.listSync();
         for (final file in files) {
-          if (file.path.contains('contactsafe_backup_')) {
+          if (file.path.contains('backup_')) {
             await file.delete();
           }
         }
