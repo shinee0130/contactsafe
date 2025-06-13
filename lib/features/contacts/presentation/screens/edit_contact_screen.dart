@@ -151,29 +151,22 @@ class _EditContactScreenState extends State<EditContactScreen> {
             )
             .toList();
 
-    // Create updated contact while preserving all necessary fields
-    Contact updatedContact = Contact(
-      id: widget.contact.id,
-      name: Name(
-        first: _firstNameController.text.trim(),
-        last: _lastNameController.text.trim(),
-      ),
-      organizations:
-          _companyController.text.trim().isNotEmpty
-              ? [Organization(company: _companyController.text.trim())]
-              : [],
-      phones: phonesToSave,
-      emails: emailsToSave,
-      websites: websitesToSave,
-      addresses: addressesToSave,
-      photo: _selectedPhoto,
+    // Update fields on the existing contact so that rawId and account
+    // information are preserved during the update call.
+    Contact updatedContact = widget.contact;
+    updatedContact.name = Name(
+      first: _firstNameController.text.trim(),
+      last: _lastNameController.text.trim(),
     );
-
-    // Preserve critical fields from original contact
-    // updatedContact.rawId = widget.contact.rawId;
-    // updatedContact.accounts = widget.contact.accounts;
-    // updatedContact.isDeleted = widget.contact.isDeleted;
-    // updatedContact.displayName = widget.contact.displayName;
+    updatedContact.organizations =
+        _companyController.text.trim().isNotEmpty
+            ? [Organization(company: _companyController.text.trim())]
+            : [];
+    updatedContact.phones = phonesToSave;
+    updatedContact.emails = emailsToSave;
+    updatedContact.websites = websitesToSave;
+    updatedContact.addresses = addressesToSave;
+    updatedContact.photo = _selectedPhoto;
 
     try {
       if (await FlutterContacts.requestPermission()) {
