@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
@@ -112,17 +112,8 @@ class _SearchScreenState extends State<SearchScreen> {
         );
       }).toList();
 
-      // Fetch events for the current user
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      final eventSnapshot = await FirebaseFirestore.instance
-          .collection('events')
-          .where('userId', isEqualTo: uid)
-          .withConverter(
-            fromFirestore: AppEvent.fromFirestore,
-            toFirestore: (AppEvent event, options) => event.toFirestore(),
-          )
-          .get();
-      final events = eventSnapshot.docs.map((doc) => doc.data()).toList();
+      // Load events from local storage
+      final events = await LocalEventRepository().loadEvents();
 
       setState(() {
         _allFiles = files;

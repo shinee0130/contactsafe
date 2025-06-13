@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_contacts/contact.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 class AppEvent {
   final String? id; // Firestore document ID
@@ -9,7 +9,7 @@ class AppEvent {
   location; // Stores either an address string or coordinates string
   final String? description;
   final List<String> participantContactIds; // Store only Contact IDs
-  final String userId; // Owner of the event
+  final String userId; // Owner of the event (unused for local storage)
 
   AppEvent({
     this.id,
@@ -45,6 +45,31 @@ class AppEvent {
     return {
       'title': title,
       'date': Timestamp.fromDate(date),
+      'location': location,
+      'description': description,
+      'participantContactIds': participantContactIds,
+      'userId': userId,
+    };
+  }
+
+  factory AppEvent.fromJson(Map<String, dynamic> json) {
+    return AppEvent(
+      id: json['id'] as String?,
+      title: json['title'] as String? ?? 'No Title',
+      date: DateTime.parse(json['date'] as String),
+      location: json['location'] as String?,
+      description: json['description'] as String?,
+      participantContactIds:
+          List<String>.from(json['participantContactIds'] ?? const []),
+      userId: json['userId'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'date': date.toIso8601String(),
       'location': location,
       'description': description,
       'participantContactIds': participantContactIds,

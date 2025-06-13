@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
@@ -23,12 +22,10 @@ class _EventsScreenState extends State<EventsScreen> {
   int _currentIndex = 2;
   final TextEditingController _searchController = TextEditingController();
   List<Contact> _allContacts = []; // Stores all device contacts
-  List<AppEvent> _events = []; // Stores events fetched from Firestore
+  List<AppEvent> _events = []; // Stores events from local storage
   List<AppEvent> _filteredEvents =
       []; // Stores events after applying search filter
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance; // Firestore instance
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Auth instance
+  final LocalEventRepository _eventRepository = LocalEventRepository();
 
   @override
   void initState() {
@@ -115,45 +112,21 @@ class _EventsScreenState extends State<EventsScreen> {
     }
   }
 
-  // Fetches events from Firestore in real-time
+  // Loads events from local storage
   Future<void> _fetchEvents() async {
     try {
-      final String? uid = _auth.currentUser?.uid;
-      if (uid == null) return;
-
-      _firestore
-          .collection('events')
-          .where('userId', isEqualTo: uid)
-          .withConverter(
-            fromFirestore: AppEvent.fromFirestore,
-            toFirestore: (AppEvent event, options) => event.toFirestore(),
-          )
-          .snapshots()
-          .listen(
-            (snapshot) {
-              final fetchedEvents =
-                  snapshot.docs.map((doc) => doc.data() as AppEvent).toList();
-
-              setState(() {
-                _events = fetchedEvents;
-                _filterEvents(
-                  _searchController.text,
-                ); // Re-filter when new events arrive
-              });
-            },
-            onError: (error) {
-              print("Error fetching events: $error");
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error fetching events: ${error.toString()}'),
-                  ),
-                );
-              }
-            },
-          );
+      final events = await _eventRepository.loadEvents();
+      setState(() {
+        _events = events;
+        _filterEvents(_searchController.text);
+      });
     } catch (e) {
-      print("Failed to set up event listener: $e");
+      print("Failed to load events: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading events: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -412,13 +385,15 @@ class _EventsScreenState extends State<EventsScreen> {
                                   : descriptionController.text,
                               participantContactIds:
                                   selectedParticipants.map((c) => c.id).toList(),
-                              userId: _auth.currentUser?.uid ?? '',
+                              userId: '',
                             );
 
                             try {
-                              await _firestore
-                                  .collection('events')
-                                  .add(newAppEvent.toFirestore());
+                              await _eventRepository.addEvent(newAppEvent);
+                              setState(() {
+                                _events.add(newAppEvent);
+                                _filterEvents(_searchController.text);
+                              });
                               if (mounted) {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
