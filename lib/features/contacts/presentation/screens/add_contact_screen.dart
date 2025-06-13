@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'dart:typed_data';
-import 'package:cloud_firestore/cloud_firestore.dart'; // <<< ADD THIS IMPORT
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({super.key});
@@ -397,7 +397,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       child: IntlPhoneField(
                         initialValue: _phoneNumbers[index],
                         decoration: InputDecoration(
-                          labelText: 'Phone Number',
                           hintText: 'Enter phone number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -426,9 +425,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           ),
                         ),
                         initialCountryCode: 'US',
-                        inputFormatters: const [
-                          LengthLimitingTextInputFormatter(20),
-                        ],
+                        inputFormatters: [LengthLimitingTextInputFormatter(20)],
                         onChanged: (phone) {
                           _phoneNumbers[index] = phone.number;
                         },

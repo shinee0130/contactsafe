@@ -460,9 +460,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
                           ),
                         ),
                         initialCountryCode: 'US',
-                        inputFormatters: const [
-                          LengthLimitingTextInputFormatter(20),
-                        ],
+                        inputFormatters: [LengthLimitingTextInputFormatter(20)],
                         onChanged: (phone) {
                           _phoneNumbers[index] = phone.number;
                         },
