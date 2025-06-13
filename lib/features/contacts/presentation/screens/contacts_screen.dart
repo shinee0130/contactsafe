@@ -2,6 +2,8 @@ import 'package:contactsafe/features/contacts/presentation/provider/contacts_pro
 import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
+import 'package:contactsafe/features/contacts/presentation/screens/AssignContactsToGroupScreen.dart'
+    show globalContactGroupsMap;
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -19,6 +21,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ContactsProvider _contactsProvider = ContactsProvider();
+  final List<String> _selectedGroups = [];
+  List<Contact> _displayedContacts = [];
 
   @override
   void initState() {
@@ -28,24 +32,19 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   Future<void> _loadContacts() async {
     await _contactsProvider.fetchContacts();
+    _applyFilters(query: _searchController.text);
     if (mounted) setState(() {});
   }
 
   void _filterContacts(String query) {
-    _contactsProvider.filterContacts(query);
-    setState(() {});
+    _applyFilters(query: query);
   }
 
   void _scrollToLetter(String letter) {
     final groupedContacts = _contactsProvider.groupContacts(
-      _contactsProvider.contacts,
+      _displayedContacts,
     );
-    final index = _contactsProvider.findContactIndexForLetter(
-      letter,
-      groupedContacts,
-    );
-
-    if (index != -1) {
+    if (groupedContacts.containsKey(letter)) {
       final offset = _calculateScrollOffset(letter, groupedContacts);
       _scrollController.animateTo(
         offset * 56.0,
@@ -71,6 +70,28 @@ class _ContactsScreenState extends State<ContactsScreen> {
     return offset;
   }
 
+  void _applyFilters({String query = ''}) {
+    List<Contact> filtered = List.from(_contactsProvider.allContacts);
+
+    if (_selectedGroups.isNotEmpty) {
+      filtered = filtered.where((contact) {
+        final groups = globalContactGroupsMap[contact.displayName] ?? ['Not assigned'];
+        if (groups.isEmpty) groups.add('Not assigned');
+        return groups.any((g) => _selectedGroups.contains(g));
+      }).toList();
+    }
+
+    if (query.isNotEmpty) {
+      filtered = filtered
+          .where((c) => c.displayName.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+
+    setState(() {
+      _displayedContacts = filtered;
+    });
+  }
+
   void _onBottomNavigationTap(int index) {
     setState(() {
       _currentIndex = index;
@@ -94,8 +115,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
     });
   }
 
-  void _navigateToGroups() {
-    Navigator.push(
+  Future<void> _navigateToGroups() async {
+    final result = await Navigator.push(
       context,
       PageRouteBuilder(
         pageBuilder:
@@ -112,6 +133,13 @@ class _ContactsScreenState extends State<ContactsScreen> {
         },
       ),
     );
+
+    if (result is List<String>) {
+      _selectedGroups
+        ..clear()
+        ..addAll(result);
+      _applyFilters(query: _searchController.text);
+    }
   }
 
   void _addNewContact() {
@@ -219,7 +247,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: ContactListWidget(
-                    contacts: _contactsProvider.contacts,
+                    contacts: _displayedContacts,
                     scrollController: _scrollController,
                     onContactTap: (contact) {
                       Navigator.pushNamed(
