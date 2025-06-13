@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'note_detail_screen.dart';
 
 class ContactNotesScreen extends StatefulWidget {
   final Contact contact;
@@ -12,15 +15,27 @@ class ContactNotesScreen extends StatefulWidget {
 }
 
 class _ContactNotesScreenState extends State<ContactNotesScreen> {
-  final List<ContactNote> _notes = [];
+  List<ContactNote> _notes = [];
   final TextEditingController _noteController = TextEditingController();
   final FocusNode _noteFocusNode = FocusNode();
   int _editingIndex = -1;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  CollectionReference<ContactNote> _contactNotesCollection() {
+    return _firestore
+        .collection('contact_notes')
+        .doc(widget.contact.id)
+        .collection('notes')
+        .withConverter<ContactNote>(
+          fromFirestore: (snapshot, _) => ContactNote.fromFirestore(snapshot),
+          toFirestore: (note, _) => note.toFirestore(),
+        );
+  }
 
   @override
   void initState() {
     super.initState();
-    _loadDummyNotes(); // Replace with actual data loading
+    _loadNotes();
   }
 
   @override
@@ -30,64 +45,84 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
     super.dispose();
   }
 
-  void _loadDummyNotes() {
-    // Replace with actual data loading from storage
-    setState(() {
-      _notes.addAll([
-        ContactNote(
-          content: 'Meeting scheduled for next Monday at 2 PM',
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        ContactNote(
-          content: 'Discussed project requirements. Follow up in 2 weeks.',
-          createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        ),
-      ]);
-    });
+  Future<void> _loadNotes() async {
+    try {
+      final query = await _contactNotesCollection().get();
+      setState(() {
+        _notes = query.docs.map((d) => d.data()).toList();
+      });
+    } catch (e) {
+      _showSnackBar('Failed to load notes: ${e.toString()}');
+    }
   }
 
-  void _addOrUpdateNote() {
+  Future<void> _addOrUpdateNote() async {
     if (_noteController.text.trim().isEmpty) return;
 
-    setState(() {
-      if (_editingIndex >= 0) {
-        // Update existing note
-        _notes[_editingIndex] = ContactNote(
-          content: _noteController.text,
-          createdAt: _notes[_editingIndex].createdAt,
-          updatedAt: DateTime.now(),
-        );
-        _editingIndex = -1;
-      } else {
-        // Add new note
-        _notes.insert(
-          0,
-          ContactNote(content: _noteController.text, createdAt: DateTime.now()),
-        );
+    if (_editingIndex >= 0) {
+      final note = _notes[_editingIndex]
+          .copyWith(content: _noteController.text, updatedAt: DateTime.now());
+      try {
+        await _contactNotesCollection().doc(note.id).update(note.toFirestore());
+        setState(() {
+          _notes[_editingIndex] = note;
+          _editingIndex = -1;
+        });
+      } catch (e) {
+        _showSnackBar('Failed to update note: ${e.toString()}');
       }
-      _noteController.clear();
-      _noteFocusNode.unfocus();
-    });
+    } else {
+      final newNote = ContactNote(
+        id: '',
+        content: _noteController.text,
+        createdAt: DateTime.now(),
+      );
+      try {
+        final doc = await _contactNotesCollection().add(newNote);
+        setState(() {
+          _notes.insert(0, newNote.copyWith(id: doc.id));
+        });
+      } catch (e) {
+        _showSnackBar('Failed to add note: ${e.toString()}');
+      }
+    }
+    _noteController.clear();
+    _noteFocusNode.unfocus();
   }
 
-  void _editNote(int index) {
-    setState(() {
-      _editingIndex = index;
-      _noteController.text = _notes[index].content;
-      _noteFocusNode.requestFocus();
-    });
+  Future<void> _viewNote(int index) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => NoteDetailScreen(note: _notes[index]),
+      ),
+    );
+    if (result == 'delete') {
+      _deleteNote(index);
+    } else if (result is String) {
+      // Edited content returned
+      setState(() {
+        _editingIndex = index;
+        _noteController.text = result;
+      });
+      _showNoteDialog();
+    }
   }
 
-  void _deleteNote(int index) {
-    setState(() {
-      _notes.removeAt(index);
-      if (_editingIndex == index) {
-        _editingIndex = -1;
-        _noteController.clear();
-        _noteFocusNode.unfocus();
-      }
-    });
+  Future<void> _deleteNote(int index) async {
+    try {
+      await _contactNotesCollection().doc(_notes[index].id).delete();
+      setState(() {
+        _notes.removeAt(index);
+        if (_editingIndex == index) {
+          _editingIndex = -1;
+          _noteController.clear();
+          _noteFocusNode.unfocus();
+        }
+      });
+    } catch (e) {
+      _showSnackBar('Failed to delete note: ${e.toString()}');
+    }
   }
 
   void _showNoteDialog() {
@@ -166,8 +201,8 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
-                        onPressed: () {
-                          _addOrUpdateNote();
+                        onPressed: () async {
+                          await _addOrUpdateNote();
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
@@ -286,7 +321,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: () => _editNote(index),
+        onTap: () => _viewNote(index),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -326,12 +361,54 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
       ),
     );
   }
+
+  void _showSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
 }
 
 class ContactNote {
+  final String id;
   final String content;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  ContactNote({required this.content, required this.createdAt, this.updatedAt});
+  ContactNote({
+    required this.id,
+    required this.content,
+    required this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ContactNote.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return ContactNote(
+      id: doc.id,
+      content: data['content'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      updatedAt:
+          data['updatedAt'] != null ? (data['updatedAt'] as Timestamp).toDate() : null,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'content': content,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+    };
+  }
+
+  ContactNote copyWith({String? id, String? content, DateTime? createdAt, DateTime? updatedAt}) {
+    return ContactNote(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

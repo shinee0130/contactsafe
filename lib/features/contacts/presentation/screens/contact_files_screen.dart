@@ -1,11 +1,15 @@
 // lib/features/contact/presentation/screens/contact_files_screen.dart
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 // --- Custom Model for Contact File Metadata (NO CHANGES HERE) ---
 class ContactFile {
@@ -137,18 +141,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   Future<void> _pickAndUploadFiles() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: [
-        'jpg',
-        'jpeg',
-        'png',
-        'pdf',
-        'doc',
-        'docx',
-        'xls',
-        'xlsx',
-        'txt',
-      ],
+      type: FileType.any,
     );
 
     if (result != null) {
@@ -295,6 +288,120 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _deleteFile(ContactFile file) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await _storage.ref().child(file.storagePath).delete();
+      await _contactFilesCollection().doc(file.id).delete();
+      setState(() {
+        _files.removeWhere((f) => f.id == file.id);
+      });
+      _showSnackBar('File deleted');
+    } catch (e) {
+      _showSnackBar('Failed to delete file: ${e.toString()}');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _renameFile(ContactFile file) async {
+    final controller = TextEditingController(text: file.name);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Rename File'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Enter new name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName != null && newName.isNotEmpty && newName != file.name) {
+      try {
+        await _contactFilesCollection().doc(file.id).update({'name': newName});
+        setState(() {
+          final index = _files.indexWhere((f) => f.id == file.id);
+          if (index != -1) {
+            _files[index] = _files[index].copyWith(name: newName);
+            _sortFiles();
+          }
+        });
+      } catch (e) {
+        _showSnackBar('Failed to rename file: ${e.toString()}');
+      }
+    }
+  }
+
+  Future<void> _shareFile(ContactFile file) async {
+    try {
+      final data = await _storage.ref().child(file.storagePath).getData();
+      if (data == null) {
+        _showSnackBar('Unable to retrieve file data');
+        return;
+      }
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/${file.name}');
+      await tempFile.writeAsBytes(data);
+      await Share.shareXFiles([XFile(tempFile.path)], text: file.name);
+    } catch (e) {
+      _showSnackBar('Failed to share file: ${e.toString()}');
+    }
+  }
+
+  void _showFileOptions(ContactFile file) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.drive_file_rename_outline),
+                title: const Text('Rename'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _renameFile(file);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text('Share'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareFile(file);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteFile(file);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // --- UI and Helper Functions (mostly retained, minor tweaks) ---
@@ -584,10 +691,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                                   Icons.more_vert,
                                   color: Colors.grey,
                                 ),
-                                onPressed: () {
-                                  // TODO: Show file options menu (e.g., share, download)
-                                  _showSnackBar('Options for ${file.name}');
-                                },
+                                onPressed: () => _showFileOptions(file),
                               ),
                       onTap: () {
                         if (_editMode) {
