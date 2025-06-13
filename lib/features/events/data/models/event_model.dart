@@ -9,6 +9,7 @@ class AppEvent {
   location; // Stores either an address string or coordinates string
   final String? description;
   final List<String> participantContactIds; // Store only Contact IDs
+  final String userId; // Owner of the event
 
   AppEvent({
     this.id,
@@ -17,6 +18,7 @@ class AppEvent {
     this.location,
     this.description,
     required this.participantContactIds,
+    required this.userId,
   });
 
   // Factory constructor to create an AppEvent from a Firestore document
@@ -34,6 +36,7 @@ class AppEvent {
       participantContactIds: List<String>.from(
         data?['participantContactIds'] ?? [],
       ),
+      userId: data?['userId'] ?? '',
     );
   }
 
@@ -45,6 +48,7 @@ class AppEvent {
       'location': location,
       'description': description,
       'participantContactIds': participantContactIds,
+      'userId': userId,
     };
   }
 

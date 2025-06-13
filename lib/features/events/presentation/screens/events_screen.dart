@@ -4,6 +4,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
@@ -27,6 +28,7 @@ class _EventsScreenState extends State<EventsScreen> {
       []; // Stores events after applying search filter
   final FirebaseFirestore _firestore =
       FirebaseFirestore.instance; // Firestore instance
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Auth instance
 
   @override
   void initState() {
@@ -116,8 +118,12 @@ class _EventsScreenState extends State<EventsScreen> {
   // Fetches events from Firestore in real-time
   Future<void> _fetchEvents() async {
     try {
+      final String? uid = _auth.currentUser?.uid;
+      if (uid == null) return;
+
       _firestore
           .collection('events')
+          .where('userId', isEqualTo: uid)
           .withConverter(
             fromFirestore: AppEvent.fromFirestore,
             toFirestore: (AppEvent event, options) => event.toFirestore(),
@@ -193,254 +199,253 @@ class _EventsScreenState extends State<EventsScreen> {
 
     showDialog(
       context: context,
-      builder:
-          (context) => StatefulBuilder(
-            builder: (context, setStateSB) {
-              return AlertDialog(
-                title: const Text('New Event'),
-                content: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        controller: titleController,
-                        decoration: const InputDecoration(
-                          labelText: 'Event Title',
-                        ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateSB) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'New Event',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
                       ),
-                      TextField(
-                        controller: descriptionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Description (Optional)',
-                        ),
-                        maxLines: 3,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(labelText: 'Event Title'),
+                    ),
+                    TextField(
+                      controller: descriptionController,
+                      decoration:
+                          const InputDecoration(labelText: 'Description (Optional)'),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 10),
+                    ListTile(
+                      title: Text(
+                        selectedDate == null
+                            ? 'Select Date'
+                            : 'Date: ${DateFormat.yMMMd().format(selectedDate!)}',
                       ),
-                      const SizedBox(height: 10),
-                      ListTile(
-                        title: Text(
-                          selectedDate == null
-                              ? 'Select Date'
-                              : 'Date: ${DateFormat.yMMMd().format(selectedDate!)}',
-                        ),
-                        trailing: const Icon(Icons.calendar_today),
-                        onTap: () async {
-                          final DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(
-                              const Duration(days: 365 * 5),
-                            ),
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+                        );
+                        if (picked != null) {
+                          setStateSB(() {
+                            selectedDate = picked;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_allContacts.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No contacts available to add.')),
                           );
-                          if (picked != null) {
-                            setStateSB(() {
-                              selectedDate = picked;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_allContacts.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('No contacts available to add.'),
-                              ),
-                            );
-                            return;
-                          }
+                          return;
+                        }
 
-                          final List<Contact>?
-                          chosenContacts = await showDialog<List<Contact>>(
-                            context: context,
-                            builder: (BuildContext dialogContext) {
-                              List<Contact> tempSelected = List.from(
-                                selectedParticipants,
-                              );
-                              return AlertDialog(
-                                title: const Text('Select Participants'),
-                                content: SizedBox(
-                                  width: double.maxFinite,
-                                  height:
-                                      MediaQuery.of(dialogContext).size.height *
-                                      0.6,
-                                  child: ListView.builder(
-                                    itemCount: _allContacts.length,
-                                    itemBuilder: (context, index) {
-                                      final contact = _allContacts[index];
-                                      return CheckboxListTile(
-                                        title: Text(contact.displayName),
-                                        value: tempSelected.contains(contact),
-                                        onChanged: (bool? value) {
-                                          setStateSB(() {
-                                            // Use setStateSB to update dialog state
-                                            if (value == true) {
-                                              tempSelected.add(contact);
-                                            } else {
-                                              tempSelected.remove(contact);
-                                            }
-                                          });
-                                        },
-                                      );
-                                    },
-                                  ),
+                        final List<Contact>? chosenContacts = await showDialog<List<Contact>>(
+                          context: context,
+                          builder: (BuildContext dialogContext) {
+                            List<Contact> tempSelected = List.from(selectedParticipants);
+                            return AlertDialog(
+                              title: const Text('Select Participants'),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                height: MediaQuery.of(dialogContext).size.height * 0.6,
+                                child: ListView.builder(
+                                  itemCount: _allContacts.length,
+                                  itemBuilder: (context, index) {
+                                    final contact = _allContacts[index];
+                                    return CheckboxListTile(
+                                      title: Text(contact.displayName),
+                                      value: tempSelected.contains(contact),
+                                      onChanged: (bool? value) {
+                                        setStateSB(() {
+                                          if (value == true) {
+                                            tempSelected.add(contact);
+                                          } else {
+                                            tempSelected.remove(contact);
+                                          }
+                                        });
+                                      },
+                                    );
+                                  },
                                 ),
-                                actions: [
-                                  TextButton(
-                                    onPressed:
-                                        () =>
-                                            Navigator.pop(dialogContext, null),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.pop(
-                                          dialogContext,
-                                          tempSelected,
-                                        ),
-                                    child: const Text('Select'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext, null),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext, tempSelected),
+                                  child: const Text('Select'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
 
-                          if (chosenContacts != null) {
-                            setStateSB(() {
-                              selectedParticipants = chosenContacts;
-                            });
-                          }
-                        },
-                        child: Text(
-                          'Add Participants (${selectedParticipants.length})',
-                        ),
-                      ),
-                      Wrap(
-                        spacing: 8.0,
-                        children:
-                            selectedParticipants
-                                .map(
-                                  (contact) => Chip(
-                                    label: Text(contact.displayName),
-                                    onDeleted: () {
-                                      setStateSB(() {
-                                        selectedParticipants.remove(contact);
-                                      });
-                                    },
-                                  ),
-                                )
-                                .toList(),
-                      ),
-
-                      const SizedBox(height: 20),
-                      // New "Choose Location" button
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => LocationPickerScreen(
-                                    initialLocation: selectedLocation,
-                                    initialAddress: selectedAddress,
-                                  ),
+                        if (chosenContacts != null) {
+                          setStateSB(() {
+                            selectedParticipants = chosenContacts;
+                          });
+                        }
+                      },
+                      child: Text('Add Participants (${selectedParticipants.length})'),
+                    ),
+                    Wrap(
+                      spacing: 8.0,
+                      children: selectedParticipants
+                          .map(
+                            (contact) => Chip(
+                              label: Text(contact.displayName),
+                              onDeleted: () {
+                                setStateSB(() {
+                                  selectedParticipants.remove(contact);
+                                });
+                              },
                             ),
-                          );
-
-                          if (result != null && result['location'] != null) {
-                            setStateSB(() {
-                              // Use setStateSB to update dialog state
-                              selectedLocation = result['location'];
-                              selectedAddress = result['address'];
-                            });
-                          }
-                        },
-                        icon: const Icon(Icons.map),
-                        label: const Text('Choose Location on Map'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Theme color
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                        ),
-                      ),
-                      if (selectedLocation != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Text(
-                            'Location: ${selectedAddress ?? '${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)}'}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      if (titleController.text.isEmpty ||
-                          selectedDate == null ||
-                          selectedLocation == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Please enter a title, select a date, and select a location.',
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LocationPickerScreen(
+                              initialLocation: selectedLocation,
+                              initialAddress: selectedAddress,
                             ),
                           ),
                         );
-                        return;
-                      }
 
-                      final newAppEvent = AppEvent(
-                        title: titleController.text,
-                        date: selectedDate!,
-                        location:
-                            selectedAddress ??
-                            '${selectedLocation!.latitude}, ${selectedLocation!.longitude}', // Store address or coordinates
-                        description:
-                            descriptionController.text.isEmpty
-                                ? null
-                                : descriptionController.text,
-                        participantContactIds:
-                            selectedParticipants.map((c) => c.id).toList(),
-                      );
+                        if (result != null && result['location'] != null) {
+                          setStateSB(() {
+                            selectedLocation = result['location'];
+                            selectedAddress = result['address'];
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.map),
+                      label: const Text('Choose Location on Map'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                      ),
+                    ),
+                    if (selectedLocation != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          'Location: ${selectedAddress ?? '${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)}'}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (titleController.text.isEmpty ||
+                                selectedDate == null ||
+                                selectedLocation == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Please enter a title, select a date, and select a location.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
 
-                      try {
-                        await _firestore
-                            .collection('events')
-                            .add(newAppEvent.toFirestore());
-                        print('Event added to Firestore!');
-                        if (mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Event added successfully!'),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        print('Error adding event: $e');
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Failed to add event: ${e.toString()}',
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    child: const Text('Create'),
-                  ),
-                ],
-              );
-            },
-          ),
+                            final newAppEvent = AppEvent(
+                              title: titleController.text,
+                              date: selectedDate!,
+                              location: selectedAddress ??
+                                  '${selectedLocation!.latitude}, ${selectedLocation!.longitude}',
+                              description: descriptionController.text.isEmpty
+                                  ? null
+                                  : descriptionController.text,
+                              participantContactIds:
+                                  selectedParticipants.map((c) => c.id).toList(),
+                              userId: _auth.currentUser?.uid ?? '',
+                            );
+
+                            try {
+                              await _firestore
+                                  .collection('events')
+                                  .add(newAppEvent.toFirestore());
+                              if (mounted) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Event added successfully!')),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Failed to add event: ${e.toString()}'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: const Text('Create'),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
