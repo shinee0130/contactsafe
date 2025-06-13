@@ -6,6 +6,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:contactsafe/features/contacts/presentation/screens/edit_contact_screen.dart';
 
@@ -36,12 +37,27 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   }
 
   Future<void> _loadCounts() async {
-    // final files = await YourFileService.getCount(widget.contact.id);
-    // final notes = await YourNoteService.getCount(widget.contact.id);
-    setState(() {
-      _filesCount = 3; // Example count - replace with real implementation
-      _notesCount = 2; // Example count - replace with real implementation
-    });
+    try {
+      final filesSnapshot = await FirebaseFirestore.instance
+          .collection('contact_files_metadata')
+          .doc(widget.contact.id)
+          .collection('files')
+          .get();
+      final notesSnapshot = await FirebaseFirestore.instance
+          .collection('contact_notes')
+          .doc(widget.contact.id)
+          .collection('notes')
+          .get();
+      setState(() {
+        _filesCount = filesSnapshot.size;
+        _notesCount = notesSnapshot.size;
+      });
+    } catch (e) {
+      setState(() {
+        _filesCount = 0;
+        _notesCount = 0;
+      });
+    }
   }
 
   Future<void> _loadContactDetails(String contactId) async {
