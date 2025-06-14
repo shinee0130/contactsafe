@@ -1,16 +1,36 @@
-# contactsafe
+# ContactSafe
 
-A new Flutter project.
+ContactSafe is a Flutter application for securely managing your contacts, notes, events and photos. It lets you group contacts, attach files or notes and lock the app with an optional PIN. Firebase is used for authentication and cloud storage.
+
+## Prerequisites
+
+- **Flutter 3.7** or later.
+- Run `flutter pub get` to fetch the dependencies listed in `pubspec.yaml`.
+- Platform toolchains if you plan to build for a specific device:
+  - Android SDK for Android builds.
+  - Xcode for iOS builds.
+  - A supported browser such as Chrome for web builds.
+
+## Running Tests
+
+Execute all unit and widget tests with:
+
+```bash
+flutter test
+```
+
+## Building
+
+To produce release builds, run the following commands from the project root:
+
+```bash
+flutter build apk     # Android
+flutter build ios     # iOS
+flutter build web     # Web
+```
+
+Use `flutter run` to launch the app in debug mode on a connected device or simulator.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+See the [Flutter documentation](https://docs.flutter.dev/) for detailed installation and setup instructions.
