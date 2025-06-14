@@ -58,7 +58,9 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
   }
 
   Future<void> _addOrUpdateNote() async {
-    if (_noteController.text.trim().isEmpty) return;
+    if (_noteController.text.trim().isEmpty) {
+      return;
+    }
 
     if (_editingIndex >= 0) {
       final note = _notes[_editingIndex]

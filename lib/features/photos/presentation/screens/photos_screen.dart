@@ -82,7 +82,9 @@ class _PhotosScreenState extends State<PhotosScreen> {
   void _toggleEditMode() {
     setState(() {
       _editMode = !_editMode;
-      if (!_editMode) _selectedIndices.clear();
+      if (!_editMode) {
+        _selectedIndices.clear();
+      }
     });
   }
 

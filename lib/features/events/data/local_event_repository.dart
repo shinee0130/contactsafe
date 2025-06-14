@@ -13,9 +13,13 @@ class LocalEventRepository {
 
   Future<List<AppEvent>> loadEvents() async {
     final file = await _getEventsFile();
-    if (!await file.exists()) return [];
+    if (!await file.exists()) {
+      return [];
+    }
     final jsonString = await file.readAsString();
-    if (jsonString.isEmpty) return [];
+    if (jsonString.isEmpty) {
+      return [];
+    }
     final List<dynamic> data = jsonDecode(jsonString);
     return data
         .map((e) => AppEvent.fromJson(e as Map<String, dynamic>))

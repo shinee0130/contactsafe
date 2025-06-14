@@ -71,44 +71,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importContacts() async {
     try {
       final count = await _controller.importContacts();
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Successfully imported $count contacts!')),
       );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error importing contacts: $e')));
-    }
+      } catch (e) {
+        if (!mounted) {
+          return;
+      }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error importing contacts: $e')));
+      }
   }
 
   Future<void> _createBackup() async {
     try {
-      final fileName = await _controller.createBackup();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Backup created successfully at $fileName')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to create backup: $e')));
-    }
+        final fileName = await _controller.createBackup();
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Backup created successfully at $fileName')),
+        );
+      } catch (e) {
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to create backup: $e')));
+      }
   }
 
   Future<void> _restoreFromBackup() async {
     try {
       final count = await _controller.restoreFromBackup();
-      if (count > 0) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Restored $count contacts from backup!')),
-        );
+        if (count > 0) {
+          if (!mounted) {
+            return;
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Restored $count contacts from backup!')),
+          );
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to restore backup: $e')));
@@ -117,13 +129,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _backupToGoogleDrive() async {
     try {
-      await _controller.backupToGoogleDrive();
-      if (!mounted) return;
+        await _controller.backupToGoogleDrive();
+        if (!mounted) {
+          return;
+        }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Backup uploaded to Google Drive')),
       );
-    } catch (e) {
-      if (!mounted) return;
+      } catch (e) {
+        if (!mounted) {
+          return;
+        }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Backup failed: $e')),
       );
@@ -131,14 +147,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _restoreFromGoogleDrive() async {
-    try {
-      final count = await _controller.restoreFromGoogleDrive();
-      if (!mounted) return;
+      try {
+        final count = await _controller.restoreFromGoogleDrive();
+        if (!mounted) {
+          return;
+        }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Restored $count contacts from Google Drive')),
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Restore failed: $e')),
       );
@@ -148,12 +168,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importBackupFromLink(String url) async {
     try {
       final count = await _controller.importBackupFromLink(url);
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Imported $count contacts from link')),
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Import failed: $e')),
       );
@@ -232,12 +256,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _deleteAllApplicationData() async {
     try {
       await _controller.deleteAllApplicationData();
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('All application data has been deleted.')),
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to delete all data: $e')));
@@ -256,7 +284,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           (context) => PinDialog(title: 'Create a 4-digit PIN', error: error),
     );
 
-    if (pin == null) return null;
+      if (pin == null) {
+        return null;
+      }
 
     // Confirm PIN
     confirmPin = await showDialog<String>(
@@ -264,10 +294,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => PinDialog(title: 'Confirm your PIN', error: error),
     );
 
-    if (confirmPin == null) return null;
+      if (confirmPin == null) {
+        return null;
+      }
 
-    if (pin != confirmPin) {
-      if (!mounted) return null; // Check if the widget is still mounted
+      if (pin != confirmPin) {
+        if (!mounted) {
+          return null; // Check if the widget is still mounted
+        }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('PINs do not match. Please try again.')),
       );
@@ -279,7 +313,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<bool> _showVerifyPinDialog() async {
     final hasPin = await _controller.hasPin();
-    if (!hasPin) return true;
+      if (!hasPin) {
+        return true;
+      }
 
     bool verified = false;
     String? error;
@@ -290,7 +326,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context) => PinDialog(title: 'Enter your PIN', error: error),
       );
 
-      if (enteredPin == null) return false;
+        if (enteredPin == null) {
+          return false;
+        }
 
       verified = await _controller.verifyPin(enteredPin);
       if (!verified) {
@@ -310,19 +348,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (authenticated) {
           setState(() => _useFaceId = true);
           await _controller.saveUseFaceIdSetting(true);
-          if (!mounted) return;
+          if (!mounted) {
+            return;
+      }
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Biometrics enabled.')));
         } else {
-          if (!mounted) return;
+          if (!mounted) {
+            return;
+      }
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Authentication failed or canceled.')),
           );
         }
       } else {
         setState(() => _useFaceId = false);
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+      }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No biometrics available.')),
         );
@@ -330,7 +374,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else {
       setState(() => _useFaceId = false);
       await _controller.saveUseFaceIdSetting(false);
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Biometrics disabled.')));
@@ -674,7 +720,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   if (newOrder != null) {
                     await _controller.saveTabBarOrder(newOrder);
                     setState(() => _navigationItems = newOrder);
-                    if (!mounted) return;
+                    if (!mounted) {
+                      return;
+      }
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('TabBar order updated successfully!'),
@@ -716,13 +764,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await _controller.savePin(pin);
                       setState(() => _usePass = true);
                       await _controller.saveUsePasswordSetting(true);
-                      if (!mounted) return;
+                      if (!mounted) {
+                        return;
+      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('PIN enabled.')),
                       );
                     } else {
                       setState(() => _usePass = false);
-                      if (!mounted) return;
+                      if (!mounted) {
+                        return;
+      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('PIN setup canceled or invalid.'),
@@ -736,7 +788,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await _controller.deletePin();
                       setState(() => _usePass = false);
                       await _controller.saveUsePasswordSetting(false);
-                      if (!mounted) return;
+                      if (!mounted) {
+                        return;
+      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('PIN disabled.')),
                       );
@@ -763,14 +817,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final newPin = await _showCreatePinDialog();
                       if (newPin != null && newPin.length == 4) {
                         await _controller.savePin(newPin);
-                        if (!mounted) return;
+                        if (!mounted) {
+                          return;
+      }
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('PIN changed successfully'),
                           ),
                         );
                       } else {
-                        if (!mounted) return;
+                        if (!mounted) {
+                          return;
+      }
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('PIN change canceled or invalid.'),

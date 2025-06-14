@@ -219,7 +219,9 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           summaryMessage += '$successfulUploads file(s) uploaded successfully.';
         }
         if (failedUploads > 0) {
-          if (summaryMessage.isNotEmpty) summaryMessage += '\n';
+          if (summaryMessage.isNotEmpty) {
+            summaryMessage += '\n';
+          }
           summaryMessage += '$failedUploads file(s) failed to upload.';
         }
         if (summaryMessage.isEmpty) {
@@ -245,7 +247,9 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   }
 
   Future<void> _deleteSelectedFiles() async {
-    if (_selectedFileIds.isEmpty) return;
+    if (_selectedFileIds.isEmpty) {
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -420,7 +424,9 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   void _toggleEditMode() {
     setState(() {
       _editMode = !_editMode;
-      if (!_editMode) _selectedFileIds.clear();
+      if (!_editMode) {
+        _selectedFileIds.clear();
+      }
     });
   }
 
@@ -514,8 +520,12 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   }
 
   String _formatFileSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1048576) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024) {
+      return '$bytes B';
+    }
+    if (bytes < 1048576) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    }
     return '${(bytes / 1048576).toStringAsFixed(1)} MB';
   }
 
