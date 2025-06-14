@@ -62,7 +62,7 @@ class SettingsController {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('useFaceId', value);
     if (kDebugMode) {
-      print('Saved useFaceId: $value');
+      debugPrint('Saved useFaceId: $value');
     }
   }
 
@@ -110,13 +110,13 @@ class SettingsController {
             .toList();
       } catch (e) {
         if (kDebugMode) {
-          print('Error decoding saved TabBar order: $e');
+          debugPrint('Error decoding saved TabBar order: $e');
         }
         return NavigationItem.defaultItems();
       }
     } else {
       if (kDebugMode) {
-        print('No saved TabBar order found, using default.');
+        debugPrint('No saved TabBar order found, using default.');
       }
       return NavigationItem.defaultItems();
     }
@@ -129,7 +129,7 @@ class SettingsController {
         newOrder.map((item) => item.toJson()).toList();
     await prefs.setString('tabBarOrder', jsonEncode(orderToJson));
     if (kDebugMode) {
-      print('Saved TabBar order: ${newOrder.map((e) => e.label).join(', ')}');
+      debugPrint('Saved TabBar order: ${newOrder.map((e) => e.label).join(', ')}');
     }
   }
 
@@ -146,7 +146,7 @@ class SettingsController {
       return 0;
     } catch (e) {
       if (kDebugMode) {
-        print('Error importing contacts: $e');
+        debugPrint('Error importing contacts: $e');
       }
       throw Exception('Failed to import contacts: $e');
     }
@@ -186,7 +186,7 @@ class SettingsController {
       return file.path.split('/').last;
     } catch (e) {
       if (kDebugMode) {
-        print('Error creating backup: $e');
+        debugPrint('Error creating backup: $e');
       }
       throw Exception('Failed to create backup: $e');
     }
@@ -232,7 +232,7 @@ class SettingsController {
       return 0;
     } catch (e) {
       if (kDebugMode) {
-        print('Error restoring backup: $e');
+        debugPrint('Error restoring backup: $e');
       }
       throw Exception('Failed to restore backup: $e');
     }
@@ -364,7 +364,7 @@ class SettingsController {
       return data.length;
     } catch (e) {
       if (kDebugMode) {
-        print('Error importing from link: $e');
+        debugPrint('Error importing from link: $e');
       }
       throw Exception('Failed to import backup from link: $e');
     }
@@ -386,7 +386,7 @@ class SettingsController {
       await prefs.clear();
     } catch (e) {
       if (kDebugMode) {
-        print('Error deleting all data: $e');
+        debugPrint('Error deleting all data: $e');
       }
       throw Exception('Failed to delete all data: $e');
     }
@@ -421,7 +421,7 @@ class SettingsController {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_usePasswordKey, value);
     if (kDebugMode) {
-      print('Saved usePassword: $value');
+      debugPrint('Saved usePassword: $value');
     }
   }
 }

@@ -34,7 +34,7 @@ class ContactsProvider {
         _allContacts = List.from(contacts);
       }
     } catch (e) {
-      print('Error requesting contact permission: $e');
+      debugPrint('Error requesting contact permission: $e');
       rethrow;
     }
   }

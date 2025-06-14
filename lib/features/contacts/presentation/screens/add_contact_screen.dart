@@ -184,7 +184,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
       }
     } catch (e) {
       if (mounted) {
-        print('Error saving contact to device or Firestore: $e');
+        debugPrint('Error saving contact to device or Firestore: $e');
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Failed to save contact: $e')));

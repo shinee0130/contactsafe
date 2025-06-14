@@ -119,10 +119,10 @@ class _AssignContactsToGroupScreenState
     // -----------------------------------------------------
 
     // Optional: Print updated map for verification
-    print('Updated Group Assignments for "${widget.groupName}":');
+    debugPrint('Updated Group Assignments for "${widget.groupName}":');
     globalContactGroupsMap.forEach((contactName, groups) {
       if (groups.contains(widget.groupName)) {
-        print('- $contactName is now in "${widget.groupName}"');
+        debugPrint('- $contactName is now in "${widget.groupName}"');
       }
     });
 

@@ -77,7 +77,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         }
       }
     } catch (e) {
-      print("Could not get current location: $e");
+      debugPrint("Could not get current location: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not get current location.')),
@@ -109,7 +109,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         }
       }
     } catch (e) {
-      print('Error during reverse geocoding: $e');
+      debugPrint('Error during reverse geocoding: $e');
       address = null; // Ensure it's null if geocoding fails
     } finally {
       setState(() {

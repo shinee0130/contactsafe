@@ -51,9 +51,9 @@ class _EventsScreenState extends State<EventsScreen> {
             .request(); // Or .location if you need background location
 
     if (status.isGranted) {
-      print('Location permission granted');
+      debugPrint('Location permission granted');
     } else if (status.isDenied) {
-      print('Location permission denied');
+      debugPrint('Location permission denied');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -64,7 +64,7 @@ class _EventsScreenState extends State<EventsScreen> {
         );
       }
     } else if (status.isPermanentlyDenied) {
-      print('Location permission permanently denied');
+      debugPrint('Location permission permanently denied');
       if (mounted) {
         openAppSettings(); // Direct the user to app settings
         ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +81,7 @@ class _EventsScreenState extends State<EventsScreen> {
   // Fetches contacts from the device
   Future<void> _fetchContacts() async {
     if (!await FlutterContacts.requestPermission()) {
-      print('Contacts permission denied');
+      debugPrint('Contacts permission denied');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -104,7 +104,7 @@ class _EventsScreenState extends State<EventsScreen> {
         _allContacts = contacts;
       });
     } catch (e) {
-      print('Error fetching contacts: $e');
+      debugPrint('Error fetching contacts: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error fetching contacts: ${e.toString()}')),
@@ -123,7 +123,7 @@ class _EventsScreenState extends State<EventsScreen> {
         _filterEvents(_searchController.text);
       });
     } catch (e) {
-      print("Failed to load events: $e");
+      debugPrint("Failed to load events: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading events: ${e.toString()}')),
@@ -576,7 +576,7 @@ class _EventsScreenState extends State<EventsScreen> {
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() => _currentIndex = index);
-          print('Bottom navigation tapped: $index');
+          debugPrint('Bottom navigation tapped: $index');
           switch (index) {
             case 0:
               Navigator.pushReplacementNamed(context, '/contacts');

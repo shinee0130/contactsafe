@@ -50,7 +50,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
             final lat = double.parse(parts[0].trim());
             final lng = double.parse(parts[1].trim());
             _eventLatLng = LatLng(lat, lng);
-            print('Parsed location directly: $_eventLatLng');
+            debugPrint('Parsed location directly: $_eventLatLng');
           } catch (_) {
             // Not a direct LatLng, proceed to geocoding
           }
@@ -66,16 +66,16 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
               locations.first.latitude,
               locations.first.longitude,
             );
-            print('Geocoded location: $_eventLatLng');
+            debugPrint('Geocoded location: $_eventLatLng');
           } else {
-            print('Could not geocode address: ${widget.event.location}');
+            debugPrint('Could not geocode address: ${widget.event.location}');
           }
         }
       } else {
-        print('Event has no location string.');
+        debugPrint('Event has no location string.');
       }
     } catch (e) {
-      print('Error geocoding event location: $e');
+      debugPrint('Error geocoding event location: $e');
     } finally {
       setState(() {
         _isLoadingMap = false;
