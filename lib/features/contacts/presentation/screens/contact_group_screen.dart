@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'AssignContactsToGroupScreen.dart'
+import 'assign_contacts_to_group_screen.dart.dart'
     show AssignContactsToGroupScreen, globalGroups, globalContactGroupsMap;
 
 class ContactGroupsScreen extends StatefulWidget {
@@ -362,9 +362,10 @@ class _ContactGroupsScreenState extends State<ContactGroupsScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: group == 'Not assigned'
-                            ? null
-                            : () => _deleteGroup(group),
+                        onPressed:
+                            group == 'Not assigned'
+                                ? null
+                                : () => _deleteGroup(group),
                       ),
                     ],
                   ),

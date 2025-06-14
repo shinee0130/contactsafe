@@ -4,7 +4,7 @@ import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
-import 'package:contactsafe/features/contacts/presentation/screens/AssignContactsToGroupScreen.dart'
+import 'package:contactsafe/features/contacts/presentation/screens/assign_contacts_to_group_screen.dart.dart'
     show globalContactGroupsMap;
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
@@ -56,9 +56,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   void _scrollToLetter(String letter) {
-    final groupedContacts = _contactsProvider.groupContacts(
-      _displayedContacts,
-    );
+    final groupedContacts = _contactsProvider.groupContacts(_displayedContacts);
     if (groupedContacts.containsKey(letter)) {
       final offset = _calculateScrollOffset(letter, groupedContacts);
       _scrollController.animateTo(
@@ -89,17 +87,23 @@ class _ContactsScreenState extends State<ContactsScreen> {
     List<Contact> filtered = List.from(_contactsProvider.allContacts);
 
     if (_selectedGroups.isNotEmpty) {
-      filtered = filtered.where((contact) {
-        final groups = globalContactGroupsMap[contact.displayName] ?? ['Not assigned'];
-        if (groups.isEmpty) groups.add('Not assigned');
-        return groups.any((g) => _selectedGroups.contains(g));
-      }).toList();
+      filtered =
+          filtered.where((contact) {
+            final groups =
+                globalContactGroupsMap[contact.displayName] ?? ['Not assigned'];
+            if (groups.isEmpty) groups.add('Not assigned');
+            return groups.any((g) => _selectedGroups.contains(g));
+          }).toList();
     }
 
     if (query.isNotEmpty) {
-      filtered = filtered
-          .where((c) => c.displayName.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      filtered =
+          filtered
+              .where(
+                (c) =>
+                    c.displayName.toLowerCase().contains(query.toLowerCase()),
+              )
+              .toList();
     }
 
     setState(() {
@@ -216,7 +220,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.add, color: Colors.blue, size: 24),
@@ -253,7 +259,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: (0.05 * 255).round()),
+                      color: Colors.black.withValues(
+                        alpha: (0.05 * 255).round(),
+                      ),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
