@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -310,7 +311,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             labelText,
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
             ),
           ),
           const SizedBox(height: 4),
@@ -416,7 +417,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
             ),
           ),
           ListView.builder(
@@ -508,14 +509,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
               },
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
               ),
               label: Text(
                 'Add phone',
                 style: TextStyle(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -618,7 +619,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
                       fontSize: 12,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
+                      ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -708,14 +709,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
               onPressed: onAdd,
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
               ),
               label: Text(
                 'Add $label',
                 style: TextStyle(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -729,7 +730,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
@@ -881,7 +882,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
                         Icons.clear,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                       ),
                       onPressed: () {
                         setState(() {
@@ -938,14 +939,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       side: BorderSide(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                         width: 1,
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -256,7 +257,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: (0.1 * 255).round()),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -526,7 +527,7 @@ class _EventsScreenState extends State<EventsScreen> {
           ),
         ],
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -659,7 +660,7 @@ class EventCard extends StatelessWidget {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: (0.7 * 255).round()),
                   ),
                 ),
               const SizedBox(height: 8),
@@ -668,7 +669,7 @@ class EventCard extends StatelessWidget {
                 style: TextStyle(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                 ),
               ),
               const SizedBox(height: 8),
@@ -687,7 +688,7 @@ class EventCard extends StatelessWidget {
                       fontStyle: FontStyle.italic,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.7),
+                      ).colorScheme.onSurface.withValues(alpha: (0.7 * 255).round()),
                     ),
                   ),
                 ),

@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
@@ -19,7 +20,7 @@ class ContactSafeNavigationBar extends StatelessWidget {
       selectedItemColor: Colors.blue,
       unselectedItemColor: Theme.of(
         context,
-      ).colorScheme.onSurface.withOpacity(0.6),
+      ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
       backgroundColor: Theme.of(context).colorScheme.surface,
       items: const [
         BottomNavigationBarItem(

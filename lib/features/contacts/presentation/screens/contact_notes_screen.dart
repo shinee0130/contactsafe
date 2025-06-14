@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
@@ -142,7 +143,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: (0.1 * 255).round()),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),

@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -287,7 +288,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
@@ -367,7 +368,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                               size: 64,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.4),
+                              ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -376,7 +377,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                 fontSize: 18,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withOpacity(0.6),
+                                ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -387,7 +388,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                 fontSize: 14,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withOpacity(0.6),
+                                ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                               ),
                             ),
                           ],
