@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -380,7 +381,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
           Text(
             'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 12.0,
               color: Theme.of(
                 context,
               ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
