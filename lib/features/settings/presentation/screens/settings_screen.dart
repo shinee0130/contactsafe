@@ -60,7 +60,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url)) {
+    final success = await launchUrl(url);
+    if (!success && mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Could not open $urlString')));
@@ -70,10 +71,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importContacts() async {
     try {
       final count = await _controller.importContacts();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Successfully imported $count contacts!')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error importing contacts: $e')));
@@ -83,10 +86,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _createBackup() async {
     try {
       final fileName = await _controller.createBackup();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Backup created successfully at $fileName')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to create backup: $e')));
@@ -97,11 +102,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final count = await _controller.restoreFromBackup();
       if (count > 0) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Restored $count contacts from backup!')),
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to restore backup: $e')));
@@ -225,10 +232,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _deleteAllApplicationData() async {
     try {
       await _controller.deleteAllApplicationData();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('All application data has been deleted.')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to delete all data: $e')));
@@ -360,7 +369,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
-    if (selected != null) {
+    if (selected != null && mounted) {
       setState(() => _currentLanguage = selected);
       await _controller.saveLanguage(selected);
     }
