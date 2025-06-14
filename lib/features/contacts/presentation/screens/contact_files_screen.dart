@@ -1,5 +1,3 @@
-// lib/features/contact/presentation/screens/contact_files_screen.dart
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -314,24 +312,25 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     final controller = TextEditingController(text: file.name);
     final newName = await showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Rename File'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(hintText: 'Enter new name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Rename File'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(hintText: 'Enter new name'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, controller.text.trim()),
+                child: const Text('Save'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
     );
 
     if (newName != null && newName.isNotEmpty && newName != file.name) {
