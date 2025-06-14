@@ -101,6 +101,7 @@ class _EventsScreenState extends State<EventsScreen> {
         withPhoto: true,
       );
       contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+      if (!mounted) return;
       setState(() {
         _allContacts = contacts;
       });
@@ -118,6 +119,7 @@ class _EventsScreenState extends State<EventsScreen> {
   Future<void> _fetchEvents() async {
     try {
       final events = await _eventRepository.loadEvents();
+      if (!mounted) return;
       setState(() {
         _events = events;
         _sortEvents();
@@ -460,6 +462,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
                             try {
                           await _eventRepository.addEvent(newAppEvent);
+                          if (!mounted) return;
                           setState(() {
                                 _events.add(newAppEvent);
                                 _sortEvents();
