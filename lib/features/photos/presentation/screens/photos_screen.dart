@@ -136,7 +136,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
   Future<void> _shareSelectedPhotos() async {
     final files = _selectedIndices.map((i) => XFile(_photos[i].path)).toList();
     if (files.isNotEmpty) {
-      await Share.shareXFiles(files);
+      await SharePlus.instance.share(files: files);
     }
   }
 
