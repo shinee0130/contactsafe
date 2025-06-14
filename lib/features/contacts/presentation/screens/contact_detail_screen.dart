@@ -565,7 +565,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                         fontSize: 18,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                        ).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

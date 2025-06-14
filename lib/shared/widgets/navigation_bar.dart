@@ -20,7 +20,7 @@ class ContactSafeNavigationBar extends StatelessWidget {
       selectedItemColor: Colors.blue,
       unselectedItemColor: Theme.of(
         context,
-      ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+      ).colorScheme.onSurfaceVariant,
       backgroundColor: Theme.of(context).colorScheme.surface,
       items: const [
         BottomNavigationBarItem(

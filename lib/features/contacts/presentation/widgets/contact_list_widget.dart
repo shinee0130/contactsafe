@@ -45,7 +45,7 @@ class ContactListWidget extends StatelessWidget {
                       fontSize: 18,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                      ).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],

@@ -311,7 +311,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             labelText,
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 4),
@@ -417,7 +417,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           ListView.builder(
@@ -509,14 +509,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
               },
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               label: Text(
                 'Add phone',
                 style: TextStyle(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                  ).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -619,7 +619,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
                       fontSize: 12,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                      ).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -709,14 +709,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
               onPressed: onAdd,
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               label: Text(
                 'Add $label',
                 style: TextStyle(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                  ).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -882,7 +882,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
                         Icons.clear,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                        ).colorScheme.onSurfaceVariant,
                       ),
                       onPressed: () {
                         setState(() {
@@ -939,14 +939,14 @@ class _EditContactScreenState extends State<EditContactScreen> {
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                    ).colorScheme.onSurfaceVariant,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       side: BorderSide(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                        ).colorScheme.onSurfaceVariant,
                         width: 1,
                       ),
                     ),

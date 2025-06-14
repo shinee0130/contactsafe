@@ -379,7 +379,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                 fontSize: 18,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                                ).colorScheme.onSurfaceVariant,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -390,7 +390,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                                 fontSize: 14,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                                ).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
