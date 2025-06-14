@@ -245,7 +245,9 @@ class SettingsController {
     final file = File('${directory.path}/ContactSafe/$fileName');
     final GoogleSignInAccount? account =
         await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
-    if (account == null) throw Exception('Google sign in failed');
+    if (account == null) {
+      throw Exception('Google sign in failed');
+    }
     final authHeaders = await account.authHeaders;
     final client = GoogleAuthClient(authHeaders);
     final driveApi = drive.DriveApi(client);
@@ -260,7 +262,9 @@ class SettingsController {
   Future<int> restoreFromGoogleDrive() async {
     final GoogleSignInAccount? account =
         await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
-    if (account == null) throw Exception('Google sign in failed');
+    if (account == null) {
+      throw Exception('Google sign in failed');
+    }
     final authHeaders = await account.authHeaders;
     final client = GoogleAuthClient(authHeaders);
     final driveApi = drive.DriveApi(client);
@@ -273,7 +277,9 @@ class SettingsController {
       throw Exception('No backup file found');
     }
     final fileId = fileList.files!.first.id;
-    if (fileId == null) throw Exception('Invalid file id');
+    if (fileId == null) {
+      throw Exception('Invalid file id');
+    }
     final media =
         await driveApi.files.get(
               fileId,

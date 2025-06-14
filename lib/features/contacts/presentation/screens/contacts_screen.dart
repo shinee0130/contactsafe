@@ -48,7 +48,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
   Future<void> _loadContacts() async {
     await _contactsProvider.fetchContacts();
     _applyFilters(query: _searchController.text);
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _filterContacts(String query) {
@@ -75,7 +77,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final sortedKeys = groupedContacts.keys.toList()..sort();
 
     for (final key in sortedKeys) {
-      if (key == letter) break;
+      if (key == letter) {
+        break;
+      }
       offset += 1; // For the header
       offset += groupedContacts[key]!.length; // For the contacts
       offset += 2; // For the dividers (assuming each group has 2 dividers)
@@ -91,7 +95,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
           filtered.where((contact) {
             final groups =
                 globalContactGroupsMap[contact.displayName] ?? ['Not assigned'];
-            if (groups.isEmpty) groups.add('Not assigned');
+            if (groups.isEmpty) {
+              groups.add('Not assigned');
+            }
             return groups.any((g) => _selectedGroups.contains(g));
           }).toList();
     }
