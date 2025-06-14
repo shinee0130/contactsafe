@@ -78,6 +78,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
     } catch (e) {
       debugPrint('Error geocoding event location: $e');
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoadingMap = false;
       });
