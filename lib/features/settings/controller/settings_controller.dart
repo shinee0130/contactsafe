@@ -172,14 +172,15 @@ class SettingsController {
         );
       }
 
-      final List<Map<String, dynamic>> contactsData = contacts.map((c) {
-        return {
-          'id': c.id,
-          'displayName': c.displayName,
-          'phones': c.phones.map((p) => p.number).toList(),
-          'emails': c.emails.map((e) => e.address).toList(),
-        };
-      }).toList();
+      final List<Map<String, dynamic>> contactsData =
+          contacts.map((c) {
+            return {
+              'id': c.id,
+              'displayName': c.displayName,
+              'phones': c.phones.map((p) => p.number).toList(),
+              'emails': c.emails.map((e) => e.address).toList(),
+            };
+          }).toList();
 
       await file.writeAsString(jsonEncode(contactsData));
       return file.path.split('/').last;
@@ -206,14 +207,22 @@ class SettingsController {
         if (await FlutterContacts.requestPermission()) {
           for (final item in decodedData) {
             try {
-              final contact = Contact()
-                ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
-                ..phones = (item['phones'] as List?)
-                        ?.map((p) => Phone(p.toString()))
-                        .toList() ?? []
-                ..emails = (item['emails'] as List?)
-                        ?.map((e) => Email(e.toString()))
-                        .toList() ?? [];
+              final contact =
+                  Contact()
+                    ..name = Name(
+                      first: item['firstName'] ?? '',
+                      last: item['lastName'] ?? '',
+                    )
+                    ..phones =
+                        (item['phones'] as List?)
+                            ?.map((p) => Phone(p.toString()))
+                            .toList() ??
+                        []
+                    ..emails =
+                        (item['emails'] as List?)
+                            ?.map((e) => Email(e.toString()))
+                            .toList() ??
+                        [];
               await contact.insert();
             } catch (_) {}
           }
@@ -234,7 +243,8 @@ class SettingsController {
     final fileName = await createBackup();
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/ContactSafe/$fileName');
-    final GoogleSignInAccount? account = await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
+    final GoogleSignInAccount? account =
+        await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
     if (account == null) throw Exception('Google sign in failed');
     final authHeaders = await account.authHeaders;
     final client = GoogleAuthClient(authHeaders);
@@ -248,35 +258,62 @@ class SettingsController {
 
   // Restore from Google Drive (downloads the most recent backup)
   Future<int> restoreFromGoogleDrive() async {
-    final GoogleSignInAccount? account = await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
+    final GoogleSignInAccount? account =
+        await GoogleSignIn(scopes: [drive.DriveApi.driveFileScope]).signIn();
     if (account == null) throw Exception('Google sign in failed');
     final authHeaders = await account.authHeaders;
     final client = GoogleAuthClient(authHeaders);
     final driveApi = drive.DriveApi(client);
-    final fileList = await driveApi.files.list(q: "name contains 'backup_'", spaces: 'drive', orderBy: 'createdTime desc');
+    final fileList = await driveApi.files.list(
+      q: "name contains 'backup_'",
+      spaces: 'drive',
+      orderBy: 'createdTime desc',
+    );
     if (fileList.files == null || fileList.files!.isEmpty) {
       throw Exception('No backup file found');
     }
     final fileId = fileList.files!.first.id;
     if (fileId == null) throw Exception('Invalid file id');
-    final media = await driveApi.files.get(fileId, downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
-    final bytes = await media.stream.toBytes();
+    final media =
+        await driveApi.files.get(
+              fileId,
+              downloadOptions: drive.DownloadOptions.fullMedia,
+            )
+            as drive.Media;
+    final byteList = await media.stream.fold<List<int>>(
+      [],
+      (prev, element) => prev..addAll(element),
+    );
+    final bytes = Uint8List.fromList(byteList);
     final directory = await getApplicationDocumentsDirectory();
     final backupDir = Directory('${directory.path}/ContactSafe');
     if (!await backupDir.exists()) {
       await backupDir.create(recursive: true);
     }
-    final path = '${backupDir.path}/restored_${_formatDateTime(DateTime.now())}.json';
+    final path =
+        '${backupDir.path}/restored_${_formatDateTime(DateTime.now())}.json';
     final file = File(path);
     await file.writeAsBytes(bytes);
     final data = jsonDecode(utf8.decode(bytes)) as List<dynamic>;
     if (await FlutterContacts.requestPermission()) {
       for (final item in data) {
         try {
-          final contact = Contact()
-            ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
-            ..phones = (item['phones'] as List?)?.map((p) => Phone(p.toString())).toList() ?? []
-            ..emails = (item['emails'] as List?)?.map((e) => Email(e.toString())).toList() ?? [];
+          final contact =
+              Contact()
+                ..name = Name(
+                  first: item['firstName'] ?? '',
+                  last: item['lastName'] ?? '',
+                )
+                ..phones =
+                    (item['phones'] as List?)
+                        ?.map((p) => Phone(p.toString()))
+                        .toList() ??
+                    []
+                ..emails =
+                    (item['emails'] as List?)
+                        ?.map((e) => Email(e.toString()))
+                        .toList() ??
+                    [];
           await contact.insert();
         } catch (_) {}
       }
@@ -296,17 +333,30 @@ class SettingsController {
       if (!await backupDir.exists()) {
         await backupDir.create(recursive: true);
       }
-      final path = '${backupDir.path}/imported_${_formatDateTime(DateTime.now())}.json';
+      final path =
+          '${backupDir.path}/imported_${_formatDateTime(DateTime.now())}.json';
       final file = File(path);
       await file.writeAsBytes(response.bodyBytes);
       final data = jsonDecode(response.body) as List<dynamic>;
       if (await FlutterContacts.requestPermission()) {
         for (final item in data) {
           try {
-            final contact = Contact()
-              ..name = Name(first: item['firstName'] ?? '', last: item['lastName'] ?? '')
-              ..phones = (item['phones'] as List?)?.map((p) => Phone(p.toString())).toList() ?? []
-              ..emails = (item['emails'] as List?)?.map((e) => Email(e.toString())).toList() ?? [];
+            final contact =
+                Contact()
+                  ..name = Name(
+                    first: item['firstName'] ?? '',
+                    last: item['lastName'] ?? '',
+                  )
+                  ..phones =
+                      (item['phones'] as List?)
+                          ?.map((p) => Phone(p.toString()))
+                          .toList() ??
+                      []
+                  ..emails =
+                      (item['emails'] as List?)
+                          ?.map((e) => Email(e.toString()))
+                          .toList() ??
+                      [];
             await contact.insert();
           } catch (_) {}
         }
