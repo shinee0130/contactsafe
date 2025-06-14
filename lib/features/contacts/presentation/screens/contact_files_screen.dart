@@ -96,7 +96,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   void initState() {
     super.initState();
     // Log the contact ID to ensure it's valid
-    print('Loading files for contact ID: ${widget.contact.id}');
+    debugPrint('Loading files for contact ID: ${widget.contact.id}');
     _loadFiles();
   }
 
@@ -128,7 +128,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         _sortFiles();
       });
     } catch (e) {
-      print('Error loading files: $e');
+      debugPrint('Error loading files: $e');
       _showSnackBar('Failed to load files: ${e.toString()}'); // Show full error
     } finally {
       setState(() {
@@ -168,15 +168,15 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             final ref = _storage.ref().child(storagePath);
 
             // 1. Upload file to Firebase Storage
-            print('Attempting to upload ${fileName} to Storage...');
+            debugPrint('Attempting to upload ${fileName} to Storage...');
             await ref.putData(platformFile.bytes!);
             final downloadUrl = await ref.getDownloadURL();
-            print(
+            debugPrint(
               'Successfully uploaded ${fileName} to Storage. Download URL: $downloadUrl',
             );
 
             // 2. Save metadata to Firestore
-            print(
+            debugPrint(
               'Attempting to save metadata for ${fileName} to Firestore...',
             );
             final newFile = ContactFile(
@@ -190,7 +190,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
 
             // Add document to Firestore and get its ID
             final docRef = await _contactFilesCollection().add(newFile);
-            print(
+            debugPrint(
               'Successfully saved metadata for ${fileName} to Firestore. Doc ID: ${docRef.id}',
             );
 
@@ -201,7 +201,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             });
             successfulUploads++;
           } catch (e) {
-            print(
+            debugPrint(
               'Error uploading or saving metadata for ${platformFile.name}: $e',
             );
             _showSnackBar(
@@ -230,7 +230,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         _loadFiles(); // Re-fetch the true state from Firestore
       } catch (e) {
         // <--- Corresponding catch block for the outer try
-        print('Overall error during file picking or processing: $e');
+        debugPrint('Overall error during file picking or processing: $e');
         _showSnackBar(
           'An overall error occurred during file picking or processing: ${e.toString()}',
         );
@@ -261,14 +261,14 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                         'File not found locally for ID: $fileId',
                       ), // More robust error
             );
-            print(
+            debugPrint(
               'Attempting to delete ${fileToDelete.name} from Storage and Firestore...',
             );
             // Delete from Firebase Storage
             await _storage.ref().child(fileToDelete.storagePath).delete();
             // Delete metadata from Firestore
             await _contactFilesCollection().doc(fileId).delete();
-            print('Successfully deleted ${fileToDelete.name}.');
+            debugPrint('Successfully deleted ${fileToDelete.name}.');
           }).toList();
 
       await Future.wait(deleteFutures);
@@ -280,7 +280,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       });
       _showSnackBar('Selected files deleted successfully!');
     } catch (e) {
-      print('Error deleting files: $e');
+      debugPrint('Error deleting files: $e');
       _showSnackBar('Failed to delete selected files: ${e.toString()}');
     } finally {
       setState(() {

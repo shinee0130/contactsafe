@@ -125,7 +125,7 @@ class _SearchScreenState extends State<SearchScreen> {
       setState(() {
         _isLoading = false;
       });
-      print('Error fetching data: $e');
+      debugPrint('Error fetching data: $e');
     }
   }
 
