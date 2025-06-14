@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactsProvider {
@@ -22,12 +23,14 @@ class ContactsProvider {
           withAccounts: true,
         );
         contacts.sort((a, b) {
-          String keyA = sortByFirstName
-              ? a.name.first
-              : (a.name.last.isNotEmpty ? a.name.last : a.displayName);
-          String keyB = sortByFirstName
-              ? b.name.first
-              : (b.name.last.isNotEmpty ? b.name.last : b.displayName);
+          String keyA =
+              sortByFirstName
+                  ? a.name.first
+                  : (a.name.last.isNotEmpty ? a.name.last : a.displayName);
+          String keyB =
+              sortByFirstName
+                  ? b.name.first
+                  : (b.name.last.isNotEmpty ? b.name.last : b.displayName);
           return keyA.compareTo(keyB);
         });
         _contacts = contacts;
@@ -57,9 +60,10 @@ class ContactsProvider {
   Map<String, List<Contact>> groupContacts(List<Contact> contacts) {
     final Map<String, List<Contact>> groupedContacts = {};
     for (final contact in contacts) {
-      final String displayName = lastNameFirst && contact.name.last.isNotEmpty
-          ? '${contact.name.last} ${contact.name.first}'
-          : contact.displayName;
+      final String displayName =
+          lastNameFirst && contact.name.last.isNotEmpty
+              ? '${contact.name.last} ${contact.name.first}'
+              : contact.displayName;
       if (displayName.isNotEmpty) {
         final firstLetter = displayName[0].toUpperCase();
         groupedContacts.putIfAbsent(firstLetter, () => []).add(contact);
