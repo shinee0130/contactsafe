@@ -26,6 +26,7 @@ class _EventsScreenState extends State<EventsScreen> {
   List<AppEvent> _filteredEvents =
       []; // Stores events after applying search filter
   final LocalEventRepository _eventRepository = LocalEventRepository();
+  EventSortOption _sortOption = EventSortOption.dateAsc;
 
   @override
   void initState() {
@@ -118,6 +119,7 @@ class _EventsScreenState extends State<EventsScreen> {
       final events = await _eventRepository.loadEvents();
       setState(() {
         _events = events;
+        _sortEvents();
         _filterEvents(_searchController.text);
       });
     } catch (e) {
@@ -159,6 +161,73 @@ class _EventsScreenState extends State<EventsScreen> {
                   )
                   .toList();
     });
+  }
+
+  void _sortEvents() {
+    switch (_sortOption) {
+      case EventSortOption.titleAsc:
+        _events.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case EventSortOption.titleDesc:
+        _events.sort((a, b) => b.title.compareTo(a.title));
+        break;
+      case EventSortOption.dateAsc:
+        _events.sort((a, b) => a.date.compareTo(b.date));
+        break;
+      case EventSortOption.dateDesc:
+        _events.sort((a, b) => b.date.compareTo(a.date));
+        break;
+    }
+  }
+
+  void _showSortDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Sort Events By',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              ...EventSortOption.values.map(
+                (option) => ListTile(
+                  title: Text(_getSortOptionName(option)),
+                  trailing: _sortOption == option
+                      ? const Icon(Icons.check, color: Colors.blue)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _sortOption = option;
+                      _sortEvents();
+                      _filterEvents(_searchController.text);
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _getSortOptionName(EventSortOption option) {
+    switch (option) {
+      case EventSortOption.titleAsc:
+        return 'Title (A-Z)';
+      case EventSortOption.titleDesc:
+        return 'Title (Z-A)';
+      case EventSortOption.dateAsc:
+        return 'Date (Oldest first)';
+      case EventSortOption.dateDesc:
+        return 'Date (Newest first)';
+    }
   }
 
   // Shows a dialog to add a new event with name, date, participants, and location
@@ -389,11 +458,12 @@ class _EventsScreenState extends State<EventsScreen> {
                             );
 
                             try {
-                              await _eventRepository.addEvent(newAppEvent);
-                              setState(() {
+                          await _eventRepository.addEvent(newAppEvent);
+                          setState(() {
                                 _events.add(newAppEvent);
+                                _sortEvents();
                                 _filterEvents(_searchController.text);
-                              });
+                          });
                               if (mounted) {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -447,7 +517,7 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {}, // TODO: Implement sort functionality
+            onPressed: _showSortDialog,
             icon: Icon(Icons.swap_vert, color: Colors.blue, size: 30),
           ),
           IconButton(
@@ -628,3 +698,4 @@ class EventCard extends StatelessWidget {
     );
   }
 }
+enum EventSortOption { titleAsc, titleDesc, dateAsc, dateDesc }

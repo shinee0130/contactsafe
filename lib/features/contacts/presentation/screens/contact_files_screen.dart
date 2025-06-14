@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // --- Custom Model for Contact File Metadata (NO CHANGES HERE) ---
 class ContactFile {
@@ -365,6 +366,15 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     }
   }
 
+  Future<void> _openFile(ContactFile file) async {
+    final uri = Uri.parse(file.downloadUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      _showSnackBar('Could not open file');
+    }
+  }
+
   void _showFileOptions(ContactFile file) {
     showModalBottomSheet(
       context: context,
@@ -696,11 +706,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                         if (_editMode) {
                           _toggleSelection(file.id);
                         } else {
-                          // TODO: Implement file preview/opening (requires more packages)
-                          _showSnackBar(
-                            'Opening file: ${file.name} (Not implemented)',
-                          );
-                          print('Download URL: ${file.downloadUrl}');
+                          _openFile(file);
                         }
                       },
                       onLongPress: () {

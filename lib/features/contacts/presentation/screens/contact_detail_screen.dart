@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:contactsafe/features/contacts/presentation/screens/edit_contact_screen.dart';
 
@@ -28,12 +29,15 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   Contact? _detailedContact;
   int _filesCount = 0;
   int _notesCount = 0;
+  bool _isFavorite = false;
 
   @override
   void initState() {
     super.initState();
+    _isFavorite = widget.isFavorite;
     _loadContactDetails(widget.contact.id);
     _loadCounts();
+    _loadFavoriteStatus();
   }
 
   Future<void> _loadCounts() async {
@@ -58,6 +62,28 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         _notesCount = 0;
       });
     }
+  }
+
+  Future<void> _loadFavoriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favIds = prefs.getStringList('favorite_contacts') ?? [];
+    setState(() {
+      _isFavorite = favIds.contains(widget.contact.id);
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favIds = prefs.getStringList('favorite_contacts') ?? [];
+    if (favIds.contains(widget.contact.id)) {
+      favIds.remove(widget.contact.id);
+    } else {
+      favIds.add(widget.contact.id);
+    }
+    await prefs.setStringList('favorite_contacts', favIds);
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
   }
 
   Future<void> _loadContactDetails(String contactId) async {
@@ -491,11 +517,11 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           ),
           IconButton(
             icon: Icon(
-              widget.isFavorite ? Icons.star : Icons.star_border,
+              _isFavorite ? Icons.star : Icons.star_border,
               color: Colors.blue,
             ),
             onPressed: () {
-              // TODO: Implement favorite toggle logic
+              _toggleFavorite();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(

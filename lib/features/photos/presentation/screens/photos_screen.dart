@@ -174,6 +174,22 @@ class _PhotosScreenState extends State<PhotosScreen> {
     });
   }
 
+  void _openPhotoViewer(File photo) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: EdgeInsets.zero,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: InteractiveViewer(
+            child: Image.file(photo),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _sortPhotos() {
     setState(() {
       switch (_sortOption) {
@@ -387,13 +403,13 @@ class _PhotosScreenState extends State<PhotosScreen> {
                         itemCount: _photos.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                            onTap: () {
-                              if (_editMode) {
-                                _togglePhotoSelection(index);
-                              } else {
-                                // TODO: Implement photo viewer
-                              }
-                            },
+                          onTap: () {
+                            if (_editMode) {
+                              _togglePhotoSelection(index);
+                            } else {
+                                _openPhotoViewer(_photos[index]);
+                            }
+                          },
                             onLongPress: () {
                               if (!_editMode) {
                                 setState(() {
