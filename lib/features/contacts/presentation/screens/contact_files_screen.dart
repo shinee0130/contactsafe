@@ -361,7 +361,8 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${file.name}');
       await tempFile.writeAsBytes(data);
-      await Share.shareXFiles([XFile(tempFile.path)], text: file.name);
+      await SharePlus.instance
+          .share(files: [XFile(tempFile.path)], text: file.name);
     } catch (e) {
       _showSnackBar('Failed to share file: ${e.toString()}');
     }
