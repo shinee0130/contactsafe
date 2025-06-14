@@ -451,7 +451,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           settingsTileTextColor: Theme.of(context).colorScheme.onSurface,
           tileDescriptionTextColor: Theme.of(
             context,
-          ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+          ).colorScheme.onSurfaceVariant,
           dividerColor: Theme.of(context).colorScheme.outline.withValues(alpha: (0.2 * 255).round()),
         ),
         darkTheme: SettingsThemeData(
@@ -461,7 +461,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           settingsTileTextColor: Theme.of(context).colorScheme.onSurface,
           tileDescriptionTextColor: Theme.of(
             context,
-          ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+          ).colorScheme.onSurfaceVariant,
           dividerColor: Theme.of(context).colorScheme.outline.withValues(alpha: (0.2 * 255).round()),
         ),
         sections: [
@@ -492,7 +492,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(
               'Privacy',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -512,7 +512,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: Text(
                   _languageLabel(_currentLanguage),
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 onPressed: (context) => _showLanguageDialog(),
@@ -523,7 +523,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(
               'About',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -535,7 +535,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                    ).colorScheme.onSurfaceVariant,
                     fontSize: 15.0,
                   ),
                 ),
@@ -573,7 +573,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(
               'General',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -601,7 +601,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(
               'Data Management',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -679,7 +679,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'App Customization & Reset',
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             tiles: [
@@ -749,7 +749,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Security',
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             tiles: [
@@ -853,7 +853,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   fontSize: 12.0,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                  ).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

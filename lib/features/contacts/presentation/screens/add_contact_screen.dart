@@ -384,7 +384,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
               fontSize: 12.0,
               color: Theme.of(
                 context,
-              ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+              ).colorScheme.onSurfaceVariant,
             ),
           ),
           ListView.builder(
@@ -478,14 +478,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 Icons.add_circle_outline,
                 color: Theme.of(
                   context,
-                ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                ).colorScheme.onSurfaceVariant,
               ), // Grey icon
               label: Text(
                 'Add phone',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(
-                    alpha: (0.6 * 255).round(),
-                  ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -704,8 +702,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.clear,
-                        color: Theme.of(context).colorScheme.onSurface
-                            .withValues(alpha: (0.6 * 255).round()),
+                        color: Theme.of(context)
+                            .colorScheme.onSurfaceVariant,
                       ),
                       onPressed: () {
                         setState(() {
@@ -943,14 +941,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 Icons.add_circle_outline,
                 color: Theme.of(
                   context,
-                ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
+                ).colorScheme.onSurfaceVariant,
               ), // Grey icon
               label: Text(
                 'Add $label',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(
-                    alpha: (0.6 * 255).round(),
-                  ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
