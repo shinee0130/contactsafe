@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -35,7 +36,7 @@ class ContactListWidget extends StatelessWidget {
                     size: 48,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.4),
+                    ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -44,7 +45,7 @@ class ContactListWidget extends StatelessWidget {
                       fontSize: 18,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
+                      ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                     ),
                   ),
                 ],
@@ -93,7 +94,7 @@ class ContactListWidget extends StatelessWidget {
                             indent: 72,
                             color: Theme.of(
                               context,
-                            ).colorScheme.outline.withOpacity(0.2),
+                            ).colorScheme.outline.withValues(alpha: (0.2 * 255).round()),
                           ),
                     ),
                   ],
@@ -112,7 +113,7 @@ class ContactListWidget extends StatelessWidget {
           child: Center(
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.surface.withValues(alpha: (0.7 * 255).round()),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -176,8 +177,8 @@ class ContactListItem extends StatelessWidget {
       color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         onTap: onTap,
-        splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+        splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
+        highlightColor: Theme.of(context).colorScheme.primary.withValues(alpha: (0.05 * 255).round()),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
@@ -205,7 +206,7 @@ class ContactListItem extends StatelessWidget {
                   size: 20,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.4),
+                  ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
                 ),
               ),
             ],
@@ -221,7 +222,7 @@ class ContactListItem extends StatelessWidget {
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
       ),
       child: Center(
         child:

@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:contactsafe/features/contacts/presentation/provider/contacts_provider.dart';
 import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
@@ -169,9 +170,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -215,7 +216,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.add, color: Colors.blue, size: 24),
@@ -252,7 +253,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: (0.05 * 255).round()),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -284,7 +285,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: (0.1 * 255).round()),
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),

@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -313,7 +314,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -333,7 +334,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       height: 120,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
         border: Border.all(color: Colors.blue, width: 2),
       ),
       child:
@@ -375,7 +376,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -476,7 +477,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0.5,
@@ -564,7 +565,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                         fontSize: 18,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: (0.6 * 255).round()),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -647,7 +648,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -709,7 +710,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),

@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -669,7 +670,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                         decoration: BoxDecoration(
                           color: _getFileIconColor(
                             file.name.split('.').last,
-                          ).withOpacity(0.2),
+                          ).withValues(alpha: (0.2 * 255).round()),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(

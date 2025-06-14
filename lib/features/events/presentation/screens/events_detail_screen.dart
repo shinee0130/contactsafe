@@ -1,3 +1,4 @@
+import 'package:contactsafe/utils/color_extensions.dart';
 // lib/features/events/presentation/screens/events_detail_screen.dart
 
 import 'package:flutter/material.dart';
@@ -253,7 +254,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onBackground.withOpacity(0.7),
+                    ).colorScheme.onBackground.withValues(alpha: (0.7 * 255).round()),
                   ),
                 )
                 : ListView.builder(
@@ -313,7 +314,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onBackground.withOpacity(0.8),
+                  color: Theme.of(context).colorScheme.onBackground.withValues(alpha: (0.8 * 255).round()),
                 ),
               ),
               Text(
