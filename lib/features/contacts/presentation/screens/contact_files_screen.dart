@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
@@ -20,6 +21,8 @@ class ContactFile {
   final String downloadUrl;
   final DateTime uploadDate;
   final String storagePath;
+  final String uid;
+  final String contactId;
 
   ContactFile({
     required this.id,
@@ -28,6 +31,8 @@ class ContactFile {
     required this.downloadUrl,
     required this.uploadDate,
     required this.storagePath,
+    required this.uid,
+    required this.contactId,
   });
 
   factory ContactFile.fromFirestore(DocumentSnapshot doc) {
@@ -39,6 +44,8 @@ class ContactFile {
       downloadUrl: data['downloadUrl'] ?? '',
       uploadDate: (data['uploadDate'] as Timestamp).toDate(),
       storagePath: data['storagePath'] ?? '',
+      uid: data['uid'] ?? '',
+      contactId: data['contactId'] ?? '',
     );
   }
 
@@ -49,6 +56,8 @@ class ContactFile {
       'downloadUrl': downloadUrl,
       'uploadDate': Timestamp.fromDate(uploadDate),
       'storagePath': storagePath,
+      'uid': uid,
+      'contactId': contactId,
     };
   }
 }
@@ -62,6 +71,8 @@ extension ContactFileExtension on ContactFile {
     String? downloadUrl,
     DateTime? uploadDate,
     String? storagePath,
+    String? uid,
+    String? contactId,
   }) {
     return ContactFile(
       id: id ?? this.id,
@@ -70,6 +81,8 @@ extension ContactFileExtension on ContactFile {
       downloadUrl: downloadUrl ?? this.downloadUrl,
       uploadDate: uploadDate ?? this.uploadDate,
       storagePath: storagePath ?? this.storagePath,
+      uid: uid ?? this.uid,
+      contactId: contactId ?? this.contactId,
     );
   }
 }
@@ -110,8 +123,11 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       );
     }
 
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     return _firestore
-        .collection('contact_files_metadata')
+        .collection('user_files')
+        .doc(uid)
+        .collection('contacts')
         .doc(contactId)
         .collection('files')
         .withConverter<ContactFile>(
@@ -205,7 +221,8 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
 
         try {
           final fileName = platformFile.name;
-          final storagePath = 'contact_files/${widget.contact.id}/$fileName';
+          final uid = FirebaseAuth.instance.currentUser!.uid;
+          final storagePath = 'user_files/$uid/${widget.contact.id}/$fileName';
           final ref = _storage.ref().child(storagePath);
 
           // 1. Upload file to Firebase Storage
@@ -220,6 +237,8 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             downloadUrl: downloadUrl,
             uploadDate: DateTime.now(),
             storagePath: storagePath,
+            uid: uid,
+            contactId: widget.contact.id,
           );
 
           // Add document to Firestore and get its ID

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'note_detail_screen.dart';
 
@@ -22,8 +23,11 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   CollectionReference<ContactNote> _contactNotesCollection() {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     return _firestore
-        .collection('contact_notes')
+        .collection('user_notes')
+        .doc(uid)
+        .collection('contacts')
         .doc(widget.contact.id)
         .collection('notes')
         .withConverter<ContactNote>(
@@ -80,6 +84,8 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
         id: '',
         content: _noteController.text,
         createdAt: DateTime.now(),
+        uid: FirebaseAuth.instance.currentUser!.uid,
+        contactId: widget.contact.id,
       );
       try {
         final doc = await _contactNotesCollection().add(newNote);
@@ -380,12 +386,16 @@ class ContactNote {
   final String content;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final String uid;
+  final String contactId;
 
   ContactNote({
     required this.id,
     required this.content,
     required this.createdAt,
     this.updatedAt,
+    required this.uid,
+    required this.contactId,
   });
 
   factory ContactNote.fromFirestore(DocumentSnapshot doc) {
@@ -398,6 +408,8 @@ class ContactNote {
           data['updatedAt'] != null
               ? (data['updatedAt'] as Timestamp).toDate()
               : null,
+      uid: data['uid'] ?? '',
+      contactId: data['contactId'] ?? '',
     );
   }
 
@@ -406,6 +418,8 @@ class ContactNote {
       'content': content,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+      'uid': uid,
+      'contactId': contactId,
     };
   }
 
@@ -414,12 +428,16 @@ class ContactNote {
     String? content,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? uid,
+    String? contactId,
   }) {
     return ContactNote(
       id: id ?? this.id,
       content: content ?? this.content,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      uid: uid ?? this.uid,
+      contactId: contactId ?? this.contactId,
     );
   }
 }
