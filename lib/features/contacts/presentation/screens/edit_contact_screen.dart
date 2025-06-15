@@ -3,7 +3,6 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
-import 'dart:typed_data';
 import 'package:permission_handler/permission_handler.dart';
 
 class EditContactScreen extends StatefulWidget {

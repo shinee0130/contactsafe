@@ -69,6 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
           withPhoto: true,
         );
         contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+        if (!mounted) return; // <-- энд нэмж өгнө
         setState(() {
           _allContacts = contacts;
         });
@@ -115,6 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
       // Load events from local storage
       final events = await LocalEventRepository().loadEvents();
 
+      if (!mounted) return; // <-- энд бас шалгана
       setState(() {
         _allFiles = files;
         _allNotes = notes;
@@ -122,6 +124,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return; // <-- энд бас шалгана
       setState(() {
         _isLoading = false;
       });

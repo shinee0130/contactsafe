@@ -211,9 +211,29 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     return vcfContent.toString();
   }
 
+  Future<bool> requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      final status = await Permission.manageExternalStorage.request();
+      if (status.isGranted) return true;
+
+      // Android 13+ хувьд media permission-уудыг шалгах
+      final photos = await Permission.photos.request();
+      final videos = await Permission.videos.request();
+      if (photos.isGranted || videos.isGranted) return true;
+
+      // Storage permission ч олгогдсон эсэх
+      final storage = await Permission.storage.request();
+      return storage.isGranted;
+    } else if (Platform.isIOS) {
+      final status = await Permission.photos.request();
+      return status.isGranted;
+    }
+    return false;
+  }
+
   Future<void> saveVcfFile(String vcfContent, String contactName) async {
-    var status = await Permission.storage.request();
-    if (status.isGranted) {
+    bool hasPermission = await requestStoragePermission();
+    if (hasPermission) {
       try {
         Directory? directory;
         if (Platform.isAndroid) {
@@ -245,18 +265,12 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           ).showSnackBar(SnackBar(content: Text('Error saving VCF file: $e')));
         }
       }
-    } else if (status.isDenied) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Storage permission denied.')),
-        );
-      }
-    } else if (status.isPermanentlyDenied) {
+    } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              'Storage permission permanently denied. Please enable in settings.',
+              'Storage permission denied. Please enable in settings.',
             ),
             action: SnackBarAction(
               label: 'Settings',
@@ -589,6 +603,13 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       _buildActionButton(Icons.call, 'Call', () {
                         if (currentContact.phones.isNotEmpty) {
                           _makePhoneCall(currentContact.phones.first.number);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Calling ${currentContact.displayName}',
+                              ),
+                            ),
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -596,18 +617,18 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                             ),
                           );
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Calling ${currentContact.displayName}',
-                            ),
-                          ),
-                        );
                       }),
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.message, 'Message', () {
                         if (currentContact.phones.isNotEmpty) {
                           _sendSms(currentContact.phones.first.number);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Messaging ${currentContact.displayName}',
+                              ),
+                            ),
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -615,18 +636,18 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                             ),
                           );
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Messaging ${currentContact.displayName}',
-                            ),
-                          ),
-                        );
                       }),
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.email, 'Email', () {
                         if (currentContact.emails.isNotEmpty) {
                           _sendEmail(currentContact.emails.first.address);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Emailing ${currentContact.displayName}',
+                              ),
+                            ),
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -634,13 +655,6 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                             ),
                           );
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Emailing ${currentContact.displayName}',
-                            ),
-                          ),
-                        );
                       }),
                     ],
                   ),

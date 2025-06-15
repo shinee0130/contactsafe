@@ -1,10 +1,12 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddContactScreen extends StatefulWidget {
@@ -192,37 +194,70 @@ class _AddContactScreenState extends State<AddContactScreen> {
     }
   }
 
-  Future<void> _changePhoto() async {
-    final status = await Permission.photos.request();
+  Future<bool> requestPhotoPermission(BuildContext context) async {
+    PermissionStatus status;
+
+    if (Platform.isAndroid) {
+      int sdkInt = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
+      if (sdkInt >= 33) {
+        // Android 13+
+        status = await Permission.photos.request();
+      } else {
+        // Android 12- (хуучин хувилбар)
+        status = await Permission.storage.request();
+      }
+    } else if (Platform.isIOS) {
+      status = await Permission.photos.request();
+    } else {
+      // Бусад платформд зөвшөөрөл шаардахгүй
+      return true;
+    }
+
     if (status.isGranted) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        final bytes = await image.readAsBytes();
-        setState(() {
-          _selectedPhoto = bytes;
-        });
-      }
+      return true;
     } else if (status.isDenied) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Photo library permission denied.')),
-        );
-      }
-    } else if (status.isPermanentlyDenied) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Photo library permission permanently denied. Please enable in settings.',
-            ),
-            action: SnackBarAction(
-              label: 'Settings',
-              onPressed: openAppSettings,
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Photo library permission denied.'),
+          action: SnackBarAction(
+            label: 'Settings',
+            onPressed: () {
+              openAppSettings();
+            },
           ),
-        );
-      }
+        ),
+      );
+      return false;
+    } else if (status.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Photo library permission permanently denied. Please enable in settings.',
+          ),
+          action: SnackBarAction(
+            label: 'Settings',
+            onPressed: () {
+              openAppSettings();
+            },
+          ),
+        ),
+      );
+      return false;
+    }
+    return false;
+  }
+
+  Future<void> _changePhoto() async {
+    final granted = await requestPhotoPermission(context);
+    if (!granted) return;
+
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      setState(() {
+        _selectedPhoto = bytes;
+      });
     }
   }
 
@@ -252,11 +287,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         fit: BoxFit.cover,
                       ),
                     )
-                    : Icon(
-                      Icons.add_a_photo_outlined,
-                      size: 48,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                    : Icon(Icons.person_outline, size: 48, color: Colors.blue),
           ),
         ),
         const SizedBox(height: 8),
@@ -635,7 +666,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
             _buildPhoneInputList(),
             const SizedBox(height: 16),
 
-            if (_emailControllers.every((c) => c.text.isEmpty))
+            // ---- EMAIL SECTION ----
+            if (_emailControllers.isEmpty)
               _buildAddButton(
                 icon: Icons.email_outlined,
                 text: 'Add email',
@@ -647,7 +679,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 },
                 isSpecial: true,
               ),
-            if (_emailControllers.any((c) => c.text.isNotEmpty))
+            if (_emailControllers.isNotEmpty)
               _buildEditableTextFieldList(
                 label: 'Email',
                 controllers: _emailControllers,
@@ -665,8 +697,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   });
                 },
               ),
+
             const SizedBox(height: 8),
 
+            // ---- BIRTHDAY SECTION ----
             if (_selectedBirthday == null)
               _buildAddButton(
                 icon: Icons.cake_outlined,
@@ -715,7 +749,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
             const SizedBox(height: 8),
 
-            if (_addressControllers.every((c) => c.text.isEmpty))
+            // ---- ADDRESS SECTION ----
+            if (_addressControllers.isEmpty)
               _buildAddButton(
                 icon: Icons.location_on_outlined,
                 text: 'Add address',
@@ -727,7 +762,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 },
                 isSpecial: true,
               ),
-            if (_addressControllers.any((c) => c.text.isNotEmpty))
+            if (_addressControllers.isNotEmpty)
               _buildEditableTextFieldList(
                 label: 'Address',
                 controllers: _addressControllers,
@@ -745,6 +780,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   });
                 },
               ),
+
             const SizedBox(height: 24),
           ],
         ),
@@ -763,67 +799,61 @@ class _AddContactScreenState extends State<AddContactScreen> {
   }) {
     Widget _buildLabelDropdown(int index) {
       if (label == 'Email') {
-        return Expanded(
-          flex: 2,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<EmailLabel>(
-              isExpanded: true,
-              value:
-                  labels != null && index < labels.length
-                      ? labels[index] as EmailLabel
-                      : EmailLabel.other,
-              onChanged: (EmailLabel? newValue) {
-                if (newValue != null && onLabelChanged != null) {
-                  onLabelChanged(index, newValue);
-                }
-              },
-              items:
-                  EmailLabel.values.map<DropdownMenuItem<EmailLabel>>((
-                    EmailLabel value,
-                  ) {
-                    return DropdownMenuItem<EmailLabel>(
-                      value: value,
-                      child: Text(_getEmailLabelString(value)),
-                    );
-                  }).toList(),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 16,
-              ),
-              dropdownColor: Theme.of(context).colorScheme.surface,
+        return DropdownButtonHideUnderline(
+          child: DropdownButton<EmailLabel>(
+            value:
+                labels != null && index < labels.length
+                    ? labels[index] as EmailLabel
+                    : EmailLabel.other,
+            onChanged: (EmailLabel? newValue) {
+              if (newValue != null && onLabelChanged != null) {
+                onLabelChanged(index, newValue);
+              }
+            },
+            items:
+                EmailLabel.values.map((value) {
+                  return DropdownMenuItem<EmailLabel>(
+                    value: value,
+                    child: Text(
+                      _getEmailLabelString(value),
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  );
+                }).toList(),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 15,
             ),
+            dropdownColor: Theme.of(context).colorScheme.surface,
           ),
         );
       } else if (label == 'Address') {
-        return Expanded(
-          flex: 2,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<AddressLabel>(
-              isExpanded: true,
-              value:
-                  labels != null && index < labels.length
-                      ? labels[index] as AddressLabel
-                      : AddressLabel.other,
-              onChanged: (AddressLabel? newValue) {
-                if (newValue != null && onLabelChanged != null) {
-                  onLabelChanged(index, newValue);
-                }
-              },
-              items:
-                  AddressLabel.values.map<DropdownMenuItem<AddressLabel>>((
-                    AddressLabel value,
-                  ) {
-                    return DropdownMenuItem<AddressLabel>(
-                      value: value,
-                      child: Text(_getAddressLabelString(value)),
-                    );
-                  }).toList(),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 16,
-              ),
-              dropdownColor: Theme.of(context).colorScheme.surface,
+        return DropdownButtonHideUnderline(
+          child: DropdownButton<AddressLabel>(
+            value:
+                labels != null && index < labels.length
+                    ? labels[index] as AddressLabel
+                    : AddressLabel.other,
+            onChanged: (AddressLabel? newValue) {
+              if (newValue != null && onLabelChanged != null) {
+                onLabelChanged(index, newValue);
+              }
+            },
+            items:
+                AddressLabel.values.map((value) {
+                  return DropdownMenuItem<AddressLabel>(
+                    value: value,
+                    child: Text(
+                      _getAddressLabelString(value),
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  );
+                }).toList(),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 15,
             ),
+            dropdownColor: Theme.of(context).colorScheme.surface,
           ),
         );
       }
@@ -839,33 +869,27 @@ class _AddContactScreenState extends State<AddContactScreen> {
           itemCount: controllers.length,
           itemBuilder: (context, index) {
             return Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8.0),
+              padding: const EdgeInsets.only(left: 0, right: 0, bottom: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (labels != null &&
-                      (label == 'Email' || label == 'Address'))
-                    _buildLabelDropdown(index),
-                  if (labels != null &&
-                      (label == 'Email' || label == 'Address'))
-                    const SizedBox(width: 8),
+                  // Dropdown (label)
+                  Container(
+                    width: 90,
+                    margin: const EdgeInsets.only(right: 8),
+                    child: _buildLabelDropdown(index),
+                  ),
+                  // Textfield (email or address)
                   Expanded(
-                    flex: 3,
                     child: TextField(
                       controller: controllers[index],
                       keyboardType: keyboardType,
-                      maxLines: maxLines,
+                      maxLines: maxLines ?? 1,
                       decoration: InputDecoration(
-                        labelText:
-                            (labels != null &&
-                                    (label == 'Email' || label == 'Address'))
-                                ? null
-                                : (controllers.length > 1
-                                    ? '$label ${index + 1}'
-                                    : label),
-                        floatingLabelBehavior:
-                            FloatingLabelBehavior.never, // Label stays as hint
-                        alignLabelWithHint: true,
+                        hintText:
+                            label == "Email"
+                                ? "example@email.com"
+                                : "Enter address",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           borderSide: BorderSide(
@@ -889,40 +913,52 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         fillColor: Theme.of(context).colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 16.0,
-                          horizontal: 16.0,
+                          horizontal: 14.0,
                         ),
                       ),
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.remove_circle_outline,
-                      color: Theme.of(context).colorScheme.error,
-                      size: 28,
+                  // Remove icon
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6, right: 3),
+                    child: ClipOval(
+                      child: Material(
+                        color: Colors.grey.shade200,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (controllers.length > 1) {
+                                controllers[index].dispose();
+                                controllers.removeAt(index);
+                                if (labels != null && index < labels.length) {
+                                  labels.removeAt(index);
+                                }
+                              } else if (controllers.length == 1) {
+                                controllers[index].clear();
+                                if (labels != null && index < labels.length) {
+                                  if (label == 'Email')
+                                    labels[index] = EmailLabel.other;
+                                  if (label == 'Address')
+                                    labels[index] = AddressLabel.other;
+                                }
+                              }
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: Icon(
+                              Icons.remove_circle,
+                              color: Colors.red,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        if (controllers.length > 1) {
-                          controllers[index].dispose();
-                          controllers.removeAt(index);
-                          if (labels != null && index < labels.length) {
-                            labels.removeAt(index);
-                          }
-                        } else if (controllers.length == 1) {
-                          controllers[index].clear();
-                          if (labels != null && index < labels.length) {
-                            if (label == 'Email')
-                              labels[index] = EmailLabel.other;
-                            if (label == 'Address')
-                              labels[index] = AddressLabel.other;
-                          }
-                        }
-                      });
-                    },
                   ),
                 ],
               ),
@@ -932,20 +968,31 @@ class _AddContactScreenState extends State<AddContactScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
-            padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+            padding: const EdgeInsets.only(left: 0.0, bottom: 16.0),
             child: TextButton.icon(
               onPressed: onAdd,
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-              ), // Grey icon
+                color: Colors.blue,
+                size: 22,
+              ),
               label: Text(
                 'Add $label',
                 style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.5),
+                  color: Colors.blue,
                   fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+                backgroundColor: Colors.blue.withOpacity(0.08),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 9,
                 ),
               ),
             ),
