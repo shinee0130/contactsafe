@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:contactsafe/app.dart';
 import 'package:contactsafe/firebase_options.dart';
-import 'core/theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
