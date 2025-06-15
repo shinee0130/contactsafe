@@ -723,43 +723,16 @@ class _EditContactScreenState extends State<EditContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        elevation: 0,
-        centerTitle: true,
+        title: const Text('Edit contact'),
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.blue),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'ContactSafe',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            Image.asset('assets/contactsafe_logo.png', height: 26),
-          ],
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          TextButton(
+          IconButton(
+            icon: const Icon(Icons.check),
             onPressed: _saveContact,
-            child: const Text(
-              'Save',
-              style: TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
           ),
         ],
       ),
@@ -769,22 +742,6 @@ class _EditContactScreenState extends State<EditContactScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  'Edit contact',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-            const Divider(),
             const SizedBox(height: 24),
             _buildAvatar(),
             const SizedBox(height: 24),
