@@ -583,6 +583,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -634,6 +635,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           ),
         ],
       ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())

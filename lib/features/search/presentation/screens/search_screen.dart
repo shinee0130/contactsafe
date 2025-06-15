@@ -383,6 +383,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
         ),
       ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -27,11 +27,36 @@ class _PhotosScreenState extends State<PhotosScreen> {
   }
 
   Future<void> _loadPhotos() async {
-    final status = await Permission.storage.request();
-    if (!status.isGranted) {
+    bool granted = false;
+
+    if (Platform.isAndroid) {
+      int version = int.parse(
+        Platform.version.split('(')[0].trim().split('.')[0],
+      );
+      if (version >= 13) {
+        var status = await Permission.photos.request();
+        granted = status.isGranted;
+      } else {
+        var status = await Permission.storage.request();
+        granted = status.isGranted;
+      }
+    } else {
+      granted = true;
+    }
+
+    if (!granted) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Storage permission denied')),
+          SnackBar(
+            content: const Text('Storage permission denied'),
+            action: SnackBarAction(
+              label: 'Settings',
+              textColor: Colors.blue,
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
+          ),
         );
       }
       return;
