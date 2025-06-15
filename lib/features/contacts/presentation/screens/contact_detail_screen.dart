@@ -480,15 +480,33 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Contact details'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0.5,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.blue),
           onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'ContactSafe',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+          ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: Icon(Icons.edit, color: Colors.blue),
             onPressed: () {
               Navigator.push(
                 context,
@@ -504,6 +522,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           IconButton(
             icon: Icon(
               _isFavorite ? Icons.star : Icons.star_border,
+              color: Colors.blue,
             ),
             onPressed: () {
               _toggleFavorite();

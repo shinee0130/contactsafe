@@ -551,16 +551,43 @@ class _AddContactScreenState extends State<AddContactScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Create contact'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.close, color: Colors.blue),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'ContactSafe',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+          ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
+          TextButton(
             onPressed: _saveContact,
+            child: Text(
+              'Save',
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ),
         ],
       ),
@@ -570,6 +597,22 @@ class _AddContactScreenState extends State<AddContactScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Create contact',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+            Divider(),
             const SizedBox(height: 24),
             _buildAvatar(),
             const SizedBox(height: 24),

@@ -179,51 +179,118 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Contacts'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.group),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'ContactSafe',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Image.asset('assets/contactsafe_logo.png', height: 26),
+          ],
+        ),
+        leading: SizedBox(
+          width: 120, // Fixed width
+          child: TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.primary,
+              padding: const EdgeInsets.only(
+                left: 16.0,
+              ), // Remove default padding
+            ),
             onPressed: _navigateToGroups,
+            child: const Text(
+              'Group',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.blue,
+              ),
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _addNewContact,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.add, color: Colors.blue, size: 24),
+              ),
+              onPressed: _addNewContact,
+            ),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _filterContacts,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  hintText: 'Search contacts',
-                  border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            Text(
+              'Contacts',
+              style: TextStyle(
+                fontSize: 32.0,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
+            ),
+            const SizedBox(height: 16),
+            CustomSearchBar(
+              controller: _searchController,
+              onChanged: _filterContacts,
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: ContactListWidget(
+                    contacts: _displayedContacts,
+                    scrollController: _scrollController,
+                    onContactTap: (contact) {
+                      Navigator.pushNamed(
+                        context,
+                        '/contact_detail',
+                        arguments: contact,
+                      );
+                    },
+                    onLetterTap: _scrollToLetter,
+                    lastNameFirst: _lastNameFirst,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ContactListWidget(
-                contacts: _displayedContacts,
-                scrollController: _scrollController,
-                onContactTap: (contact) {
-                  Navigator.pushNamed(
-                    context,
-                    '/contact_detail',
-                    arguments: contact,
-                  );
-                },
-                onLetterTap: _scrollToLetter,
-                lastNameFirst: _lastNameFirst,
-              ),
-            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -244,10 +311,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
             onTap: _onBottomNavigationTap,
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNewContact,
-        child: const Icon(Icons.add),
       ),
     );
   }
