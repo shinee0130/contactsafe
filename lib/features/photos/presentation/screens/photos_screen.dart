@@ -80,14 +80,15 @@ class _PhotosScreenState extends State<PhotosScreen> {
   void _openPreview(String url) {
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: EdgeInsets.zero,
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: InteractiveViewer(child: Image.network(url)),
-        ),
-      ),
+      builder:
+          (_) => Dialog(
+            backgroundColor: Colors.black,
+            insetPadding: EdgeInsets.zero,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: InteractiveViewer(child: Image.network(url)),
+            ),
+          ),
     );
   }
 
@@ -113,8 +114,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
               Icon(
                 Icons.photo_library,
                 size: 64,
-                color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -147,10 +147,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadPhotos,
-      child: child,
-    );
+    return RefreshIndicator(onRefresh: _loadPhotos, child: child);
   }
 
   void _onNavTap(int index) {
@@ -197,7 +194,20 @@ class _PhotosScreenState extends State<PhotosScreen> {
           ],
         ),
       ),
-      body: _buildBody(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Photos',
+              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Expanded(child: _buildBody()),
+          ],
+        ),
+      ),
       bottomNavigationBar: ContactSafeNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,
