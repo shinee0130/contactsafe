@@ -79,11 +79,16 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-flutter_launcher_icons:
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/contactsafe_logo.png
   android: true
   ios: true
-  image_path: "assets/contactsafe_logo.png"
-  remove_alpha_ios: true
+  android_gravity: center
+  ios_content_mode: center
+  branding: null
+  fullscreen: true
 
 flutter:
   # The following line ensures that the Material Icons font is

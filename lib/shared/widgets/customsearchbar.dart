@@ -19,12 +19,18 @@ class CustomSearchBar extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          if (Theme.of(context).brightness == Brightness.light)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.07),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          if (Theme.of(context).brightness == Brightness.dark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.16),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
         ],
       ),
       child: TextField(

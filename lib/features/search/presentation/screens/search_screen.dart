@@ -75,42 +75,42 @@ class _SearchScreenState extends State<SearchScreen> {
       }
 
       // Fetch files across all contacts
-      final fileSnapshots = await FirebaseFirestore.instance
-          .collectionGroup('files')
-          .get();
-      final files = fileSnapshots.docs.map((doc) {
-        final data = doc.data();
-        final contactId = doc.reference.parent.parent!.id;
-        final contact = _allContacts.firstWhere(
-          (c) => c.id == contactId,
-          orElse: () => Contact(id: contactId, displayName: 'Unknown'),
-        );
-        return _FileResult(
-          id: doc.id,
-          name: data['name'] ?? '',
-          contactId: contactId,
-          contactName: contact.displayName,
-        );
-      }).toList();
+      final fileSnapshots =
+          await FirebaseFirestore.instance.collectionGroup('files').get();
+      final files =
+          fileSnapshots.docs.map((doc) {
+            final data = doc.data();
+            final contactId = doc.reference.parent.parent!.id;
+            final contact = _allContacts.firstWhere(
+              (c) => c.id == contactId,
+              orElse: () => Contact(id: contactId, displayName: 'Unknown'),
+            );
+            return _FileResult(
+              id: doc.id,
+              name: data['name'] ?? '',
+              contactId: contactId,
+              contactName: contact.displayName,
+            );
+          }).toList();
 
       // Fetch notes across all contacts
-      final noteSnapshots = await FirebaseFirestore.instance
-          .collectionGroup('notes')
-          .get();
-      final notes = noteSnapshots.docs.map((doc) {
-        final data = doc.data();
-        final contactId = doc.reference.parent.parent!.id;
-        final contact = _allContacts.firstWhere(
-          (c) => c.id == contactId,
-          orElse: () => Contact(id: contactId, displayName: 'Unknown'),
-        );
-        return _NoteResult(
-          id: doc.id,
-          content: data['content'] ?? '',
-          contactId: contactId,
-          contactName: contact.displayName,
-        );
-      }).toList();
+      final noteSnapshots =
+          await FirebaseFirestore.instance.collectionGroup('notes').get();
+      final notes =
+          noteSnapshots.docs.map((doc) {
+            final data = doc.data();
+            final contactId = doc.reference.parent.parent!.id;
+            final contact = _allContacts.firstWhere(
+              (c) => c.id == contactId,
+              orElse: () => Contact(id: contactId, displayName: 'Unknown'),
+            );
+            return _NoteResult(
+              id: doc.id,
+              content: data['content'] ?? '',
+              contactId: contactId,
+              contactName: contact.displayName,
+            );
+          }).toList();
 
       // Load events from local storage
       final events = await LocalEventRepository().loadEvents();
@@ -195,7 +195,15 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     if (_searchResults.isEmpty) {
-      return const Center(child: Text('No results found'));
+      return Center(
+        child: Text(
+          'No results found',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            fontSize: 18,
+          ),
+        ),
+      );
     }
 
     return ListView.builder(
@@ -220,65 +228,136 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildContactItem(Contact contact) {
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       leading:
           contact.photo != null && contact.photo!.isNotEmpty
-              ? CircleAvatar(backgroundImage: MemoryImage(contact.photo!))
+              ? CircleAvatar(
+                backgroundImage: MemoryImage(contact.photo!),
+                radius: 22,
+              )
               : CircleAvatar(
+                radius: 22,
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.09),
                 child: Text(
                   contact.displayName.isNotEmpty
                       ? contact.displayName[0].toUpperCase()
                       : '?',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
-      title: Text(contact.displayName),
+      title: Text(
+        contact.displayName,
+        style: TextStyle(
+          fontSize: 16,
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
       subtitle:
-          contact.phones.isNotEmpty ? Text(contact.phones.first.number) : null,
+          contact.phones.isNotEmpty
+              ? Text(
+                contact.phones.first.number,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
+              )
+              : null,
+      trailing: Icon(
+        Icons.chevron_right,
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+        size: 22,
+      ),
       onTap: () {
-        // Navigate to contact details
         Navigator.pushNamed(context, '/contact_detail', arguments: contact);
       },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      tileColor: Theme.of(context).colorScheme.surface,
+      hoverColor: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+      splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.10),
     );
   }
 
   Widget _buildFileItem(_FileResult file) {
     return ListTile(
-      leading: const Icon(Icons.insert_drive_file),
-      title: Text(file.name),
-      subtitle: Text('From: ${file.contactName}'),
-      onTap: () {
-        // No dedicated file view, so do nothing
-      },
+      leading: Icon(
+        Icons.insert_drive_file,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(
+        file.name,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      ),
+      subtitle: Text(
+        'From: ${file.contactName}',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
+      ),
+      tileColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
     );
   }
 
   Widget _buildNoteItem(_NoteResult note) {
-    final preview = note.content.length > 50
-        ? '${note.content.substring(0, 50)}...'
-        : note.content;
+    final preview =
+        note.content.length > 50
+            ? '${note.content.substring(0, 50)}...'
+            : note.content;
     return ListTile(
-      leading: const Icon(Icons.note),
-      title: Text(preview),
-      subtitle: Text('From: ${note.contactName}'),
+      leading: Icon(Icons.note, color: Theme.of(context).colorScheme.primary),
+      title: Text(
+        preview,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      ),
+      subtitle: Text(
+        'From: ${note.contactName}',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
+      ),
+      tileColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
     );
   }
 
   Widget _buildEventItem(AppEvent event) {
     return ListTile(
-      leading: const Icon(Icons.event),
-      title: Text(event.title),
-      subtitle: Text(DateFormat.yMMMd().format(event.date)),
+      leading: Icon(Icons.event, color: Theme.of(context).colorScheme.primary),
+      title: Text(
+        event.title,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      ),
+      subtitle: Text(
+        DateFormat.yMMMd().format(event.date),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
+      ),
       onTap: () {
-        // Navigate to event detail screen
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => EventsDetailScreen(
-              event: event,
-              allDeviceContacts: _allContacts,
-            ),
+            builder:
+                (_) => EventsDetailScreen(
+                  event: event,
+                  allDeviceContacts: _allContacts,
+                ),
           ),
         );
       },
+      tileColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
     );
   }
 
@@ -286,15 +365,21 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'ContactSafe',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+            Text(
+              'contactSafe',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
-            const SizedBox(width: 5.0),
-            Image.asset('assets/contactsafe_logo.png', height: 26),
+            const SizedBox(width: 6.0),
+            Image.asset('assets/contactsafe_logo.png', height: 24),
           ],
         ),
       ),

@@ -187,7 +187,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'ContactSafe',
+              'contactSafe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -263,14 +263,22 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
+                    if (Theme.of(context).brightness == Brightness.light)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    if (Theme.of(context).brightness == Brightness.dark)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(
+                          0.25,
+                        ), // эсвэл 0.18~0.22, илүү бага opacity
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
                   ],
+                  border: Border.all(color: Colors.transparent, width: 0),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
@@ -297,11 +305,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
+            if (Theme.of(context).brightness == Brightness.light)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            if (Theme.of(context).brightness == Brightness.dark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.16),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
           ],
         ),
         child: ClipRRect(

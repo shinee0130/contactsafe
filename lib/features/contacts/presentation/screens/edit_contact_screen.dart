@@ -738,7 +738,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'ContactSafe',
+              'contactSafe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,

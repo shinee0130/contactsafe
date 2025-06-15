@@ -295,7 +295,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'ContactSafe',
+              'contactSafe',
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,

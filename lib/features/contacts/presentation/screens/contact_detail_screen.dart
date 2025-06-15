@@ -312,16 +312,20 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   }
 
   Widget _buildCountBadge(int count) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        color:
+            isDark
+                ? Colors.white.withOpacity(0.09)
+                : Colors.black.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         '$count',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: 12,
           color: Theme.of(context).colorScheme.primary,
           fontWeight: FontWeight.w600,
         ),
@@ -336,7 +340,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+        border: Border.all(color: Colors.blue, width: 2),
       ),
       child:
           contact.photo != null && contact.photo!.isNotEmpty
@@ -356,7 +360,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Colors.blue,
                   ),
                 ),
               ),
@@ -376,18 +380,23 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               borderRadius: BorderRadius.circular(12),
               color: Theme.of(context).colorScheme.surface,
               boxShadow: [
-                BoxShadow(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
+                if (Theme.of(context).brightness == Brightness.light)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.07),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                if (Theme.of(context).brightness == Brightness.dark)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
               ],
             ),
             child: Column(
               children: [
-                Icon(icon, size: 28, color: Theme.of(context).colorScheme.primary),
+                Icon(icon, size: 28, color: Colors.blue),
                 const SizedBox(height: 8),
                 Text(
                   label,
@@ -415,7 +424,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
             title,
             style: TextStyle(
               fontSize: 13,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.blue,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -456,7 +465,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 children: [
                   _buildCountBadge(count),
                   const SizedBox(width: 4),
-                  Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ],
               ),
             ],
@@ -486,14 +498,14 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         elevation: 0.5,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(Icons.arrow_back, color: Colors.blue),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'ContactSafe',
+              'contactSafe',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -506,7 +518,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
+            icon: Icon(Icons.edit, color: Colors.blue),
             onPressed: () {
               Navigator.push(
                 context,
@@ -522,7 +534,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
           IconButton(
             icon: Icon(
               _isFavorite ? Icons.star : Icons.star_border,
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.blue,
             ),
             onPressed: () {
               _toggleFavorite();
@@ -648,13 +660,18 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
+                    if (Theme.of(context).brightness == Brightness.light)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    if (Theme.of(context).brightness == Brightness.dark)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
                   ],
                 ),
                 child: Column(
@@ -671,7 +688,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Colors.blue,
                         ),
                       ),
                     ),
@@ -712,13 +729,18 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
+                  if (Theme.of(context).brightness == Brightness.light)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.07),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  if (Theme.of(context).brightness == Brightness.dark)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
                 ],
               ),
               child: Column(

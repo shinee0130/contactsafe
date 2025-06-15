@@ -587,7 +587,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'ContactSafe',
+              'contactSafe',
               style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 5.0),

@@ -205,7 +205,10 @@ class _EventsScreenState extends State<EventsScreen> {
                   title: Text(_getSortOptionName(option)),
                   trailing:
                       _sortOption == option
-                          ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
+                          ? Icon(
+                            Icons.check,
+                            color: Theme.of(context).colorScheme.primary,
+                          )
                           : null,
                   onTap: () {
                     setState(() {
@@ -445,8 +448,10 @@ class _EventsScreenState extends State<EventsScreen> {
                           icon: const Icon(Icons.map),
                           label: const Text('Choose Location on Map'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
                         ),
@@ -557,7 +562,7 @@ class _EventsScreenState extends State<EventsScreen> {
           children: [
             const SizedBox(width: 10.0),
             Text(
-              'ContactSafe',
+              'contactSafe',
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,
@@ -571,11 +576,19 @@ class _EventsScreenState extends State<EventsScreen> {
         actions: [
           IconButton(
             onPressed: _showSortDialog,
-            icon: Icon(Icons.swap_vert, color: Theme.of(context).colorScheme.primary, size: 30),
+            icon: Icon(
+              Icons.swap_vert,
+              color: Theme.of(context).colorScheme.primary,
+              size: 30,
+            ),
           ),
           IconButton(
             onPressed: _addNewEvent,
-            icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 30),
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+              size: 30,
+            ),
           ),
         ],
       ),

@@ -13,13 +13,17 @@ class ContactSafeNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      selectedItemColor: colorScheme.primary,
+      unselectedItemColor: colorScheme.onSurface.withOpacity(0.6),
+      backgroundColor: colorScheme.surface,
+      selectedFontSize: 12,
+      unselectedFontSize: 12,
+      showUnselectedLabels: true,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.person_2),
