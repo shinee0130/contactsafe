@@ -1,3 +1,4 @@
+import 'package:contactsafe/core/theme/theme.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/add_contact_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_detail_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_files_screen.dart';
