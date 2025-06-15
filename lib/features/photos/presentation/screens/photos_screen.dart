@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -30,20 +30,11 @@ class _PhotosScreenState extends State<PhotosScreen> {
     });
 
     try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      final snapshot = await FirebaseFirestore.instance
-          .collectionGroup('files')
-          .where('uid', isEqualTo: uid)
-          .get();
-      const imageExts = ['.jpg', '.jpeg', '.png', '.gif'];
-
-      final urls = snapshot.docs.map((doc) {
-        final data = doc.data();
-        final name = (data['name'] as String?) ?? '';
-        final url = (data['downloadUrl'] as String?) ?? '';
-        final isImage = imageExts.any((e) => name.toLowerCase().endsWith(e));
-        return isImage && url.isNotEmpty ? url : null;
-      }).whereType<String>().toList();
+      var user = FirebaseAuth.instance.currentUser;
+      user ??= (await FirebaseAuth.instance.signInAnonymously()).user;
+      final uid = user!.uid;
+      final ref = FirebaseStorage.instance.ref().child('user_files/$uid/');
+      final urls = await _listImageUrls(ref);
 
       if (mounted) {
         setState(() {
@@ -67,6 +58,25 @@ class _PhotosScreenState extends State<PhotosScreen> {
     }
   }
 
+  Future<List<String>> _listImageUrls(Reference ref) async {
+    const imageExts = ['.jpg', '.jpeg', '.png', '.gif'];
+    final result = await ref.listAll();
+    final urls = <String>[];
+
+    for (final item in result.items) {
+      final name = item.name.toLowerCase();
+      if (imageExts.any((e) => name.endsWith(e))) {
+        urls.add(await item.getDownloadURL());
+      }
+    }
+
+    for (final prefix in result.prefixes) {
+      urls.addAll(await _listImageUrls(prefix));
+    }
+
+    return urls;
+  }
+
   void _openPreview(String url) {
     showDialog(
       context: context,
@@ -82,57 +92,64 @@ class _PhotosScreenState extends State<PhotosScreen> {
   }
 
   Widget _buildBody() {
+    Widget child;
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_errorMessage != null) {
-      return Center(
+      child = const Center(child: CircularProgressIndicator());
+    } else if (_errorMessage != null) {
+      child = Center(
         child: Text(
           _errorMessage!,
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       );
-    }
-
-    if (_photoUrls.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.photo_library,
-              size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No photos',
-              style: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+    } else if (_photoUrls.isEmpty) {
+      child = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 80),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.photo_library,
+                size: 64,
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                'No photos',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      child = GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
         ),
+        itemCount: _photoUrls.length,
+        itemBuilder: (context, index) {
+          final url = _photoUrls[index];
+          return GestureDetector(
+            onTap: () => _openPreview(url),
+            child: Image.network(url, fit: BoxFit.cover),
+          );
+        },
       );
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-      ),
-      itemCount: _photoUrls.length,
-      itemBuilder: (context, index) {
-        final url = _photoUrls[index];
-        return GestureDetector(
-          onTap: () => _openPreview(url),
-          child: Image.network(url, fit: BoxFit.cover),
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: _loadPhotos,
+      child: child,
     );
   }
 
