@@ -298,7 +298,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Colors.grey,
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),
