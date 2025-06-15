@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:contactsafe/app.dart';
 import 'package:contactsafe/firebase_options.dart';
+import 'core/theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,8 +34,8 @@ void main() async {
   runApp(
     MaterialApp(
       title: 'ContactSafe',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      darkTheme: ThemeData.dark(useMaterial3: true),
+      theme: lightTheme,
+      darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       initialRoute: '/',

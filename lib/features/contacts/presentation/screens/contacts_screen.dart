@@ -191,7 +191,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 8.0),
@@ -227,7 +227,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.primary.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.add, color: Colors.blue, size: 24),

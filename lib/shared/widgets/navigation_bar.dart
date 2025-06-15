@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -12,29 +13,33 @@ class ContactSafeNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      selectedItemColor: colorScheme.primary,
+      unselectedItemColor: colorScheme.onSurface.withOpacity(0.6),
+      backgroundColor: colorScheme.surface,
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
+          icon: Icon(CupertinoIcons.person_2),
           label: 'Contacts',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
         BottomNavigationBarItem(
-          icon: Icon(Icons.event_available_outlined),
+          icon: Icon(CupertinoIcons.search),
+          label: 'Search',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(CupertinoIcons.calendar),
           label: 'Events',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.camera_alt_outlined),
+          icon: Icon(CupertinoIcons.photo),
           label: 'Photos',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings_outlined),
+          icon: Icon(CupertinoIcons.settings),
           label: 'Settings',
         ),
       ],
