@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../l10n/app_localizations.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
@@ -562,7 +563,7 @@ class _EventsScreenState extends State<EventsScreen> {
           children: [
             const SizedBox(width: 10.0),
             Text(
-              'contactSafe',
+              context.loc.translate('appTitle'),
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,
@@ -599,7 +600,7 @@ class _EventsScreenState extends State<EventsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Events',
+              context.loc.translate('events'),
               style: TextStyle(
                 fontSize: 31.0,
                 fontWeight: FontWeight.bold,
@@ -610,6 +611,7 @@ class _EventsScreenState extends State<EventsScreen> {
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterEvents,
+              hintText: context.loc.translate('search'),
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -617,7 +619,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   _filteredEvents.isEmpty && _events.isEmpty
                       ? Center(
                         child: Text(
-                          'No events found. Create one!',
+                          context.loc.translate('noResults'),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),

@@ -1,0 +1,13 @@
+{
+  "appTitle": "contactSafe",
+  "contacts": "Contacts",
+  "search": "Search",
+  "events": "Events",
+  "photos": "Photos",
+  "settings": "Settings",
+  "group": "Group",
+  "noPhotos": "No photos",
+  "deleteAll": "Delete All",
+  "language": "Language",
+  "noResults": "No results found"
+}

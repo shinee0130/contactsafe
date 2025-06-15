@@ -18,6 +18,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:contactsafe/app.dart';
 import 'package:contactsafe/firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
+import 'l10n/locale_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,14 +40,26 @@ void main() async {
 
   final settingsController = SettingsController();
   final pinEnabled = await settingsController.hasPinEnabled();
+  final languageCode = await settingsController.loadLanguage();
+  final localeProvider = LocaleProvider(Locale(languageCode));
 
   runApp(
-    MaterialApp(
+    ChangeNotifierProvider.value(
+      value: localeProvider,
+      child: MaterialApp(
       title: 'ContactSafe',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
+      locale: localeProvider.locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('de'), Locale('mn')],
       initialRoute: '/',
       routes: {
         '/':
@@ -74,6 +90,7 @@ void main() async {
               contact: ModalRoute.of(context)!.settings.arguments as Contact,
             ),
       },
+    ),
     ),
   );
 }
