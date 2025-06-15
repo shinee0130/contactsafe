@@ -4,12 +4,11 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:googleapis/drive/v3.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart' hide Permission;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -145,12 +144,18 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
 
   Future<bool> _requestStoragePermission() async {
     if (Platform.isAndroid) {
-      // Android 13 (API 33) буюу түүнээс дээш бол
-      if (await Permission.manageExternalStorage.isGranted) return true;
+      if (await Permission.manageExternalStorage.isGranted) {
+        return true;
+      }
       var status = await Permission.manageExternalStorage.request();
+      // Зарим төхөөрөмж дээр тусгай тохиргоогоор өгөх шаардлагатай
+      if (status.isPermanentlyDenied) {
+        // Settings рүү автоматаар оруулах код дээрээ байгаа
+        return false;
+      }
       return status.isGranted;
     } else if (Platform.isIOS) {
-      // iOS-д зөвхөн photos permission
+      // Зураг/файл авах бол photos permission шаардлагатай
       var status = await Permission.photos.request();
       return status.isGranted;
     }
@@ -204,7 +209,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           final ref = _storage.ref().child(storagePath);
 
           // 1. Upload file to Firebase Storage
-          await ref.putData(fileBytes);
+          await ref.putData(fileBytes!);
           final downloadUrl = await ref.getDownloadURL();
 
           // 2. Save metadata to Firestore
@@ -394,11 +399,49 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   }
 
   Future<void> _openFile(ContactFile file) async {
-    final uri = Uri.parse(file.downloadUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      _showSnackBar('Could not open file');
+    try {
+      // 1. Файл татаж авах
+      final data = await _storage.ref().child(file.storagePath).getData();
+      if (data == null) {
+        _showSnackBar('Could not download file data');
+        return;
+      }
+
+      // 2. Түр хадгалах
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/${file.name}');
+      await tempFile.writeAsBytes(data);
+
+      // 3. File type шалгаж зураг бол харуулах, бусад бол нээх
+      if ([
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+      ].any((ext) => file.name.toLowerCase().endsWith(ext))) {
+        // App дотор preview dialog-оор харуулах (таны photos screen шиг)
+        showDialog(
+          context: context,
+          builder:
+              (_) => Dialog(
+                backgroundColor: Colors.black,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: InteractiveViewer(child: Image.file(tempFile)),
+                ),
+              ),
+        );
+      } else {
+        // Бусад файл (pdf, doc гэх мэт) -> open with external app
+        final uri = Uri.file(tempFile.path);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          _showSnackBar('Could not open file');
+        }
+      }
+    } catch (e) {
+      _showSnackBar('Failed to open file: $e');
     }
   }
 
