@@ -41,12 +41,33 @@ void main() async {
   final settingsController = SettingsController();
   final pinEnabled = await settingsController.hasPinEnabled();
   final languageCode = await settingsController.loadLanguage();
-  final localeProvider = LocaleProvider(Locale(languageCode));
 
   runApp(
-    ChangeNotifierProvider.value(
-      value: localeProvider,
-      child: MaterialApp(
+    ChangeNotifierProvider<LocaleProvider>(
+      create: (_) => LocaleProvider(Locale(languageCode)),
+      child: ContactSafeRoot(
+        settingsController: settingsController,
+        pinEnabled: pinEnabled,
+      ),
+    ),
+  );
+}
+
+class ContactSafeRoot extends StatelessWidget {
+  final SettingsController settingsController;
+  final bool pinEnabled;
+
+  const ContactSafeRoot({
+    super.key,
+    required this.settingsController,
+    required this.pinEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context);
+
+    return MaterialApp(
       title: 'ContactSafe',
       theme: lightTheme,
       darkTheme: darkTheme,
@@ -62,35 +83,29 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('de'), Locale('mn')],
       initialRoute: '/',
       routes: {
-        '/':
-            (context) =>
-                pinEnabled
-                    ? PinVerificationGate(
-                      controller: settingsController,
-                      child: ContactSafeApp(),
-                    )
-                    : ContactSafeApp(),
+        '/': (context) => pinEnabled
+            ? PinVerificationGate(
+                controller: settingsController,
+                child: ContactSafeApp(),
+              )
+            : ContactSafeApp(),
         '/contacts': (context) => const ContactsScreen(),
         '/search': (context) => const SearchScreen(),
         '/events': (context) => const EventsScreen(),
         '/photos': (context) => const PhotosScreen(),
         '/settings': (context) => const SettingsScreen(),
-        '/contact_detail':
-            (context) => ContactDetailScreen(
+        '/contact_detail': (context) => ContactDetailScreen(
               contact: ModalRoute.of(context)!.settings.arguments as Contact,
             ),
         '/add_contact': (context) => const AddContactScreen(),
         '/groups': (context) => const ContactGroupsScreen(),
-        '/contact_files':
-            (context) => ContactFilesScreen(
+        '/contact_files': (context) => ContactFilesScreen(
               contact: ModalRoute.of(context)!.settings.arguments as Contact,
             ),
-        '/contact_notes':
-            (context) => ContactNotesScreen(
+        '/contact_notes': (context) => ContactNotesScreen(
               contact: ModalRoute.of(context)!.settings.arguments as Contact,
             ),
       },
-    ),
-    ),
-  );
+    );
+  }
 }
