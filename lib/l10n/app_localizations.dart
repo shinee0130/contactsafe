@@ -165,6 +165,37 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No results found'**
   String get noResults;
+
+  /// Convenience method to access a localized string by [key].
+  /// Returns the key itself if no matching message is found.
+  String translate(String key) {
+    switch (key) {
+      case 'appTitle':
+        return appTitle;
+      case 'contacts':
+        return contacts;
+      case 'search':
+        return search;
+      case 'events':
+        return events;
+      case 'photos':
+        return photos;
+      case 'settings':
+        return settings;
+      case 'group':
+        return group;
+      case 'noPhotos':
+        return noPhotos;
+      case 'deleteAll':
+        return deleteAll;
+      case 'language':
+        return language;
+      case 'noResults':
+        return noResults;
+      default:
+        return key;
+    }
+  }
 }
 
 class _AppLocalizationsDelegate
@@ -201,4 +232,10 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
     'that was used.',
   );
+}
+
+/// Extension on [BuildContext] to easily access [AppLocalizations].
+extension AppLocalizationsX on BuildContext {
+  /// Shorthand for `AppLocalizations.of(this)!`.
+  AppLocalizations get loc => AppLocalizations.of(this)!;
 }
