@@ -124,6 +124,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     });
     try {
       final querySnapshot = await _contactFilesCollection().get();
+      if (!mounted) return;
       setState(() {
         _files = querySnapshot.docs.map((doc) => doc.data()).toList();
         _sortFiles();
@@ -132,6 +133,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       debugPrint('Error loading files: $e');
       _showSnackBar('Failed to load files: ${e.toString()}'); // Show full error
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -196,6 +198,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             );
 
             // 3. Update local state ONLY AFTER BOTH OPERATIONS SUCCEED
+            if (!mounted) return;
             setState(() {
               _files.add(newFile.copyWith(id: docRef.id));
               _sortFiles();
@@ -239,6 +242,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         );
       } finally {
         // <--- This 'finally' now has a 'try' block
+        if (!mounted) return;
         setState(() {
           _isLoading = false; // End loading regardless of success/failure
         });
@@ -278,6 +282,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
 
       await Future.wait(deleteFutures);
 
+      if (!mounted) return;
       setState(() {
         _files.removeWhere((file) => _selectedFileIds.contains(file.id));
         _selectedFileIds.clear();
@@ -288,6 +293,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       debugPrint('Error deleting files: $e');
       _showSnackBar('Failed to delete selected files: ${e.toString()}');
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -301,6 +307,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     try {
       await _storage.ref().child(file.storagePath).delete();
       await _contactFilesCollection().doc(file.id).delete();
+      if (!mounted) return;
       setState(() {
         _files.removeWhere((f) => f.id == file.id);
       });
@@ -308,6 +315,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     } catch (e) {
       _showSnackBar('Failed to delete file: ${e.toString()}');
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -342,6 +350,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     if (newName != null && newName.isNotEmpty && newName != file.name) {
       try {
         await _contactFilesCollection().doc(file.id).update({'name': newName});
+        if (!mounted) return;
         setState(() {
           final index = _files.indexWhere((f) => f.id == file.id);
           if (index != -1) {
