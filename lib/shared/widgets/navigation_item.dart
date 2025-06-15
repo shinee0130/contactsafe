@@ -1,71 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 class NavigationItem {
   final String label;
-  final IconData icon;
+  final String iconName; // icon-г нэрээр хадгална
   final String routeName;
   final int initialIndex;
 
   const NavigationItem({
     required this.label,
-    required this.icon,
+    required this.iconName,
     required this.routeName,
     required this.initialIndex,
   });
 
-  // Convert to JSON for saving
+  // JSON руу хөрвүүлэх
   Map<String, dynamic> toJson() => {
     'label': label,
-    'iconCodePoint': icon.codePoint,
-    'fontFamily': icon.fontFamily,
-    'fontPackage': icon.fontPackage,
+    'iconName': iconName,
     'routeName': routeName,
     'initialIndex': initialIndex,
   };
 
-  // Create from JSON for loading
+  // JSON-оос бүтээх
   factory NavigationItem.fromJson(Map<String, dynamic> json) => NavigationItem(
     label: json['label'],
-    icon: IconData(
-      json['iconCodePoint'] as int, // Ensure type safety with 'as int'
-      fontFamily: json['fontFamily'] as String?,
-      fontPackage: json['fontPackage'] as String?,
-    ),
+    iconName: json['iconName'],
     routeName: json['routeName'],
     initialIndex: json['initialIndex'],
   );
 
-  // Helper to get all default items (this list will be reordered)
+  // Compile-time icon map
+  static const Map<String, IconData> iconMap = {
+    'person': Icons.person,
+    'search': Icons.search,
+    'event': Icons.event,
+    'photo_library': Icons.photo_library,
+    'settings': Icons.settings,
+  };
+
+  // Actual IconData-г авах
+  IconData get icon => iconMap[iconName] ?? Icons.help_outline;
+
+  // Default items
   static List<NavigationItem> defaultItems() {
     return const [
       NavigationItem(
         label: 'Contacts',
-        icon: Icons.person,
+        iconName: 'person',
         routeName: '/contacts',
         initialIndex: 0,
       ),
       NavigationItem(
         label: 'Search',
-        icon: Icons.search,
+        iconName: 'search',
         routeName: '/search',
         initialIndex: 1,
       ),
       NavigationItem(
         label: 'Events',
-        icon: Icons.event,
+        iconName: 'event',
         routeName: '/events',
         initialIndex: 2,
       ),
       NavigationItem(
         label: 'Photos',
-        icon: Icons.photo_library,
+        iconName: 'photo_library',
         routeName: '/photos',
         initialIndex: 3,
       ),
       NavigationItem(
         label: 'Settings',
-        icon: Icons.settings,
+        iconName: 'settings',
         routeName: '/settings',
         initialIndex: 4,
       ),
