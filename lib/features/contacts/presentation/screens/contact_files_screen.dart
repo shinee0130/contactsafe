@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:googleapis/drive/v3.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart' hide Permission;
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -138,111 +141,123 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
     }
   }
 
+  Future<bool> _requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      // Android 13 (API 33) буюу түүнээс дээш бол
+      if (await Permission.manageExternalStorage.isGranted) return true;
+      var status = await Permission.manageExternalStorage.request();
+      return status.isGranted;
+    } else if (Platform.isIOS) {
+      // iOS-д зөвхөн photos permission
+      var status = await Permission.photos.request();
+      return status.isGranted;
+    }
+    return false;
+  }
+
   Future<void> _pickAndUploadFiles() async {
+    // Permission шалгах
+    if (!await _requestStoragePermission()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Storage permission denied. Please enable in settings.',
+          ),
+          action: SnackBarAction(label: 'Settings', onPressed: openAppSettings),
+        ),
+      );
+      return;
+    }
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
+      withData: true, // Заавал!
       type: FileType.any,
     );
 
-    if (result != null) {
-      setState(() {
-        _isLoading = true; // Start loading for the entire upload process
-      });
+    if (result == null) return; // No file picked
 
-      int successfulUploads = 0;
-      int failedUploads = 0;
+    setState(() {
+      _isLoading = true;
+    });
 
-      // START OF THE MISSING 'TRY' BLOCK
-      try {
-        for (PlatformFile platformFile in result.files) {
-          if (platformFile.bytes == null) {
-            _showSnackBar(
-              'Skipping ${platformFile.name}: File bytes not available. Try another file type or read method.',
-            );
-            failedUploads++;
-            continue;
-          }
+    int successfulUploads = 0;
+    int failedUploads = 0;
 
-          try {
-            final fileName = platformFile.name;
-            final storagePath = 'contact_files/${widget.contact.id}/$fileName';
-            final ref = _storage.ref().child(storagePath);
-
-            // 1. Upload file to Firebase Storage
-            debugPrint('Attempting to upload ${fileName} to Storage...');
-            await ref.putData(platformFile.bytes!);
-            final downloadUrl = await ref.getDownloadURL();
-            debugPrint(
-              'Successfully uploaded ${fileName} to Storage. Download URL: $downloadUrl',
-            );
-
-            // 2. Save metadata to Firestore
-            debugPrint(
-              'Attempting to save metadata for ${fileName} to Firestore...',
-            );
-            final newFile = ContactFile(
-              id: '', // Will be set by Firestore after doc.add
-              name: fileName,
-              size: platformFile.size,
-              downloadUrl: downloadUrl,
-              uploadDate: DateTime.now(),
-              storagePath: storagePath,
-            );
-
-            // Add document to Firestore and get its ID
-            final docRef = await _contactFilesCollection().add(newFile);
-            debugPrint(
-              'Successfully saved metadata for ${fileName} to Firestore. Doc ID: ${docRef.id}',
-            );
-
-            // 3. Update local state ONLY AFTER BOTH OPERATIONS SUCCEED
-            setState(() {
-              _files.add(newFile.copyWith(id: docRef.id));
-              _sortFiles();
-            });
-            successfulUploads++;
-          } catch (e) {
-            debugPrint(
-              'Error uploading or saving metadata for ${platformFile.name}: $e',
-            );
-            _showSnackBar(
-              'Failed to upload ${platformFile.name}: ${e.toString()}',
-            );
-            failedUploads++;
-            // Important: If a file fails, we don't want it in the local list
-          }
-        } // End of for loop
-
-        // Final summary message
-        String summaryMessage = '';
-        if (successfulUploads > 0) {
-          summaryMessage += '$successfulUploads file(s) uploaded successfully.';
+    try {
+      for (PlatformFile platformFile in result.files) {
+        Uint8List? fileBytes;
+        if (platformFile.bytes != null) {
+          fileBytes = platformFile.bytes;
+        } else if (platformFile.path != null) {
+          fileBytes = await File(platformFile.path!).readAsBytes();
+        } else {
+          _showSnackBar('Cannot read file: ${platformFile.name}');
+          continue;
         }
-        if (failedUploads > 0) {
-          if (summaryMessage.isNotEmpty) {
-            summaryMessage += '\n';
-          }
-          summaryMessage += '$failedUploads file(s) failed to upload.';
-        }
-        if (summaryMessage.isEmpty) {
-          summaryMessage = 'No files selected or processed.';
-        }
-        _showSnackBar(summaryMessage);
 
-        // Reload files after all attempts, to ensure consistency
-        _loadFiles(); // Re-fetch the true state from Firestore
-      } catch (e) {
-        // <--- Corresponding catch block for the outer try
-        debugPrint('Overall error during file picking or processing: $e');
-        _showSnackBar(
-          'An overall error occurred during file picking or processing: ${e.toString()}',
-        );
-      } finally {
-        // <--- This 'finally' now has a 'try' block
-        setState(() {
-          _isLoading = false; // End loading regardless of success/failure
-        });
+        try {
+          final fileName = platformFile.name;
+          final storagePath = 'contact_files/${widget.contact.id}/$fileName';
+          final ref = _storage.ref().child(storagePath);
+
+          // 1. Upload file to Firebase Storage
+          await ref.putData(fileBytes);
+          final downloadUrl = await ref.getDownloadURL();
+
+          // 2. Save metadata to Firestore
+          final newFile = ContactFile(
+            id: '', // Will be set by Firestore after doc.add
+            name: fileName,
+            size: platformFile.size,
+            downloadUrl: downloadUrl,
+            uploadDate: DateTime.now(),
+            storagePath: storagePath,
+          );
+
+          // Add document to Firestore and get its ID
+          final docRef = await _contactFilesCollection().add(newFile);
+
+          // 3. Update local state
+          setState(() {
+            _files.add(newFile.copyWith(id: docRef.id));
+            _sortFiles();
+          });
+          successfulUploads++;
+        } catch (e) {
+          debugPrint(
+            'Error uploading or saving metadata for ${platformFile.name}: $e',
+          );
+          _showSnackBar(
+            'Failed to upload ${platformFile.name}: ${e.toString()}',
+          );
+          failedUploads++;
+        }
       }
+      // Summary message
+      String summaryMessage = '';
+      if (successfulUploads > 0) {
+        summaryMessage += '$successfulUploads file(s) uploaded successfully.';
+      }
+      if (failedUploads > 0) {
+        if (summaryMessage.isNotEmpty) summaryMessage += '\n';
+        summaryMessage += '$failedUploads file(s) failed to upload.';
+      }
+      if (summaryMessage.isEmpty)
+        summaryMessage = 'No files selected or processed.';
+      _showSnackBar(summaryMessage);
+
+      // Reload files after all attempts, to ensure consistency
+      _loadFiles(); // Re-fetch the true state from Firestore
+    } catch (e) {
+      debugPrint('Overall error during file picking or processing: $e');
+      _showSnackBar(
+        'An error occurred during file picking or processing: ${e.toString()}',
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
