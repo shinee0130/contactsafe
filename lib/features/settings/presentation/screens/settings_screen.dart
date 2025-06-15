@@ -1,16 +1,18 @@
-import 'package:contactsafe/features/settings/controller/settings_controller.dart';
-import 'package:contactsafe/features/settings/presentation/screens/pin_dialog.dart';
-import 'package:contactsafe/features/settings/presentation/screens/select_tab_bar_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../l10n/locale_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:contactsafe/features/settings/controller/settings_controller.dart';
+import 'package:contactsafe/features/settings/presentation/screens/pin_dialog.dart';
+import 'package:contactsafe/features/settings/presentation/screens/select_tab_bar_order_screen.dart';
 import 'package:contactsafe/features/settings/presentation/widgets/onboarding_screen.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
+
+import 'package:contactsafe/l10n/app_localizations.dart';
+import 'package:contactsafe/l10n/locale_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -230,7 +232,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: Text(context.loc.translate('deleteAll') + ' Data?'),
           content: Text(
             'Are you sure you want to delete ALL data from ContactSafe? This action cannot be undone.',
-            ),
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -399,7 +401,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showLanguageDialog() async {
     final selected = await showDialog<String>(
       context: context,
-      builder: (context) => SimpleDialog(
+      builder:
+          (context) => SimpleDialog(
             title: Text(context.loc.translate('language')),
             children: [
               SimpleDialogOption(
@@ -420,8 +423,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (selected != null && mounted) {
       setState(() => _currentLanguage = selected);
       await _controller.saveLanguage(selected);
-      Provider.of<LocaleProvider>(context, listen: false)
-          .setLocale(Locale(selected));
+      Provider.of<LocaleProvider>(
+        context,
+        listen: false,
+      ).setLocale(Locale(selected));
     }
   }
 

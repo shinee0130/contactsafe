@@ -2,7 +2,7 @@ import 'package:contactsafe/features/contacts/presentation/provider/contacts_pro
 import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/assign_contacts_to_group_screen.dart.dart'
     show globalContactGroupsMap;

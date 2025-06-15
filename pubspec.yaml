@@ -67,6 +67,7 @@ dependencies:
   share_plus: ^11.0.0
   device_info_plus: ^11.4.0
   foundation: ^0.0.5
+  flutter_localization: ^0.3.2
 
 dev_dependencies:
   flutter_test:

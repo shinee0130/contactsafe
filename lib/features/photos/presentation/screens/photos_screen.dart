@@ -1,8 +1,8 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import '../../../l10n/app_localizations.dart';
 
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
 class PhotosScreen extends StatefulWidget {
@@ -202,7 +202,10 @@ class _PhotosScreenState extends State<PhotosScreen> {
           children: [
             Text(
               context.loc.translate('photos'),
-              style: const TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 31.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(child: _buildBody()),

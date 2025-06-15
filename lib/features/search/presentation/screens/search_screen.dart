@@ -1,14 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:intl/intl.dart';
-import '../../../l10n/app_localizations.dart';
+
+import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class _FileResult {
   final String id;
@@ -79,10 +80,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
       // Fetch files for this user only
       final uid = FirebaseAuth.instance.currentUser!.uid;
-      final fileSnapshots = await FirebaseFirestore.instance
-          .collectionGroup('files')
-          .where('uid', isEqualTo: uid)
-          .get();
+      final fileSnapshots =
+          await FirebaseFirestore.instance
+              .collectionGroup('files')
+              .where('uid', isEqualTo: uid)
+              .get();
       final files =
           fileSnapshots.docs.map((doc) {
             final data = doc.data();
@@ -100,10 +102,11 @@ class _SearchScreenState extends State<SearchScreen> {
           }).toList();
 
       // Fetch notes for this user only
-      final noteSnapshots = await FirebaseFirestore.instance
-          .collectionGroup('notes')
-          .where('uid', isEqualTo: uid)
-          .get();
+      final noteSnapshots =
+          await FirebaseFirestore.instance
+              .collectionGroup('notes')
+              .where('uid', isEqualTo: uid)
+              .get();
       final notes =
           noteSnapshots.docs.map((doc) {
             final data = doc.data();
@@ -401,8 +404,10 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             Text(
               context.loc.translate('search'),
-              style:
-                  const TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 31.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             CustomSearchBar(

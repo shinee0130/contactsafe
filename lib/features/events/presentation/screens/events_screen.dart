@@ -1,16 +1,17 @@
-import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../l10n/app_localizations.dart';
+
+import 'package:contactsafe/features/events/data/local_event_repository.dart';
+import 'package:contactsafe/features/events/data/models/event_model.dart';
+import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
+import 'package:contactsafe/features/events/presentation/widgets/location_picker_screen.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
+import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
-import 'package:contactsafe/features/events/data/models/event_model.dart';
-import 'package:contactsafe/features/events/presentation/widgets/location_picker_screen.dart';
-import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
