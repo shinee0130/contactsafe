@@ -35,14 +35,16 @@ class ContactListWidget extends StatelessWidget {
                     size: 48,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No contacts found',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -68,7 +70,8 @@ class ContactListWidget extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.blue,
+                          color:
+                              Theme.of(context).colorScheme.primary, // iOS blue
                         ),
                       ),
                     ),
@@ -89,9 +92,8 @@ class ContactListWidget extends StatelessWidget {
                             height: 1,
                             thickness: 1,
                             indent: 72,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withOpacity(0.6),
+                            color:
+                                Theme.of(context).dividerColor, // Theme divider
                           ),
                     ),
                   ],
@@ -103,40 +105,44 @@ class ContactListWidget extends StatelessWidget {
             ),
 
         // Alphabetical Index
-        Positioned(
-          right: 0,
-          top: 0,
-          bottom: 0,
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children:
-                    sortedKeys.map((letter) {
-                      return GestureDetector(
-                        onTap: () => onLetterTap(letter),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Text(
-                            letter,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: Colors.blue,
+        if (contacts.isNotEmpty)
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children:
+                      sortedKeys.map((letter) {
+                        return GestureDetector(
+                          onTap: () => onLetterTap(letter),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 2.0,
+                              horizontal: 2,
+                            ),
+                            child: Text(
+                              letter,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -175,10 +181,8 @@ class ContactListItem extends StatelessWidget {
       color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         onTap: onTap,
-        splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-        highlightColor: Theme.of(
-          context,
-        ).colorScheme.onSurface.withOpacity(0.6),
+        splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+        highlightColor: Colors.transparent,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
@@ -193,7 +197,7 @@ class ContactListItem extends StatelessWidget {
                       : contact.displayName,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -206,7 +210,7 @@ class ContactListItem extends StatelessWidget {
                   size: 20,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withOpacity(0.35),
                 ),
               ),
             ],
@@ -217,41 +221,32 @@ class ContactListItem extends StatelessWidget {
   }
 
   Widget _buildLeadingIcon(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-      ),
-      child: Center(
-        child:
-            contact.photo != null
-                ? ClipOval(
-                  child: Image.memory(
-                    contact.photo!,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
-                )
-                : Text(
-                  (lastNameFirst && contact.name.last.isNotEmpty
-                              ? '${contact.name.last} ${contact.name.first}'
-                              : contact.displayName)
-                          .isNotEmpty
-                      ? (lastNameFirst && contact.name.last.isNotEmpty
-                              ? contact.name.last[0]
-                              : contact.displayName[0])
-                          .toUpperCase()
-                      : '',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
+    final bool hasPhoto = contact.photo != null && contact.photo!.isNotEmpty;
+    final String initials =
+        (lastNameFirst && contact.name.last.isNotEmpty
+                ? contact.name.last[0]
+                : (contact.displayName.isNotEmpty
+                    ? contact.displayName[0]
+                    : '?'))
+            .toUpperCase();
+
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.onSurface.withOpacity(0.09), // iOS avatar bg
+      backgroundImage: hasPhoto ? MemoryImage(contact.photo!) : null,
+      child:
+          !hasPhoto
+              ? Text(
+                initials,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
-      ),
+              )
+              : null,
     );
   }
 }
