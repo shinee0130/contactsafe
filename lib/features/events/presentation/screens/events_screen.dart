@@ -205,7 +205,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   title: Text(_getSortOptionName(option)),
                   trailing:
                       _sortOption == option
-                          ? const Icon(Icons.check, color: Colors.blue)
+                          ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
                           : null,
                   onTap: () {
                     setState(() {
@@ -277,12 +277,12 @@ class _EventsScreenState extends State<EventsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'New Event',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -445,8 +445,8 @@ class _EventsScreenState extends State<EventsScreen> {
                           icon: const Icon(Icons.map),
                           label: const Text('Choose Location on Map'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
                         ),
@@ -571,11 +571,11 @@ class _EventsScreenState extends State<EventsScreen> {
         actions: [
           IconButton(
             onPressed: _showSortDialog,
-            icon: Icon(Icons.swap_vert, color: Colors.blue, size: 30),
+            icon: Icon(Icons.swap_vert, color: Theme.of(context).colorScheme.primary, size: 30),
           ),
           IconButton(
             onPressed: _addNewEvent,
-            icon: Icon(Icons.add, color: Colors.blue, size: 30),
+            icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 30),
           ),
         ],
       ),

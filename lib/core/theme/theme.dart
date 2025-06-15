@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'colors.dart';
 
-final ThemeData lightTheme = ThemeData(
+final ColorScheme _lightColorScheme = ColorScheme.fromSeed(
+  seedColor: kIOSPrimaryBlue,
   brightness: Brightness.light,
+);
+
+final ColorScheme _darkColorScheme = ColorScheme.fromSeed(
+  seedColor: kIOSPrimaryBlue,
+  brightness: Brightness.dark,
+);
+
+final ThemeData lightTheme = ThemeData(
+  useMaterial3: true,
+  colorScheme: _lightColorScheme,
   scaffoldBackgroundColor: kIOSBackground,
   primaryColor: kIOSPrimaryBlue,
   appBarTheme: AppBarTheme(
@@ -20,9 +31,9 @@ final ThemeData lightTheme = ThemeData(
   iconTheme: IconThemeData(color: kIOSPrimaryBlue),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: kIOSWhite,
-    selectedItemColor: kIOSPrimaryBlue,
+    selectedItemColor: _lightColorScheme.primary,
     unselectedItemColor: kIOSSecondaryText,
-    selectedIconTheme: IconThemeData(color: kIOSPrimaryBlue),
+    selectedIconTheme: IconThemeData(color: _lightColorScheme.primary),
     unselectedIconTheme: IconThemeData(color: kIOSSecondaryText),
     type: BottomNavigationBarType.fixed,
     showUnselectedLabels: true,
@@ -43,10 +54,12 @@ final ThemeData lightTheme = ThemeData(
               : kIOSDivider,
     ),
   ),
+  shadowColor: Colors.black.withOpacity(0.2),
 );
 
 final ThemeData darkTheme = ThemeData(
-  brightness: Brightness.dark,
+  useMaterial3: true,
+  colorScheme: _darkColorScheme,
   scaffoldBackgroundColor: kIOSDarkBackground,
   primaryColor: kIOSPrimaryBlue,
   appBarTheme: AppBarTheme(
@@ -64,9 +77,9 @@ final ThemeData darkTheme = ThemeData(
   iconTheme: IconThemeData(color: kIOSPrimaryBlue),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: kIOSDarkCard,
-    selectedItemColor: kIOSPrimaryBlue,
+    selectedItemColor: _darkColorScheme.primary,
     unselectedItemColor: kIOSDarkSecondaryText,
-    selectedIconTheme: IconThemeData(color: kIOSPrimaryBlue),
+    selectedIconTheme: IconThemeData(color: _darkColorScheme.primary),
     unselectedIconTheme: IconThemeData(color: kIOSDarkSecondaryText),
     type: BottomNavigationBarType.fixed,
     showUnselectedLabels: true,
@@ -87,4 +100,5 @@ final ThemeData darkTheme = ThemeData(
               : kIOSDarkDivider,
     ),
   ),
+  shadowColor: Colors.black.withOpacity(0.2),
 );

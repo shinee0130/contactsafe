@@ -32,7 +32,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         backgroundColor: Colors.transparent, // Make app bar transparent
         elevation: 0, // Remove shadow
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black), // Close button
+          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () {
             Navigator.of(
               context,
@@ -109,8 +109,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   decoration: BoxDecoration(
                     color:
                         _currentPage == index
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
