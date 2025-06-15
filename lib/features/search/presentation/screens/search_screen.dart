@@ -7,6 +7,7 @@ import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class _FileResult {
   final String id;
@@ -75,9 +76,12 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       }
 
-      // Fetch files across all contacts
-      final fileSnapshots =
-          await FirebaseFirestore.instance.collectionGroup('files').get();
+      // Fetch files for this user only
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final fileSnapshots = await FirebaseFirestore.instance
+          .collectionGroup('files')
+          .where('uid', isEqualTo: uid)
+          .get();
       final files =
           fileSnapshots.docs.map((doc) {
             final data = doc.data();
@@ -94,9 +98,11 @@ class _SearchScreenState extends State<SearchScreen> {
             );
           }).toList();
 
-      // Fetch notes across all contacts
-      final noteSnapshots =
-          await FirebaseFirestore.instance.collectionGroup('notes').get();
+      // Fetch notes for this user only
+      final noteSnapshots = await FirebaseFirestore.instance
+          .collectionGroup('notes')
+          .where('uid', isEqualTo: uid)
+          .get();
       final notes =
           noteSnapshots.docs.map((doc) {
             final data = doc.data();

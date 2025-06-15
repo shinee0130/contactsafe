@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
@@ -29,8 +30,11 @@ class _PhotosScreenState extends State<PhotosScreen> {
     });
 
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collectionGroup('files').get();
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final snapshot = await FirebaseFirestore.instance
+          .collectionGroup('files')
+          .where('uid', isEqualTo: uid)
+          .get();
       const imageExts = ['.jpg', '.jpeg', '.png', '.gif'];
 
       final urls = snapshot.docs.map((doc) {

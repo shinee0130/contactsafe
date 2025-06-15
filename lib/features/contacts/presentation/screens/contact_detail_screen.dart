@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:contactsafe/features/contacts/presentation/screens/edit_contact_screen.dart';
@@ -44,13 +45,17 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     try {
       final filesSnapshot =
           await FirebaseFirestore.instance
-              .collection('contact_files_metadata')
+              .collection('user_files')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .collection('contacts')
               .doc(widget.contact.id)
               .collection('files')
               .get();
       final notesSnapshot =
           await FirebaseFirestore.instance
-              .collection('contact_notes')
+              .collection('user_notes')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .collection('contacts')
               .doc(widget.contact.id)
               .collection('notes')
               .get();

@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({super.key});
@@ -176,6 +177,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
       // 2. Save to Cloud Firestore
       await _firestore
+          .collection('user_contacts')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
           .collection('contacts')
           .add(firestoreContactData); // <<< SAVE TO FIRESTORE
       if (mounted) {
