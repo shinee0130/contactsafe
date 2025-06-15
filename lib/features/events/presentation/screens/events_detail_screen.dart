@@ -1,20 +1,15 @@
-import 'package:contactsafe/utils/color_extensions.dart';
-// lib/features/events/presentation/screens/events_detail_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:geocoding/geocoding.dart'
-    as geo; // For geocoding the address back to LatLng
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 
 class EventsDetailScreen extends StatefulWidget {
   final AppEvent event;
-  final List<Contact>
-  allDeviceContacts; // To resolve participant names and potentially show images
+  final List<Contact> allDeviceContacts;
 
   const EventsDetailScreen({
     super.key,
@@ -29,7 +24,7 @@ class EventsDetailScreen extends StatefulWidget {
 class _EventsDetailScreenState extends State<EventsDetailScreen> {
   GoogleMapController? _mapController;
   LatLng? _eventLatLng;
-  bool _isLoadingMap = true; // To show loading indicator for map
+  bool _isLoadingMap = true;
 
   @override
   void initState() {
@@ -106,9 +101,12 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
       uri = Uri.parse(
         'https://www.google.com/maps/dir/?api=1&destination=${_eventLatLng!.latitude},${_eventLatLng!.longitude}',
       );
-    } else if (widget.event.location != null && widget.event.location!.isNotEmpty) {
+    } else if (widget.event.location != null &&
+        widget.event.location!.isNotEmpty) {
       final encoded = Uri.encodeComponent(widget.event.location!);
-      uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$encoded');
+      uri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$encoded',
+      );
     }
 
     if (uri != null) {
@@ -257,7 +255,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onBackground.withValues(alpha: (0.7 * 255).round()),
+                    ).colorScheme.onSurface.withOpacity(0.6),
                   ),
                 )
                 : ListView.builder(
@@ -317,7 +315,9 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onBackground.withValues(alpha: (0.8 * 255).round()),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               Text(
@@ -334,10 +334,7 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
     );
 
     if (onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        child: row,
-      );
+      return InkWell(onTap: onTap, child: row);
     }
     return row;
   }

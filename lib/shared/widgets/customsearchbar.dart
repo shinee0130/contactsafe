@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatelessWidget {
@@ -21,7 +20,7 @@ class CustomSearchBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 8,
             offset: const Offset(0, 4),
@@ -38,13 +37,13 @@ class CustomSearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.5 * 255).round()),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontWeight: FontWeight.normal,
             fontSize: 16.0,
           ),
           prefixIcon: Icon(
             Icons.search,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: (0.5 * 255).round()),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             size: 24.0,
           ),
           suffixIcon:
@@ -54,7 +53,7 @@ class CustomSearchBar extends StatelessWidget {
                       Icons.clear,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: (0.5 * 255).round()),
+                      ).colorScheme.onSurface.withOpacity(0.5),
                       size: 24.0,
                     ),
                     onPressed: () {

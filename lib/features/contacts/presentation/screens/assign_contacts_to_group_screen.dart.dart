@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -223,7 +222,9 @@ class _AssignContactsToGroupScreenState
                                   contact.thumbnail != null
                                       ? MemoryImage(contact.thumbnail!)
                                       : null,
-                              backgroundColor: Colors.blue.withValues(alpha: (0.7 * 255).round()),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.6),
                               child:
                                   contact.thumbnail == null
                                       ? Text(

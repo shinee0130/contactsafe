@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
@@ -63,8 +62,10 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
     }
 
     if (_editingIndex >= 0) {
-      final note = _notes[_editingIndex]
-          .copyWith(content: _noteController.text, updatedAt: DateTime.now());
+      final note = _notes[_editingIndex].copyWith(
+        content: _noteController.text,
+        updatedAt: DateTime.now(),
+      );
       try {
         await _contactNotesCollection().doc(note.id).update(note.toFirestore());
         setState(() {
@@ -96,9 +97,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
   Future<void> _viewNote(int index) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => NoteDetailScreen(note: _notes[index]),
-      ),
+      MaterialPageRoute(builder: (_) => NoteDetailScreen(note: _notes[index])),
     );
     if (result == 'delete') {
       _deleteNote(index);
@@ -145,7 +144,9 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: (0.1 * 255).round()),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -367,9 +368,9 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
 
   void _showSnackBar(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }
@@ -394,7 +395,9 @@ class ContactNote {
       content: data['content'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt:
-          data['updatedAt'] != null ? (data['updatedAt'] as Timestamp).toDate() : null,
+          data['updatedAt'] != null
+              ? (data['updatedAt'] as Timestamp).toDate()
+              : null,
     );
   }
 
@@ -406,7 +409,12 @@ class ContactNote {
     };
   }
 
-  ContactNote copyWith({String? id, String? content, DateTime? createdAt, DateTime? updatedAt}) {
+  ContactNote copyWith({
+    String? id,
+    String? content,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
     return ContactNote(
       id: id ?? this.id,
       content: content ?? this.content,

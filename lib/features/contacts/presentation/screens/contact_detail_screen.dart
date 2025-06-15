@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -43,16 +42,18 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
 
   Future<void> _loadCounts() async {
     try {
-      final filesSnapshot = await FirebaseFirestore.instance
-          .collection('contact_files_metadata')
-          .doc(widget.contact.id)
-          .collection('files')
-          .get();
-      final notesSnapshot = await FirebaseFirestore.instance
-          .collection('contact_notes')
-          .doc(widget.contact.id)
-          .collection('notes')
-          .get();
+      final filesSnapshot =
+          await FirebaseFirestore.instance
+              .collection('contact_files_metadata')
+              .doc(widget.contact.id)
+              .collection('files')
+              .get();
+      final notesSnapshot =
+          await FirebaseFirestore.instance
+              .collection('contact_notes')
+              .doc(widget.contact.id)
+              .collection('notes')
+              .get();
       setState(() {
         _filesCount = filesSnapshot.size;
         _notesCount = notesSnapshot.size;
@@ -314,7 +315,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -334,7 +335,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       height: 120,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
         border: Border.all(color: Colors.blue, width: 2),
       ),
       child:
@@ -376,7 +377,9 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -563,9 +566,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       subtitleText,
                       style: TextStyle(
                         fontSize: 18,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -648,7 +649,9 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -710,7 +713,9 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: (0.1 * 255).round()),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),

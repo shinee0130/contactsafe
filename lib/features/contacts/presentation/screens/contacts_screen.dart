@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:contactsafe/features/contacts/presentation/provider/contacts_provider.dart';
 import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
@@ -228,7 +227,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
+                  ).colorScheme.onSurface.withOpacity(0.6),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.add, color: Colors.blue, size: 24),
@@ -265,9 +264,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: (0.05 * 255).round(),
-                      ),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -299,7 +298,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: (0.1 * 255).round()),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),

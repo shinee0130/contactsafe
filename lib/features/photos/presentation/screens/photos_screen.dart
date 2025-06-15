@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -55,21 +54,22 @@ class _PhotosScreenState extends State<PhotosScreen> {
 
       final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
       final files = photosDir.listSync();
-      _photos = files
-          .whereType<File>()
-          .where(
-            (f) => imageExtensions.any(
-              (ext) => f.path.toLowerCase().endsWith(ext),
-            ),
-          )
-          .toList();
+      _photos =
+          files
+              .whereType<File>()
+              .where(
+                (f) => imageExtensions.any(
+                  (ext) => f.path.toLowerCase().endsWith(ext),
+                ),
+              )
+              .toList();
 
       _sortPhotos();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load photos: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to load photos: $e')));
       }
     } finally {
       if (mounted) {
@@ -77,7 +77,6 @@ class _PhotosScreenState extends State<PhotosScreen> {
       }
     }
   }
-
 
   void _toggleEditMode() {
     setState(() {
@@ -138,7 +137,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
   Future<void> _shareSelectedPhotos() async {
     final files = _selectedIndices.map((i) => XFile(_photos[i].path)).toList();
     if (files.isNotEmpty) {
-      await SharePlus.instance.share(files: files);
+      await Share.shareXFiles(files);
     }
   }
 
@@ -180,16 +179,15 @@ class _PhotosScreenState extends State<PhotosScreen> {
   void _openPhotoViewer(File photo) {
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: EdgeInsets.zero,
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: InteractiveViewer(
-            child: Image.file(photo),
+      builder:
+          (_) => Dialog(
+            backgroundColor: Colors.black,
+            insetPadding: EdgeInsets.zero,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: InteractiveViewer(child: Image.file(photo)),
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -370,16 +368,17 @@ class _PhotosScreenState extends State<PhotosScreen> {
                               size: 64,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No photos yet',
                               style: TextStyle(
                                 fontSize: 18,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -388,9 +387,10 @@ class _PhotosScreenState extends State<PhotosScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -406,13 +406,13 @@ class _PhotosScreenState extends State<PhotosScreen> {
                         itemCount: _photos.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                          onTap: () {
-                            if (_editMode) {
-                              _togglePhotoSelection(index);
-                            } else {
+                            onTap: () {
+                              if (_editMode) {
+                                _togglePhotoSelection(index);
+                              } else {
                                 _openPhotoViewer(_photos[index]);
-                            }
-                          },
+                              }
+                            },
                             onLongPress: () {
                               if (!_editMode) {
                                 setState(() {

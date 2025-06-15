@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
 import 'package:contactsafe/features/settings/presentation/screens/pin_dialog.dart';
 import 'package:contactsafe/features/settings/presentation/screens/select_tab_bar_order_screen.dart';
@@ -77,45 +76,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Successfully imported $count contacts!')),
       );
-      } catch (e) {
-        if (!mounted) {
-          return;
+    } catch (e) {
+      if (!mounted) {
+        return;
       }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error importing contacts: $e')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error importing contacts: $e')));
+    }
   }
 
   Future<void> _createBackup() async {
     try {
-        final fileName = await _controller.createBackup();
-        if (!mounted) {
-          return;
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Backup created successfully at $fileName')),
-        );
-      } catch (e) {
-        if (!mounted) {
-          return;
-        }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to create backup: $e')));
+      final fileName = await _controller.createBackup();
+      if (!mounted) {
+        return;
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Backup created successfully at $fileName')),
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to create backup: $e')));
+    }
   }
 
   Future<void> _restoreFromBackup() async {
     try {
       final count = await _controller.restoreFromBackup();
-        if (count > 0) {
-          if (!mounted) {
-            return;
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Restored $count contacts from backup!')),
-          );
+      if (count > 0) {
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Restored $count contacts from backup!')),
+        );
       }
     } catch (e) {
       if (!mounted) {
@@ -129,29 +128,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _backupToGoogleDrive() async {
     try {
-        await _controller.backupToGoogleDrive();
-        if (!mounted) {
-          return;
-        }
+      await _controller.backupToGoogleDrive();
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Backup uploaded to Google Drive')),
       );
-      } catch (e) {
-        if (!mounted) {
-          return;
-        }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Backup failed: $e')),
-      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
     }
   }
 
   Future<void> _restoreFromGoogleDrive() async {
-      try {
-        final count = await _controller.restoreFromGoogleDrive();
-        if (!mounted) {
-          return;
-        }
+    try {
+      final count = await _controller.restoreFromGoogleDrive();
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Restored $count contacts from Google Drive')),
       );
@@ -159,9 +158,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Restore failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Restore failed: $e')));
     }
   }
 
@@ -178,9 +177,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Import failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
     }
   }
 
@@ -284,9 +283,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           (context) => PinDialog(title: 'Create a 4-digit PIN', error: error),
     );
 
-      if (pin == null) {
-        return null;
-      }
+    if (pin == null) {
+      return null;
+    }
 
     // Confirm PIN
     confirmPin = await showDialog<String>(
@@ -294,14 +293,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => PinDialog(title: 'Confirm your PIN', error: error),
     );
 
-      if (confirmPin == null) {
-        return null;
-      }
+    if (confirmPin == null) {
+      return null;
+    }
 
-      if (pin != confirmPin) {
-        if (!mounted) {
-          return null; // Check if the widget is still mounted
-        }
+    if (pin != confirmPin) {
+      if (!mounted) {
+        return null; // Check if the widget is still mounted
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('PINs do not match. Please try again.')),
       );
@@ -313,9 +312,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<bool> _showVerifyPinDialog() async {
     final hasPin = await _controller.hasPin();
-      if (!hasPin) {
-        return true;
-      }
+    if (!hasPin) {
+      return true;
+    }
 
     bool verified = false;
     String? error;
@@ -326,9 +325,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context) => PinDialog(title: 'Enter your PIN', error: error),
       );
 
-        if (enteredPin == null) {
-          return false;
-        }
+      if (enteredPin == null) {
+        return false;
+      }
 
       verified = await _controller.verifyPin(enteredPin);
       if (!verified) {
@@ -350,14 +349,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await _controller.saveUseFaceIdSetting(true);
           if (!mounted) {
             return;
-      }
+          }
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Biometrics enabled.')));
         } else {
           if (!mounted) {
             return;
-      }
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Authentication failed or canceled.')),
           );
@@ -366,7 +365,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         setState(() => _useFaceId = false);
         if (!mounted) {
           return;
-      }
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No biometrics available.')),
         );
@@ -397,23 +396,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showLanguageDialog() async {
     final selected = await showDialog<String>(
       context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Select Language'),
-        children: [
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, 'en'),
-            child: const Text('English'),
+      builder:
+          (context) => SimpleDialog(
+            title: const Text('Select Language'),
+            children: [
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, 'en'),
+                child: const Text('English'),
+              ),
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, 'de'),
+                child: const Text('German'),
+              ),
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, 'mn'),
+                child: const Text('Mongolian'),
+              ),
+            ],
           ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, 'de'),
-            child: const Text('German'),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, 'mn'),
-            child: const Text('Mongolian'),
-          ),
-        ],
-      ),
     );
     if (selected != null && mounted) {
       setState(() => _currentLanguage = selected);
@@ -449,20 +449,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           settingsSectionBackground: Theme.of(context).colorScheme.surface,
           titleTextColor: Theme.of(context).colorScheme.primary,
           settingsTileTextColor: Theme.of(context).colorScheme.onSurface,
-          tileDescriptionTextColor: Theme.of(
+          tileDescriptionTextColor:
+              Theme.of(context).colorScheme.onSurfaceVariant,
+          dividerColor: Theme.of(
             context,
-          ).colorScheme.onSurfaceVariant,
-          dividerColor: Theme.of(context).colorScheme.outline.withValues(alpha: (0.2 * 255).round()),
+          ).colorScheme.onSurface.withOpacity(0.5),
         ),
         darkTheme: SettingsThemeData(
           settingsListBackground: Theme.of(context).colorScheme.surface,
           settingsSectionBackground: Theme.of(context).colorScheme.surface,
           titleTextColor: Theme.of(context).colorScheme.primary,
           settingsTileTextColor: Theme.of(context).colorScheme.onSurface,
-          tileDescriptionTextColor: Theme.of(
+          tileDescriptionTextColor:
+              Theme.of(context).colorScheme.onSurfaceVariant,
+          dividerColor: Theme.of(
             context,
-          ).colorScheme.onSurfaceVariant,
-          dividerColor: Theme.of(context).colorScheme.outline.withValues(alpha: (0.2 * 255).round()),
+          ).colorScheme.onSurface.withOpacity(0.5),
         ),
         sections: [
           CustomSettingsSection(
@@ -503,7 +505,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icons.chevron_right,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
+                  ).colorScheme.onSurface.withOpacity(0.5),
                 ),
                 onPressed: (context) async => await openAppSettings(),
               ),
@@ -533,9 +535,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: Text(
                   '1.0.1 (90)',
                   style: TextStyle(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 15.0,
                   ),
                 ),
@@ -547,7 +547,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icons.open_in_new,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
+                  ).colorScheme.onSurface.withOpacity(0.5),
                 ),
                 onPressed:
                     (context) => _launchUrl(
@@ -560,7 +560,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icons.open_in_new,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
+                  ).colorScheme.onSurface.withOpacity(0.5),
                 ),
                 onPressed:
                     (context) => _launchUrl(
@@ -722,7 +722,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() => _navigationItems = newOrder);
                     if (!mounted) {
                       return;
-      }
+                    }
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('TabBar order updated successfully!'),
@@ -766,7 +766,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await _controller.saveUsePasswordSetting(true);
                       if (!mounted) {
                         return;
-      }
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('PIN enabled.')),
                       );
@@ -774,7 +774,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       setState(() => _usePass = false);
                       if (!mounted) {
                         return;
-      }
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('PIN setup canceled or invalid.'),
@@ -790,7 +790,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await _controller.saveUsePasswordSetting(false);
                       if (!mounted) {
                         return;
-      }
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('PIN disabled.')),
                       );
@@ -819,7 +819,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         await _controller.savePin(newPin);
                         if (!mounted) {
                           return;
-      }
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('PIN changed successfully'),
@@ -828,7 +828,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       } else {
                         if (!mounted) {
                           return;
-      }
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('PIN change canceled or invalid.'),
@@ -851,9 +851,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'Powered by InAppSettingKit',
                 style: TextStyle(
                   fontSize: 12.0,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

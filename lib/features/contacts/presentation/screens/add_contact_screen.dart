@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -382,9 +381,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
             'Phone (${_getPhoneLabelString(_phoneLabels[0])})',
             style: TextStyle(
               fontSize: 12.0,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
           ListView.builder(
@@ -476,14 +473,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
               },
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ), // Grey icon
               label: Text(
                 'Add phone',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.5),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -702,8 +699,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.clear,
-                        color: Theme.of(context)
-                            .colorScheme.onSurfaceVariant,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
                       ),
                       onPressed: () {
                         setState(() {
@@ -939,14 +937,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
               onPressed: onAdd,
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ), // Grey icon
               label: Text(
                 'Add $label',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.5),
                   fontWeight: FontWeight.w500,
                 ),
               ),

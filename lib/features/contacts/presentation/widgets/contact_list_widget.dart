@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -36,16 +35,14 @@ class ContactListWidget extends StatelessWidget {
                     size: 48,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
+                    ).colorScheme.onSurface.withOpacity(0.6),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No contacts found',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -94,7 +91,7 @@ class ContactListWidget extends StatelessWidget {
                             indent: 72,
                             color: Theme.of(
                               context,
-                            ).colorScheme.outline.withValues(alpha: (0.2 * 255).round()),
+                            ).colorScheme.onSurface.withOpacity(0.6),
                           ),
                     ),
                   ],
@@ -113,7 +110,7 @@ class ContactListWidget extends StatelessWidget {
           child: Center(
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withValues(alpha: (0.7 * 255).round()),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -147,9 +144,10 @@ class ContactListWidget extends StatelessWidget {
   Map<String, List<Contact>> _groupContacts(List<Contact> contacts) {
     final Map<String, List<Contact>> groupedContacts = {};
     for (final contact in contacts) {
-      final String displayName = lastNameFirst && contact.name.last.isNotEmpty
-          ? '${contact.name.last} ${contact.name.first}'
-          : contact.displayName;
+      final String displayName =
+          lastNameFirst && contact.name.last.isNotEmpty
+              ? '${contact.name.last} ${contact.name.first}'
+              : contact.displayName;
       if (displayName.isNotEmpty) {
         final firstLetter = displayName[0].toUpperCase();
         groupedContacts.putIfAbsent(firstLetter, () => []).add(contact);
@@ -177,8 +175,10 @@ class ContactListItem extends StatelessWidget {
       color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         onTap: onTap,
-        splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
-        highlightColor: Theme.of(context).colorScheme.primary.withValues(alpha: (0.05 * 255).round()),
+        splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        highlightColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withOpacity(0.6),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
@@ -206,7 +206,7 @@ class ContactListItem extends StatelessWidget {
                   size: 20,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: (0.4 * 255).round()),
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -222,7 +222,7 @@ class ContactListItem extends StatelessWidget {
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
       ),
       child: Center(
         child:
@@ -237,9 +237,9 @@ class ContactListItem extends StatelessWidget {
                 )
                 : Text(
                   (lastNameFirst && contact.name.last.isNotEmpty
-                          ? '${contact.name.last} ${contact.name.first}'
-                          : contact.displayName)
-                      .isNotEmpty
+                              ? '${contact.name.last} ${contact.name.first}'
+                              : contact.displayName)
+                          .isNotEmpty
                       ? (lastNameFirst && contact.name.last.isNotEmpty
                               ? contact.name.last[0]
                               : contact.displayName[0])

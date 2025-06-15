@@ -1,4 +1,3 @@
-import 'package:contactsafe/utils/color_extensions.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -102,15 +101,16 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   }
 
   CollectionReference<ContactFile> _contactFilesCollection() {
-    // Ensure widget.contact.id is not null or empty
-    if (widget.contact.id == null || widget.contact.id.isEmpty) {
+    final contactId = widget.contact.id;
+    if (contactId.isEmpty) {
       throw Exception(
-        "Contact ID is null or empty, cannot access Firestore collection.",
+        "Contact ID is empty, cannot access Firestore collection.",
       );
     }
+
     return _firestore
         .collection('contact_files_metadata')
-        .doc(widget.contact.id)
+        .doc(contactId)
         .collection('files')
         .withConverter<ContactFile>(
           fromFirestore: (snapshot, _) => ContactFile.fromFirestore(snapshot),
@@ -365,8 +365,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${file.name}');
       await tempFile.writeAsBytes(data);
-      await SharePlus.instance
-          .share(files: [XFile(tempFile.path)], text: file.name);
+      await Share.shareXFiles([XFile(tempFile.path)], text: file.name);
     } catch (e) {
       _showSnackBar('Failed to share file: ${e.toString()}');
     }
@@ -679,9 +678,9 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                       leading: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: _getFileIconColor(
-                            file.name.split('.').last,
-                          ).withValues(alpha: (0.2 * 255).round()),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
