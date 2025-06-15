@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 /// A reusable AppBar that keeps the [ContactSafe] title and logo perfectly
 /// centered regardless of the width of the leading widget or action buttons.
@@ -58,7 +59,7 @@ class ContactSafeAppBar extends StatelessWidget implements PreferredSizeWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'contactSafe',
+                          context.loc.translate('appTitle'),
                           style: theme.appBarTheme.titleTextStyle,
                         ),
                         const SizedBox(width: 5),

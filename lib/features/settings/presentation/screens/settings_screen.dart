@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../l10n/locale_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:contactsafe/features/settings/presentation/widgets/onboarding_screen.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
@@ -224,14 +227,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete All Data?'),
-          content: const Text(
+          title: Text(context.loc.translate('deleteAll') + ' Data?'),
+          content: Text(
             'Are you sure you want to delete ALL data from ContactSafe? This action cannot be undone.',
-          ),
+            ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
             ),
             FilledButton(
               onPressed: () {
@@ -242,7 +245,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               child: Text(
-                'Delete All',
+                context.loc.translate('deleteAll'),
                 style: TextStyle(color: Theme.of(context).colorScheme.onError),
               ),
             ),
@@ -396,9 +399,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showLanguageDialog() async {
     final selected = await showDialog<String>(
       context: context,
-      builder:
-          (context) => SimpleDialog(
-            title: const Text('Select Language'),
+      builder: (context) => SimpleDialog(
+            title: Text(context.loc.translate('language')),
             children: [
               SimpleDialogOption(
                 onPressed: () => Navigator.pop(context, 'en'),
@@ -418,6 +420,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (selected != null && mounted) {
       setState(() => _currentLanguage = selected);
       await _controller.saveLanguage(selected);
+      Provider.of<LocaleProvider>(context, listen: false)
+          .setLocale(Locale(selected));
     }
   }
 
@@ -431,7 +435,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'contactSafe',
+              context.loc.translate('appTitle'),
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,
@@ -478,7 +482,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Settings',
+                    context.loc.translate('settings'),
                     style: TextStyle(
                       fontSize: 31.0,
                       fontWeight: FontWeight.bold,
@@ -510,7 +514,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: (context) async => await openAppSettings(),
               ),
               SettingsTile.navigation(
-                title: const Text('Language'),
+                title: Text(context.loc.translate('language')),
                 trailing: Text(
                   _languageLabel(_currentLanguage),
                   style: TextStyle(

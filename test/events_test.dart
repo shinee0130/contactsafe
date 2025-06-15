@@ -6,6 +6,8 @@ import 'package:contactsafe/features/events/presentation/screens/events_screen.d
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +31,19 @@ void main() {
   });
 
   testWidgets('Events screen loads', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: EventsScreen()));
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('de'), Locale('mn')],
+        home: const EventsScreen(),
+      ),
+    );
     expect(find.text('Events'), findsOneWidget);
   });
 

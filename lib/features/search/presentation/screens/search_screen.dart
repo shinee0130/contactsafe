@@ -3,6 +3,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:intl/intl.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 import 'package:contactsafe/shared/widgets/customsearchbar.dart';
@@ -206,7 +207,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_searchResults.isEmpty) {
       return Center(
         child: Text(
-          'No results found',
+          context.loc.translate('noResults'),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontSize: 18,
@@ -380,7 +381,7 @@ class _SearchScreenState extends State<SearchScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'contactSafe',
+              context.loc.translate('appTitle'),
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -398,14 +399,16 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Search',
-              style: TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
+            Text(
+              context.loc.translate('search'),
+              style:
+                  const TextStyle(fontSize: 31.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContent,
+              hintText: context.loc.translate('search'),
             ),
             const SizedBox(height: 16.0),
             Expanded(child: _buildSearchResults()),
