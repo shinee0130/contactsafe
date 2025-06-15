@@ -399,26 +399,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _showLanguageDialog() async {
+    final options = [
+      {'code': 'en', 'label': 'English', 'icon': Icons.language},
+      {'code': 'de', 'label': 'German', 'icon': Icons.language},
+      {'code': 'mn', 'label': 'Mongolian', 'icon': Icons.language},
+    ];
     final selected = await showDialog<String>(
       context: context,
-      builder:
-          (context) => SimpleDialog(
-            title: Text(context.loc.translate('language')),
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              SimpleDialogOption(
-                onPressed: () => Navigator.pop(context, 'en'),
-                child: const Text('English'),
+              const SizedBox(height: 20),
+              Text(
+                AppLocalizations.of(context)!.language,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
-              SimpleDialogOption(
-                onPressed: () => Navigator.pop(context, 'de'),
-                child: const Text('German'),
+              const Divider(),
+              ...options.map((opt) {
+                final isSelected = opt['code'] == _currentLanguage;
+                return ListTile(
+                  leading: Icon(
+                    opt['icon'] as IconData,
+                    color:
+                        isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
+                  ),
+                  title: Text(opt['label'] as String),
+                  trailing:
+                      isSelected
+                          ? Icon(
+                            Icons.check_circle,
+                            color: Theme.of(context).colorScheme.primary,
+                          )
+                          : null,
+                  onTap: () => Navigator.pop(context, opt['code']),
+                  selected: isSelected,
+                );
+              }),
+              const SizedBox(height: 12),
+              TextButton(
+                child: Text(
+                  MaterialLocalizations.of(context).cancelButtonLabel,
+                ),
+                onPressed: () => Navigator.pop(context),
               ),
-              SimpleDialogOption(
-                onPressed: () => Navigator.pop(context, 'mn'),
-                child: const Text('Mongolian'),
-              ),
+              const SizedBox(height: 8),
             ],
           ),
+        );
+      },
     );
     if (selected != null && mounted) {
       setState(() => _currentLanguage = selected);
