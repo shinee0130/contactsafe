@@ -615,24 +615,24 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   }
 
   Color _getFileIconColor(String? extension) {
+    final colorScheme = Theme.of(context).colorScheme;
     switch (extension?.toLowerCase()) {
       case 'pdf':
-        return Colors.red;
+        return colorScheme.error;
       case 'jpg':
       case 'jpeg':
-        return Colors.blue;
       case 'png':
-        return Colors.blue;
+        return colorScheme.primary;
       case 'doc':
       case 'docx':
-        return Colors.blue.shade800;
+        return colorScheme.primary;
       case 'xls':
       case 'xlsx':
-        return Colors.green;
+        return colorScheme.secondary;
       case 'txt':
-        return Colors.grey;
+        return colorScheme.outline;
       default:
-        return Colors.blue;
+        return colorScheme.primary;
     }
   }
 
