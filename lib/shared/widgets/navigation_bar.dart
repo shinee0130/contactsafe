@@ -13,7 +13,6 @@ class ContactSafeNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
