@@ -309,7 +309,7 @@ class _SearchScreenState extends State<SearchScreen> {
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
       subtitle: Text(
-        'From: ${file.contactName}',
+        '${context.loc.translate('from')}: ${file.contactName}',
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
         ),
@@ -332,7 +332,7 @@ class _SearchScreenState extends State<SearchScreen> {
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
       subtitle: Text(
-        'From: ${note.contactName}',
+        '${context.loc.translate('from')}: ${note.contactName}',
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
         ),
