@@ -567,7 +567,10 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                   title: Text(_getSortOptionName(option)),
                   trailing:
                       _sortOption == option
-                          ? const Icon(Icons.check, color: Colors.blue)
+                          ? Icon(
+                              Icons.check,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
                           : null,
                   onTap: () {
                     setState(() {
@@ -680,12 +683,19 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.swap_vert, size: 30, color: Colors.blue),
+            icon: Icon(
+              Icons.swap_vert,
+              size: 30,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: _showSortDialog,
           ),
           if (_editMode)
@@ -707,14 +717,18 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
               child: const Text(
                 'Edit',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           IconButton(
-            icon: const Icon(Icons.add, size: 30, color: Colors.blue),
+            icon: Icon(
+              Icons.add,
+              size: 30,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: _isLoading ? null : _pickAndUploadFiles,
           ),
         ],
@@ -752,11 +766,18 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                   return Card(
                     elevation: 2,
                     margin: const EdgeInsets.only(bottom: 12),
-                    color: isSelected ? Colors.blue[50] : null,
+                    color: isSelected
+                        ? Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.1)
+                        : null,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: BorderSide(
-                        color: isSelected ? Colors.blue : Colors.grey[300]!,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey[300]!,
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
@@ -788,10 +809,12 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                       trailing:
                           _editMode
                               ? Checkbox(
-                                value: isSelected,
-                                onChanged: (value) => _toggleSelection(file.id),
-                                activeColor: Colors.blue,
-                              )
+                                  value: isSelected,
+                                  onChanged: (value) =>
+                                      _toggleSelection(file.id),
+                                  activeColor:
+                                      Theme.of(context).colorScheme.primary,
+                                )
                               : IconButton(
                                 icon: const Icon(
                                   Icons.more_vert,

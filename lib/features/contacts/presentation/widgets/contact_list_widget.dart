@@ -70,7 +70,7 @@ class ContactListWidget extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.blue, // iOS blue
+                          color: Theme.of(context).colorScheme.primary, // iOS blue
                         ),
                       ),
                     ),
@@ -132,7 +132,7 @@ class ContactListWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
-                                color: Colors.blue,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                           ),
@@ -242,7 +242,7 @@ class ContactListItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               )
               : null,

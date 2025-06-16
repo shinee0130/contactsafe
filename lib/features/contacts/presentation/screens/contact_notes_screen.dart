@@ -167,7 +167,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -216,7 +216,8 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -256,12 +257,19 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
           ],
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, size: 30, color: Colors.blue),
+            icon: Icon(
+              Icons.add,
+              size: 30,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: () {
               _noteController.clear();
               _editingIndex = -1;

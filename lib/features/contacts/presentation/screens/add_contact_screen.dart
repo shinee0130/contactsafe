@@ -290,14 +290,18 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         fit: BoxFit.cover,
                       ),
                     )
-                    : Icon(Icons.person_outline, size: 48, color: Colors.blue),
+                    : Icon(
+                        Icons.person_outline,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
           ),
         ),
         const SizedBox(height: 8),
         Text(
           _selectedPhoto != null ? 'Change picture' : 'Add picture',
           style: TextStyle(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -544,7 +548,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
-            side: BorderSide(color: Colors.blue, width: 1),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 1,
+            ),
           ),
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
           minimumSize: const Size(double.infinity, 50),
@@ -553,7 +560,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: Colors.blue),
+            Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 16),
             Text(
               text,
@@ -591,7 +601,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.blue),
+          icon: Icon(
+            Icons.close,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -617,7 +630,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
             child: Text(
               'Save',
               style: TextStyle(
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -976,20 +989,21 @@ class _AddContactScreenState extends State<AddContactScreen> {
               onPressed: onAdd,
               icon: Icon(
                 Icons.add_circle_outline,
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.primary,
                 size: 22,
               ),
               label: Text(
                 'Add $label',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                   fontSize: 15,
                 ),
               ),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue,
-                backgroundColor: Colors.blue.withOpacity(0.08),
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                backgroundColor:
+                    Theme.of(context).colorScheme.primary.withOpacity(0.08),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

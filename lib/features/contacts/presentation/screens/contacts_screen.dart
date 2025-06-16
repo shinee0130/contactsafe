@@ -211,10 +211,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
             onPressed: _navigateToGroups,
             child: Text(
               context.loc.translate('group'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -231,7 +231,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   ).colorScheme.primary.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.add, color: Colors.blue, size: 24),
+                child: Icon(
+                  Icons.add,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
               ),
               onPressed: _addNewContact,
             ),

@@ -144,14 +144,17 @@ class _AssignContactsToGroupScreenState
         centerTitle: true,
         title: Text(
           'Assign to "${widget.groupName}"',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.bold,
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.blue),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -162,7 +165,7 @@ class _AssignContactsToGroupScreenState
             child: const Text(
               'Save',
               style: TextStyle(
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -209,7 +212,8 @@ class _AssignContactsToGroupScreenState
                                 onChanged: (bool? value) {
                                   _toggleContactSelection(contact);
                                 },
-                                activeColor: Colors.blue,
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4.0),
                                 ),
@@ -245,7 +249,7 @@ class _AssignContactsToGroupScreenState
                                 contact.displayName,
                                 style: TextStyle(
                                   fontSize: 17.0,
-                                  color: Colors.blue,
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontWeight:
                                       isSelected
                                           ? FontWeight.w600
