@@ -301,8 +301,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
         const SizedBox(height: 8),
         Text(
           _selectedPhoto != null
-              ? context.loc.translate('changePicture')
-              : context.loc.translate('addPicture'),
+              ? context.loc.changePicture
+              : context.loc.addPicture,
           style: TextStyle(
             color: Theme.of(context).colorScheme.primary,
             fontSize: 16,
@@ -438,7 +438,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       child: IntlPhoneField(
                         initialValue: _phoneNumbers[index],
                         decoration: InputDecoration(
-                          hintText: context.loc.translate('enterPhoneNumber'),
+                          hintText: context.loc.enterPhoneNumber,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide(
@@ -517,7 +517,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               ), // Grey icon
               label: Text(
-                context.loc.translate('addPhone'),
+                context.loc.addPhone,
                 style: TextStyle(
                   color: Theme.of(
                     context,
@@ -683,7 +683,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
             if (_emailControllers.isEmpty)
               _buildAddButton(
                 icon: Icons.email_outlined,
-                text: context.loc.translate('addEmail'),
+                text: context.loc.addEmail,
                 onPressed: () {
                   setState(() {
                     _emailControllers.add(TextEditingController());
@@ -766,7 +766,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
             if (_addressControllers.isEmpty)
               _buildAddButton(
                 icon: Icons.location_on_outlined,
-                text: context.loc.translate('addAddress'),
+                text: context.loc.addAddress,
                 onPressed: () {
                   setState(() {
                     _addressControllers.add(TextEditingController());
@@ -901,8 +901,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       decoration: InputDecoration(
                         hintText:
                             label == 'Email'
-                                ? context.loc.translate('exampleEmail')
-                                : context.loc.translate('enterAddress'),
+                                ? context.loc.exampleEmail
+                                : context.loc.enterAddress,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           borderSide: BorderSide(

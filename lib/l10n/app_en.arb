@@ -285,6 +285,6 @@
   "create_a_4_digit_pin": "Create a 4-digit PIN",
   "confirm_your_pin": "Confirm your PIN",
   "enter_your_pin": "Enter your PIN",
-  "incorrect_pin_try_again": "Incorrect PIN. Please try again."
+  "incorrect_pin_try_again": "Incorrect PIN. Please try again.",
   "exampleContent": "Example content"
 }

@@ -29,9 +29,8 @@ class ContactSafeAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(
-        kToolbarHeight + (bottom?.preferredSize.height ?? 0),
-      );
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
 
   @override
   Widget build(BuildContext context) {
@@ -50,16 +49,13 @@ class ContactSafeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 alignment: Alignment.center,
                 children: [
                   if (leading != null)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: leading,
-                    ),
+                    Align(alignment: Alignment.centerLeft, child: leading),
                   Center(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          context.loc.translate('appTitle'),
+                          context.loc.appTitle,
                           style: theme.appBarTheme.titleTextStyle,
                         ),
                         const SizedBox(width: 5),

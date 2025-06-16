@@ -35,7 +35,7 @@ class _SelectTabBarOrderScreenState extends State<SelectTabBarOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.loc.translate('select_tabbar_order_title')),
+        title: Text(context.loc.select_tabbar_order_title),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
@@ -55,7 +55,7 @@ class _SelectTabBarOrderScreenState extends State<SelectTabBarOrderScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: ListTile(
               leading: Icon(item.icon),
-              title: Text(context.loc.translate(item.label)),
+              title: Text(context.loc.item.label),
               trailing: const Icon(Icons.drag_handle), // Drag handle icon
             ),
           );

@@ -1,8 +1,8 @@
 import 'package:contactsafe/features/contacts/presentation/provider/contacts_provider.dart';
 import 'package:contactsafe/features/contacts/presentation/widgets/contact_list_widget.dart';
 import 'package:contactsafe/features/settings/controller/settings_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:contactsafe/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/assign_contacts_to_group_screen.dart'
     show globalContactGroupsMap;
@@ -188,7 +188,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              context.loc.translate('appTitle'),
+              context.loc.appTitle,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -210,7 +210,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             ),
             onPressed: _navigateToGroups,
             child: Text(
-              context.loc.translate('group'),
+              context.loc.group,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -249,7 +249,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           children: [
             const SizedBox(height: 16),
             Text(
-              context.loc.translate('contacts'),
+              context.loc.contacts,
               style: TextStyle(
                 fontSize: 32.0,
                 fontWeight: FontWeight.w500,
@@ -260,7 +260,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContacts,
-              hintText: context.loc.translate('search'),
+              hintText: context.loc.search,
             ),
             const SizedBox(height: 24),
             Expanded(

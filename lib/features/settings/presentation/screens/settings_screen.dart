@@ -10,7 +10,6 @@ import 'package:contactsafe/features/settings/presentation/screens/select_tab_ba
 import 'package:contactsafe/features/settings/presentation/widgets/onboarding_screen.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
-
 import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/l10n/locale_provider.dart';
 
@@ -66,12 +65,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final Uri url = Uri.parse(urlString);
     final success = await launchUrl(url);
     if (!success && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(context.loc.translate('could_not_open_url').replaceFirst('{url}', urlString)),
+          content: Text(
+            context.loc.could_not_open_url.replaceFirst('{url}', urlString),
+          ),
         ),
       );
     }
@@ -80,28 +78,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importContacts() async {
     try {
       final count = await _controller.importContacts();
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc
-                .translate('successfully_imported_contacts')
-                .replaceFirst('{count}', '$count'),
+            context.loc.successfully_imported_contacts.replaceFirst(
+              '{count}',
+              '$count',
+            ),
           ),
         ),
       );
     } catch (e) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('error_importing_contacts').replaceFirst('{error}', e.toString()),
+            context.loc.error_importing_contacts.replaceFirst(
+              '{error}',
+              e.toString(),
+            ),
           ),
         ),
       );
@@ -117,9 +113,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc
-                .translate('backup_created_successfully')
-                .replaceFirst('{fileName}', fileName),
+            context.loc.backup_created_successfully.replaceFirst(
+              '{fileName}',
+              fileName,
+            ),
           ),
         ),
       );
@@ -127,12 +124,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('failed_to_create_backup').replaceFirst('{error}', e.toString()),
+            context.loc
+                .translate('failed_to_create_backup')
+                .replaceFirst('{error}', e.toString()),
           ),
         ),
       );
@@ -160,12 +157,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('failed_to_restore_backup').replaceFirst('{error}', e.toString()),
+            context.loc
+                .translate('failed_to_restore_backup')
+                .replaceFirst('{error}', e.toString()),
           ),
         ),
       );
@@ -179,18 +176,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.loc.translate('backup_uploaded_to_google_drive'))),
+        SnackBar(content: Text(context.loc.backup_uploaded_to_google_drive)),
       );
     } catch (e) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('backup_failed').replaceFirst('{error}', e.toString()),
+            context.loc.backup_failed.replaceFirst('{error}', e.toString()),
           ),
         ),
       );
@@ -206,9 +201,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc
-                .translate('restored_contacts_from_google_drive')
-                .replaceFirst('{count}', '$count'),
+            context.loc.restored_contacts_from_google_drive.replaceFirst(
+              '{count}',
+              '$count',
+            ),
           ),
         ),
       );
@@ -216,12 +212,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('restore_failed').replaceFirst('{error}', e.toString()),
+            context.loc.restore_failed.replaceFirst('{error}', e.toString()),
           ),
         ),
       );
@@ -237,9 +231,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc
-                .translate('imported_contacts_from_link')
-                .replaceFirst('{count}', '$count'),
+            context.loc.imported_contacts_from_link.replaceFirst(
+              '{count}',
+              '$count',
+            ),
           ),
         ),
       );
@@ -247,12 +242,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('import_failed').replaceFirst('{error}', e.toString()),
+            context.loc.import_failed.replaceFirst('{error}', e.toString()),
           ),
         ),
       );
@@ -266,7 +259,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) {
         final controller = TextEditingController();
         return AlertDialog(
-          title: Text(context.loc.translate('enter_backup_link')),
+          title: Text(context.loc.enter_backup_link),
           content: TextField(
             controller: controller,
             decoration: const InputDecoration(hintText: 'https://...'),
@@ -283,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 url = controller.text.trim();
                 Navigator.of(context).pop();
               },
-              child: Text(context.loc.translate('import')),
+              child: Text(context.loc.import),
             ),
           ],
         );
@@ -300,10 +293,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(context.loc.translate('delete_all_data')),
-          content: Text(
-            context.loc.translate('delete_all_data_confirm'),
-          ),
+          title: Text(context.loc.delete_all_data),
+          content: Text(context.loc.delete_all_data_confirm),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -318,7 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               child: Text(
-                context.loc.translate('deleteAll'),
+                context.loc.deleteAll,
                 style: TextStyle(color: Theme.of(context).colorScheme.onError),
               ),
             ),
@@ -334,19 +325,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.loc.translate('all_app_data_deleted'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.loc.all_app_data_deleted)));
     } catch (e) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.translate('failed_to_delete_all_data').replaceFirst('{error}', e.toString()),
+            context.loc.failed_to_delete_all_data.replaceFirst(
+              '{error}',
+              e.toString(),
+            ),
           ),
         ),
       );
@@ -361,10 +353,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // First PIN entry
     pin = await showDialog<String>(
       context: context,
-      builder: (context) => PinDialog(
-        title: context.loc.translate('create_a_4_digit_pin'),
-        error: error,
-      ),
+      builder:
+          (context) =>
+              PinDialog(title: context.loc.create_a_4_digit_pin, error: error),
     );
 
     if (pin == null) {
@@ -374,10 +365,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Confirm PIN
     confirmPin = await showDialog<String>(
       context: context,
-      builder: (context) => PinDialog(
-        title: context.loc.translate('confirm_your_pin'),
-        error: error,
-      ),
+      builder:
+          (context) =>
+              PinDialog(title: context.loc.confirm_your_pin, error: error),
     );
 
     if (confirmPin == null) {
@@ -388,9 +378,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) {
         return null; // Check if the widget is still mounted
       }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.loc.translate('pins_do_not_match'))),
-        );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.loc.pins_do_not_match)));
       return await _showCreatePinDialog(); // Recursive call to retry
     }
 
@@ -407,21 +397,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String? error;
 
     while (!verified) {
-        final enteredPin = await showDialog<String>(
-          context: context,
-          builder: (context) => PinDialog(
-            title: context.loc.translate('enter_your_pin'),
-            error: error,
-          ),
-        );
+      final enteredPin = await showDialog<String>(
+        context: context,
+        builder:
+            (context) =>
+                PinDialog(title: context.loc.enter_your_pin, error: error),
+      );
 
       if (enteredPin == null) {
         return false;
       }
 
       verified = await _controller.verifyPin(enteredPin);
-        if (!verified) {
-          error = context.loc.translate('incorrect_pin_try_again');
+      if (!verified) {
+        error = context.loc.incorrect_pin_try_again;
       }
     }
 
@@ -440,10 +429,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (!mounted) {
             return;
           }
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(
-            SnackBar(content: Text(context.loc.translate('biometrics_enabled'))),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.loc.biometrics_enabled)),
           );
         } else {
           if (!mounted) {
@@ -451,8 +438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content:
-                  Text(context.loc.translate('authentication_failed_or_canceled')),
+              content: Text(context.loc.authentication_failed_or_canceled),
             ),
           );
         }
@@ -462,7 +448,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           return;
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.loc.translate('no_biometrics_available'))),
+          SnackBar(content: Text(context.loc.no_biometrics_available)),
         );
       }
     } else {
@@ -473,9 +459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(content: Text(context.loc.translate('biometrics_disabled'))),
-      );
+      ).showSnackBar(SnackBar(content: Text(context.loc.biometrics_disabled)));
     }
   }
 
@@ -570,7 +554,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              context.loc.translate('appTitle'),
+              context.loc.appTitle,
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,
@@ -617,7 +601,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    context.loc.translate('settings'),
+                    context.loc.settings,
                     style: TextStyle(
                       fontSize: 31.0,
                       fontWeight: FontWeight.bold,
@@ -631,7 +615,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SettingsSection(
             title: Text(
-              context.loc.translate('privacy'),
+              context.loc.privacy,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -639,7 +623,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             tiles: [
               SettingsTile.navigation(
-                title: Text(context.loc.translate('open_in_settings_app')),
+                title: Text(context.loc.open_in_settings_app),
                 trailing: Icon(
                   Icons.chevron_right,
                   color: Theme.of(
@@ -649,7 +633,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: (context) async => await openAppSettings(),
               ),
               SettingsTile.navigation(
-                title: Text(context.loc.translate('language')),
+                title: Text(context.loc.language),
                 trailing: Text(
                   _languageLabel(_currentLanguage),
                   style: TextStyle(
@@ -662,7 +646,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SettingsSection(
             title: Text(
-              context.loc.translate('about'),
+              context.loc.about,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -670,7 +654,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             tiles: [
               SettingsTile.navigation(
-                title: Text(context.loc.translate('version')),
+                title: Text(context.loc.version),
                 trailing: Text(
                   '1.0.1 (90)',
                   style: TextStyle(
@@ -681,7 +665,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: (context) {},
               ),
               SettingsTile.navigation(
-                title: Text(context.loc.translate('imprint')),
+                title: Text(context.loc.imprint),
                 trailing: Icon(
                   Icons.open_in_new,
                   color: Theme.of(
@@ -694,7 +678,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
               ),
               SettingsTile.navigation(
-                title: Text(context.loc.translate('privacy_policy')),
+                title: Text(context.loc.privacy_policy),
                 trailing: Icon(
                   Icons.open_in_new,
                   color: Theme.of(
@@ -718,7 +702,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             tiles: [
               SettingsTile.switchTile(
-                title: Text(context.loc.translate('sort_by_first_name')),
+                title: Text(context.loc.sort_by_first_name),
                 initialValue: _sortByFirstName,
                 onToggle: (value) async {
                   setState(() => _sortByFirstName = value);
@@ -726,7 +710,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               SettingsTile.switchTile(
-                title: Text(context.loc.translate('last_name_first')),
+                title: Text(context.loc.last_name_first),
                 initialValue: _lastNameFirst,
                 onToggle: (value) async {
                   setState(() => _lastNameFirst = value);
@@ -738,7 +722,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           //------------------------------------------------------------------------------------
           SettingsSection(
             title: Text(
-              context.loc.translate('data_management'),
+              context.loc.data_management,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -749,7 +733,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('import_contacts'),
+                    context.loc.import_contacts,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -761,7 +745,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('create_backup'),
+                    context.loc.create_backup,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -773,7 +757,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('restore_from_backup'),
+                    context.loc.restore_from_backup,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -785,7 +769,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('backup_to_google_drive'),
+                    context.loc.backup_to_google_drive,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -797,7 +781,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('restore_from_google_drive'),
+                    context.loc.restore_from_google_drive,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -809,7 +793,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('import_backup_from_link'),
+                    context.loc.import_backup_from_link,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -827,7 +811,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           //------------------------------------------------------------------------------------
           SettingsSection(
             title: Text(
-              context.loc.translate('app_customization_and_reset'),
+              context.loc.app_customization_and_reset,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -838,7 +822,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('onboard_tour'),
+                    context.loc.onboard_tour,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -856,7 +840,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('select_tabbar_order'),
+                    context.loc.select_tabbar_order,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -879,11 +863,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return;
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          context.loc.translate('tabbar_order_updated'),
-                        ),
-                      ),
+                      SnackBar(content: Text(context.loc.tabbar_order_updated)),
                     );
                   }
                 },
@@ -892,7 +872,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 title: Center(
                   child: Text(
-                    context.loc.translate('delete_all_app_data'),
+                    context.loc.delete_all_app_data,
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -903,7 +883,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           //------------------------------------------------------------------------------------
           SettingsSection(
             title: Text(
-              context.loc.translate('security'),
+              context.loc.security,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -911,7 +891,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             tiles: [
               SettingsTile.switchTile(
-                title: Text(context.loc.translate('use_pin')),
+                title: Text(context.loc.use_pin),
                 initialValue: _usePass,
                 onToggle: (value) async {
                   if (value) {
@@ -925,7 +905,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         return;
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(context.loc.translate('pin_enabled'))),
+                        SnackBar(content: Text(context.loc.pin_enabled)),
                       );
                     } else {
                       setState(() => _usePass = false);
@@ -935,7 +915,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            context.loc.translate('pin_setup_canceled_or_invalid'),
+                            context.loc.pin_setup_canceled_or_invalid,
                           ),
                         ),
                       );
@@ -951,21 +931,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         return;
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(context.loc.translate('pin_disabled'))),
+                        SnackBar(content: Text(context.loc.pin_disabled)),
                       );
                     }
                   }
                 },
               ),
               SettingsTile.switchTile(
-                title: Text(context.loc.translate('use_biometrics')),
+                title: Text(context.loc.use_biometrics),
                 initialValue: _useFaceId,
                 onToggle: _handleBiometricToggle,
               ),
               if (_usePass)
                 SettingsTile.navigation(
                   title: Text(
-                    context.loc.translate('change_pin'),
+                    context.loc.change_pin,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -980,7 +960,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(context.loc.translate('pin_changed_successfully'))),
+                          SnackBar(
+                            content: Text(context.loc.pin_changed_successfully),
+                          ),
                         );
                       } else {
                         if (!mounted) {
@@ -989,7 +971,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              context.loc.translate('pin_change_canceled_or_invalid'),
+                              context.loc.pin_change_canceled_or_invalid,
                             ),
                           ),
                         );
@@ -1007,7 +989,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 left: 16.0,
               ),
               child: Text(
-                context.loc.translate('powered_by_inappsettingkit'),
+                context.loc.powered_by_inappsettingkit,
                 style: TextStyle(
                   fontSize: 12.0,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -28,23 +28,23 @@ class ContactSafeNavigationBar extends StatelessWidget {
       items: [
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.person_2),
-          label: context.loc.translate('contacts'),
+          label: context.loc.contacts,
         ),
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.search),
-          label: context.loc.translate('search'),
+          label: context.loc.search,
         ),
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.calendar),
-          label: context.loc.translate('events'),
+          label: context.loc.events,
         ),
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.photo),
-          label: context.loc.translate('photos'),
+          label: context.loc.photos,
         ),
         BottomNavigationBarItem(
           icon: const Icon(CupertinoIcons.settings),
-          label: context.loc.translate('settings'),
+          label: context.loc.settings,
         ),
       ],
     );

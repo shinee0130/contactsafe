@@ -1,3 +1,4 @@
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,7 +9,6 @@ import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 import 'package:contactsafe/features/events/presentation/screens/location_picker_screen.dart';
-import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
@@ -283,7 +283,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          context.loc.translate('newEvent'),
+                          context.loc.newEvent,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -308,7 +308,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         ListTile(
                           title: Text(
                             selectedDate == null
-                                ? context.loc.translate('selectDate')
+                                ? context.loc.selectDate
                                 : 'Date: ${DateFormat.yMMMd().format(selectedDate!)}',
                           ),
                           trailing: const Icon(Icons.calendar_today),
@@ -564,7 +564,7 @@ class _EventsScreenState extends State<EventsScreen> {
           children: [
             const SizedBox(width: 10.0),
             Text(
-              context.loc.translate('appTitle'),
+              context.loc.appTitle,
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,
@@ -601,7 +601,7 @@ class _EventsScreenState extends State<EventsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.loc.translate('events'),
+              context.loc.events,
               style: TextStyle(
                 fontSize: 31.0,
                 fontWeight: FontWeight.bold,
@@ -612,7 +612,7 @@ class _EventsScreenState extends State<EventsScreen> {
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterEvents,
-              hintText: context.loc.translate('search'),
+              hintText: context.loc.search,
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -620,7 +620,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   _filteredEvents.isEmpty && _events.isEmpty
                       ? Center(
                         child: Text(
-                          context.loc.translate('noResults'),
+                          context.loc.noResults,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -7,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
-import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
@@ -210,7 +210,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_searchResults.isEmpty) {
       return Center(
         child: Text(
-          context.loc.translate('noResults'),
+          context.loc.noResults,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontSize: 18,
@@ -309,7 +309,7 @@ class _SearchScreenState extends State<SearchScreen> {
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
       subtitle: Text(
-        '${context.loc.translate('from')}: ${file.contactName}',
+        '${context.loc.from}: ${file.contactName}',
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
         ),
@@ -332,7 +332,7 @@ class _SearchScreenState extends State<SearchScreen> {
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
       subtitle: Text(
-        '${context.loc.translate('from')}: ${note.contactName}',
+        '${context.loc.from}: ${note.contactName}',
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
         ),
@@ -384,7 +384,7 @@ class _SearchScreenState extends State<SearchScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              context.loc.translate('appTitle'),
+              context.loc.appTitle,
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -403,7 +403,7 @@ class _SearchScreenState extends State<SearchScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.loc.translate('search'),
+              context.loc.search,
               style: const TextStyle(
                 fontSize: 31.0,
                 fontWeight: FontWeight.bold,
@@ -413,7 +413,7 @@ class _SearchScreenState extends State<SearchScreen> {
             CustomSearchBar(
               controller: _searchController,
               onChanged: _filterContent,
-              hintText: context.loc.translate('search'),
+              hintText: context.loc.search,
             ),
             const SizedBox(height: 16.0),
             Expanded(child: _buildSearchResults()),

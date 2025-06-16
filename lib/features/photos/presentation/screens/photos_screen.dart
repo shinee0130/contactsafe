@@ -1,8 +1,8 @@
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
 class PhotosScreen extends StatefulWidget {
@@ -119,7 +119,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                context.loc.translate('noPhotos'),
+                context.loc.noPhotos,
                 style: TextStyle(
                   fontSize: 18,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -183,7 +183,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
           children: [
             const SizedBox(width: 10),
             Text(
-              context.loc.translate('appTitle'),
+              context.loc.appTitle,
               style: TextStyle(
                 fontSize: 16.5,
                 fontWeight: FontWeight.bold,
@@ -201,7 +201,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.loc.translate('photos'),
+              context.loc.photos,
               style: const TextStyle(
                 fontSize: 31.0,
                 fontWeight: FontWeight.bold,
