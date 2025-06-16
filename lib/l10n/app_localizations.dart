@@ -308,6 +308,38 @@ abstract class AppLocalizations {
         return 'Enter backup link';
       case 'import':
         return 'Import';
+      case 'addAddress':
+        return 'Add address';
+      case 'addEmail':
+        return 'Add email';
+      case 'addPhone':
+        return 'Add phone';
+      case 'addPicture':
+        return 'Add picture';
+      case 'changePicture':
+        return 'Change picture';
+      case 'delete_all_data':
+        return 'Delete All Data?';
+      case 'delete_all_data_confirm':
+        return 'Are you sure you want to delete ALL data from ContactSafe? This action cannot be undone.';
+      case 'done':
+        return 'Done';
+      case 'enterAddress':
+        return 'Enter address';
+      case 'enterPhoneNumber':
+        return 'Enter phone number';
+      case 'exampleContent':
+        return 'Example content';
+      case 'exampleEmail':
+        return 'example@email.com';
+      case 'from':
+        return 'From';
+      case 'newEvent':
+        return 'New Event';
+      case 'selectDate':
+        return 'Select Date';
+      case 'skip':
+        return 'Skip';
       default:
         return key;
     }
