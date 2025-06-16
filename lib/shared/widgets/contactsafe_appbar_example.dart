@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'contactsafe_appbar.dart';
 
 /// Example screen demonstrating the [ContactSafeAppBar].
@@ -24,8 +25,8 @@ class ContactSafeAppBarExample extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text('Example content'),
+      body: Center(
+        child: Text(context.loc.translate('exampleContent')),
       ),
     );
   }

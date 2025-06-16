@@ -114,6 +114,7 @@
   "couldNotOpenFile": "Could not open file",
   "groups": "Groups",
   "done": "Done",
+  "skip": "Skip",
   "selectAllGroups": "Select all groups",
   "newGroup": "New Group",
   "enterNewGroup": "Enter the name for your new group:",
@@ -285,4 +286,5 @@
   "confirm_your_pin": "Confirm your PIN",
   "enter_your_pin": "Enter your PIN",
   "incorrect_pin_try_again": "Incorrect PIN. Please try again."
+  ,"exampleContent": "Example content"
 }

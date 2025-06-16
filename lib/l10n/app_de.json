@@ -114,6 +114,7 @@
   "couldNotOpenFile": "Datei konnte nicht geöffnet werden",
   "groups": "Gruppen",
   "done": "Fertig",
+  "skip": "Überspringen",
   "selectAllGroups": "Alle Gruppen auswählen",
   "newGroup": "Neue Gruppe",
   "enterNewGroup": "Geben Sie den Namen für die neue Gruppe ein:",
@@ -284,5 +285,6 @@
   "create_a_4_digit_pin": "Erstellen Sie eine 4-stellige PIN",
   "confirm_your_pin": "Bestätigen Sie Ihre PIN",
   "enter_your_pin": "PIN eingeben",
-  "incorrect_pin_try_again": "PIN ist falsch. Bitte erneut versuchen."
+  "incorrect_pin_try_again": "PIN ist falsch. Bitte erneut versuchen.",
+  "exampleContent": "Beispielinhalt"
 }

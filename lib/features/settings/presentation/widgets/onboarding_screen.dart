@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:contactsafe/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -45,7 +46,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Navigator.of(context).pop(); // Skip/Done button
             },
             child: Text(
-              _currentPage == _onboardingImages.length - 1 ? 'Done' : 'Skip',
+              _currentPage == _onboardingImages.length - 1
+                  ? context.loc.translate('done')
+                  : context.loc.translate('skip'),
               style: TextStyle(color: Theme.of(context).primaryColor),
             ),
           ),
