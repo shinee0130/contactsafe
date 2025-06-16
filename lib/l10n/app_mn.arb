@@ -284,5 +284,7 @@
   "create_a_4_digit_pin": "4 оронтой PIN үүсгэнэ үү",
   "confirm_your_pin": "PIN-ээ баталгаажуулна уу",
   "enter_your_pin": "PIN оруулна уу",
-  "incorrect_pin_try_again": "PIN буруу байна. Дахин оролдоно уу."
+  "incorrect_pin_try_again": "PIN буруу байна. Дахин оролдоно уу.",
+  "skip": "Алгасах",
+  "exampleContent": "Жишээ агуулга"
 }
