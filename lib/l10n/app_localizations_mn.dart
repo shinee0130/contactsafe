@@ -9,10 +9,10 @@ class AppLocalizationsMn extends AppLocalizations {
   AppLocalizationsMn([String locale = 'mn']) : super(locale);
 
   @override
-  String get appTitle => 'ХолбооSafe';
+  String get appTitle => 'contactSafe';
 
   @override
-  String get contacts => 'Холбоо';
+  String get contacts => 'Контакт';
 
   @override
   String get search => 'Хайх';
@@ -30,7 +30,7 @@ class AppLocalizationsMn extends AppLocalizations {
   String get group => 'Бүлэг';
 
   @override
-  String get noPhotos => 'Зураг алга';
+  String get noPhotos => 'Зураг олдсонгүй';
 
   @override
   String get deleteAll => 'Бүгдийг устгах';
@@ -40,4 +40,7 @@ class AppLocalizationsMn extends AppLocalizations {
 
   @override
   String get noResults => 'Үр дүн олдсонгүй';
+
+  @override
+  String get Location => 'Байршил';
 }

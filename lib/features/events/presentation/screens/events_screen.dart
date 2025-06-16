@@ -283,7 +283,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'New Event',
+                          context.loc.translate('newEvent'),
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -308,7 +308,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         ListTile(
                           title: Text(
                             selectedDate == null
-                                ? 'Select Date'
+                                ? context.loc.translate('selectDate')
                                 : 'Date: ${DateFormat.yMMMd().format(selectedDate!)}',
                           ),
                           trailing: const Icon(Icons.calendar_today),
