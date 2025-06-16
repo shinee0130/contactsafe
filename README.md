@@ -11,6 +11,13 @@ ContactSafe is a Flutter application for securely managing your contacts, notes,
   - Xcode for iOS builds.
   - A supported browser such as Chrome for web builds.
 
+## Localization
+
+Translation files live under `lib/l10n`. English, German and Mongolian strings
+are provided as both `.arb` and `.json` files. You can switch languages from the
+settings screen. To add a new language simply create another ARB/JSON file in
+that directory and rebuild the app.
+
 ## Running Tests
 
 Execute all unit and widget tests with:

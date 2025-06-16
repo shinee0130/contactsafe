@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NavigationItem {
+  /// Localization key for this navigation label
   final String label;
   final String iconName; // icon-г нэрээр хадгална
   final String routeName;
@@ -45,31 +46,31 @@ class NavigationItem {
   static List<NavigationItem> defaultItems() {
     return const [
       NavigationItem(
-        label: 'Contacts',
+        label: 'contacts',
         iconName: 'person',
         routeName: '/contacts',
         initialIndex: 0,
       ),
       NavigationItem(
-        label: 'Search',
+        label: 'search',
         iconName: 'search',
         routeName: '/search',
         initialIndex: 1,
       ),
       NavigationItem(
-        label: 'Events',
+        label: 'events',
         iconName: 'event',
         routeName: '/events',
         initialIndex: 2,
       ),
       NavigationItem(
-        label: 'Photos',
+        label: 'photos',
         iconName: 'photo_library',
         routeName: '/photos',
         initialIndex: 3,
       ),
       NavigationItem(
-        label: 'Settings',
+        label: 'settings',
         iconName: 'settings',
         routeName: '/settings',
         initialIndex: 4,

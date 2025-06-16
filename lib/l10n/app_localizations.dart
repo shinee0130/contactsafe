@@ -192,6 +192,122 @@ abstract class AppLocalizations {
         return language;
       case 'noResults':
         return noResults;
+      case 'privacy':
+        return 'Privacy';
+      case 'open_in_settings_app':
+        return 'Open in "Settings" app';
+      case 'about':
+        return 'About';
+      case 'version':
+        return 'Version';
+      case 'imprint':
+        return 'Imprint';
+      case 'privacy_policy':
+        return 'Privacy Policy';
+      case 'general':
+        return 'General';
+      case 'sort_by_first_name':
+        return 'Sort by first name';
+      case 'last_name_first':
+        return 'Last name first';
+      case 'data_management':
+        return 'Data Management';
+      case 'import_contacts':
+        return 'Import contacts';
+      case 'create_backup':
+        return 'Create backup';
+      case 'restore_from_backup':
+        return 'Restore from backup';
+      case 'backup_to_google_drive':
+        return 'Backup to Google Drive';
+      case 'restore_from_google_drive':
+        return 'Restore from Google Drive';
+      case 'import_backup_from_link':
+        return 'Import backup from link';
+      case 'app_customization_and_reset':
+        return 'App Customization & Reset';
+      case 'onboard_tour':
+        return 'Onboard Tour';
+      case 'select_tabbar_order':
+        return 'Select TabBar order';
+      case 'select_tabbar_order_title':
+        return 'Select TabBar Order';
+      case 'delete_all_app_data':
+        return 'Delete all app data';
+      case 'security':
+        return 'Security';
+      case 'use_pin':
+        return 'Use PIN';
+      case 'use_biometrics':
+        return 'Use Biometrics (Face ID/Fingerprint)';
+      case 'change_pin':
+        return 'Change PIN';
+      case 'powered_by_inappsettingkit':
+        return 'Powered by InAppSettingKit';
+      case 'tabbar_order_updated':
+        return 'TabBar order updated successfully!';
+      case 'could_not_open_url':
+        return 'Could not open {url}';
+      case 'successfully_imported_contacts':
+        return 'Successfully imported {count} contacts!';
+      case 'error_importing_contacts':
+        return 'Error importing contacts: {error}';
+      case 'backup_created_successfully':
+        return 'Backup created successfully at {fileName}';
+      case 'failed_to_create_backup':
+        return 'Failed to create backup: {error}';
+      case 'restored_contacts_from_backup':
+        return 'Restored {count} contacts from backup!';
+      case 'failed_to_restore_backup':
+        return 'Failed to restore backup: {error}';
+      case 'backup_uploaded_to_google_drive':
+        return 'Backup uploaded to Google Drive';
+      case 'backup_failed':
+        return 'Backup failed: {error}';
+      case 'restored_contacts_from_google_drive':
+        return 'Restored {count} contacts from Google Drive';
+      case 'restore_failed':
+        return 'Restore failed: {error}';
+      case 'imported_contacts_from_link':
+        return 'Imported {count} contacts from link';
+      case 'import_failed':
+        return 'Import failed: {error}';
+      case 'all_app_data_deleted':
+        return 'All application data has been deleted.';
+      case 'failed_to_delete_all_data':
+        return 'Failed to delete all data: {error}';
+      case 'pin_enabled':
+        return 'PIN enabled.';
+      case 'pin_setup_canceled_or_invalid':
+        return 'PIN setup canceled or invalid.';
+      case 'pin_disabled':
+        return 'PIN disabled.';
+      case 'pin_changed_successfully':
+        return 'PIN changed successfully';
+      case 'pin_change_canceled_or_invalid':
+        return 'PIN change canceled or invalid.';
+      case 'biometrics_enabled':
+        return 'Biometrics enabled.';
+      case 'authentication_failed_or_canceled':
+        return 'Authentication failed or canceled.';
+      case 'no_biometrics_available':
+        return 'No biometrics available.';
+      case 'biometrics_disabled':
+        return 'Biometrics disabled.';
+      case 'pins_do_not_match':
+        return 'PINs do not match. Please try again.';
+      case 'create_a_4_digit_pin':
+        return 'Create a 4-digit PIN';
+      case 'confirm_your_pin':
+        return 'Confirm your PIN';
+      case 'enter_your_pin':
+        return 'Enter your PIN';
+      case 'incorrect_pin_try_again':
+        return 'Incorrect PIN. Please try again.';
+      case 'enter_backup_link':
+        return 'Enter backup link';
+      case 'import':
+        return 'Import';
       default:
         return key;
     }
