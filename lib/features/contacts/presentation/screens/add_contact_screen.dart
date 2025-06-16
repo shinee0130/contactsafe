@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -291,10 +292,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       ),
                     )
                     : Icon(
-                        Icons.person_outline,
-                        size: 48,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      Icons.person_outline,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
           ),
         ),
         const SizedBox(height: 8),
@@ -562,10 +563,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 16),
             Text(
               text,
@@ -603,10 +601,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
-            Icons.close,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.primary),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -1004,8 +999,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
               ),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.primary,
-                backgroundColor:
-                    Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.primary.withOpacity(0.08),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
