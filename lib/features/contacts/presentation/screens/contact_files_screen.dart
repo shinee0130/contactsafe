@@ -568,9 +568,9 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                   trailing:
                       _sortOption == option
                           ? Icon(
-                              Icons.check,
-                              color: Theme.of(context).colorScheme.primary,
-                            )
+                            Icons.check,
+                            color: Theme.of(context).colorScheme.primary,
+                          )
                           : null,
                   onTap: () {
                     setState(() {
@@ -714,7 +714,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
           else
             TextButton(
               onPressed: _toggleEditMode,
-              child: const Text(
+              child: Text(
                 'Edit',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
@@ -766,18 +766,19 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                   return Card(
                     elevation: 2,
                     margin: const EdgeInsets.only(bottom: 12),
-                    color: isSelected
-                        ? Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.1)
-                        : null,
+                    color:
+                        isSelected
+                            ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.1)
+                            : null,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: BorderSide(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey[300]!,
+                        color:
+                            isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey[300]!,
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
@@ -809,12 +810,11 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
                       trailing:
                           _editMode
                               ? Checkbox(
-                                  value: isSelected,
-                                  onChanged: (value) =>
-                                      _toggleSelection(file.id),
-                                  activeColor:
-                                      Theme.of(context).colorScheme.primary,
-                                )
+                                value: isSelected,
+                                onChanged: (value) => _toggleSelection(file.id),
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+                              )
                               : IconButton(
                                 icon: const Icon(
                                   Icons.more_vert,

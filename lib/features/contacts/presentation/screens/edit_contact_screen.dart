@@ -728,10 +728,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
-            Icons.close,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.primary),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -754,7 +751,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         actions: [
           TextButton(
             onPressed: _saveContact,
-            child: const Text(
+            child: Text(
               'Save',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,

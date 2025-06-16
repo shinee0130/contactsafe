@@ -162,7 +162,7 @@ class _AssignContactsToGroupScreenState
         actions: [
           TextButton(
             onPressed: _saveAssignments,
-            child: const Text(
+            child: Text(
               'Save',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
