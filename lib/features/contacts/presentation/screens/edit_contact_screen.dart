@@ -285,7 +285,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
         Text(
           _selectedPhoto != null ? 'Change picture' : 'Add picture',
           style: TextStyle(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -728,7 +728,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.blue),
+          icon: Icon(
+            Icons.close,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -754,7 +757,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
             child: const Text(
               'Save',
               style: TextStyle(
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
