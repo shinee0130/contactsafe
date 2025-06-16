@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'assign_contacts_to_group_screen.dart.dart'
+import 'assign_contacts_to_group_screen.dart'
     show AssignContactsToGroupScreen, globalGroups, globalContactGroupsMap;
 
 class ContactGroupsScreen extends StatefulWidget {

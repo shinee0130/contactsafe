@@ -8,7 +8,7 @@ import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 import 'package:contactsafe/l10n/app_localizations.dart';
-import 'package:contactsafe/shared/widgets/customsearchbar.dart';
+import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 
 class _FileResult {

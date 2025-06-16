@@ -4,9 +4,9 @@ import 'package:contactsafe/features/settings/controller/settings_controller.dar
 import 'package:flutter/material.dart';
 import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/features/contacts/presentation/screens/contact_group_screen.dart';
-import 'package:contactsafe/features/contacts/presentation/screens/assign_contacts_to_group_screen.dart.dart'
+import 'package:contactsafe/features/contacts/presentation/screens/assign_contacts_to_group_screen.dart'
     show globalContactGroupsMap;
-import 'package:contactsafe/shared/widgets/customsearchbar.dart';
+import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'add_contact_screen.dart';
