@@ -7,9 +7,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:contactsafe/features/events/data/local_event_repository.dart';
 import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
-import 'package:contactsafe/features/events/presentation/widgets/location_picker_screen.dart';
+import 'package:contactsafe/features/events/presentation/screens/location_picker_screen.dart';
 import 'package:contactsafe/l10n/app_localizations.dart';
-import 'package:contactsafe/shared/widgets/customsearchbar.dart';
+import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
 

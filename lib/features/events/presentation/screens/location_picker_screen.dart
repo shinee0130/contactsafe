@@ -1,4 +1,4 @@
-// lib/features/events/presentation/widgets/location_picker_screen.dart
+// lib/features/events/presentation/screens/location_picker_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geo;
