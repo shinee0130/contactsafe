@@ -127,8 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc
-                .translate('failed_to_create_backup')
+            context.loc.failed_to_create_backup
                 .replaceFirst('{error}', e.toString()),
           ),
         ),
@@ -146,8 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.loc
-                  .translate('restored_contacts_from_backup')
+              context.loc.restored_contacts_from_backup
                   .replaceFirst('{count}', '$count'),
             ),
           ),
@@ -160,8 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc
-                .translate('failed_to_restore_backup')
+            context.loc.failed_to_restore_backup
                 .replaceFirst('{error}', e.toString()),
           ),
         ),
@@ -694,7 +691,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SettingsSection(
             title: Text(
-              context.loc.translate('general'),
+              context.loc.general,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
