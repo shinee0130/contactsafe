@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:flutter/foundation.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts_service/flutter_contacts_service.dart';
 import 'package:contactsafe/models/contact_labels.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
