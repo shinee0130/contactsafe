@@ -59,8 +59,9 @@ class AppEvent {
       date: DateTime.parse(json['date'] as String),
       location: json['location'] as String?,
       description: json['description'] as String?,
-      participantContactIds:
-          List<String>.from(json['participantContactIds'] ?? const []),
+      participantContactIds: List<String>.from(
+        json['participantContactIds'] ?? const [],
+      ),
       userId: json['userId'] as String? ?? '',
     );
   }
@@ -84,9 +85,7 @@ class AppEvent {
         .map(
           (id) => allDeviceContacts.firstWhere(
             (contact) => contact.identifier == id,
-            orElse:
-                () =>
-                    Contact(identifier: id, displayName: 'Unknown Contact'), // Fallback
+            orElse: () => Contact(identifier: id, givenName: 'Unknown Contact'),
           ),
         )
         .toList();

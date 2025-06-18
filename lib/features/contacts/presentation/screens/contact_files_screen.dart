@@ -111,18 +111,17 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   void initState() {
     super.initState();
     // Log the contact ID to ensure it's valid
-    debugPrint('Loading files for contact ID: ${widget.contact.id}');
+    debugPrint('Loading files for contact ID: ${widget.contact.identifier}');
     _loadFiles();
   }
 
   CollectionReference<ContactFile> _contactFilesCollection() {
-    final contactId = widget.contact.id;
+    final contactId = widget.contact.identifier ?? '';
     if (contactId.isEmpty) {
       throw Exception(
         "Contact ID is empty, cannot access Firestore collection.",
       );
     }
-
     final uid = FirebaseAuth.instance.currentUser!.uid;
     return _firestore
         .collection('user_files')
@@ -222,7 +221,8 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         try {
           final fileName = platformFile.name;
           final uid = FirebaseAuth.instance.currentUser!.uid;
-          final storagePath = 'user_files/$uid/${widget.contact.id}/$fileName';
+          final storagePath =
+              'user_files/$uid/${widget.contact.identifier}/$fileName';
           final ref = _storage.ref().child(storagePath);
 
           // 1. Upload file to Firebase Storage
@@ -238,7 +238,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             uploadDate: DateTime.now(),
             storagePath: storagePath,
             uid: uid,
-            contactId: widget.contact.id,
+            contactId: widget.contact.identifier ?? '',
           );
 
           // Add document to Firestore and get its ID

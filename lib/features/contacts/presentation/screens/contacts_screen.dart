@@ -106,8 +106,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
       filtered =
           filtered
               .where(
-                (c) =>
-                    c.displayName.toLowerCase().contains(query.toLowerCase()),
+                (c) => (c.displayName ?? '').toLowerCase().contains(
+                  query.toLowerCase(),
+                ),
               )
               .toList();
     }

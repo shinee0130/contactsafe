@@ -50,10 +50,14 @@ class _AssignContactsToGroupScreenState
 
     final status = await Permission.contacts.request();
     if (status.isGranted) {
-      _allContacts = await ContactsService.getContacts(withThumbnails: false).then((c) => c.toList());
+      _allContacts = await ContactsService.getContacts(
+        withThumbnails: false,
+      ).then((c) => c.toList());
 
       // Sort contacts alphabetically
-      _allContacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+      _allContacts.sort(
+        (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''),
+      );
 
       // Pre-select contacts already in this group (if any)
       _selectedContactsForGroup =
@@ -105,6 +109,10 @@ class _AssignContactsToGroupScreenState
     // Now, add the group to all currently selected contacts
     for (final contact in _selectedContactsForGroup) {
       final contactDisplayName = contact.displayName;
+      if (contactDisplayName == null || contactDisplayName.isEmpty) {
+        // null эсвэл хоосон нэртэй контакт skip хийх
+        continue;
+      }
       globalContactGroupsMap.putIfAbsent(
         contactDisplayName,
         () => [],
@@ -222,17 +230,19 @@ class _AssignContactsToGroupScreenState
                             CircleAvatar(
                               radius: 22,
                               backgroundImage:
-                                  contact.thumbnail != null
-                                      ? MemoryImage(contact.thumbnail!)
+                                  (contact.avatar != null &&
+                                          contact.avatar!.isNotEmpty)
+                                      ? MemoryImage(contact.avatar!)
                                       : null,
                               backgroundColor: Theme.of(
                                 context,
                               ).colorScheme.onSurface.withOpacity(0.6),
                               child:
-                                  contact.thumbnail == null
+                                  (contact.avatar == null ||
+                                          contact.avatar!.isEmpty)
                                       ? Text(
-                                        contact.displayName.isNotEmpty
-                                            ? contact.displayName[0]
+                                        (contact.displayName ?? '').isNotEmpty
+                                            ? contact.displayName![0]
                                                 .toUpperCase()
                                             : '',
                                         style: const TextStyle(
@@ -245,7 +255,7 @@ class _AssignContactsToGroupScreenState
                             const SizedBox(width: 16.0),
                             Expanded(
                               child: Text(
-                                contact.displayName,
+                                contact.displayName ?? '',
                                 style: TextStyle(
                                   fontSize: 17.0,
                                   color: Theme.of(context).colorScheme.primary,

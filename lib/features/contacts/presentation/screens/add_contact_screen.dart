@@ -373,8 +373,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
         return 'Other';
       case PhoneLabel.custom:
         return 'Custom';
-      default:
-        return 'Phone';
     }
   }
 
@@ -388,8 +386,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
         return 'Other';
       case EmailLabel.custom:
         return 'Custom';
-      default:
-        return 'Email';
     }
   }
 
@@ -403,8 +399,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
         return 'Other';
       case AddressLabel.custom:
         return 'Custom';
-      default:
-        return 'Address';
     }
   }
 

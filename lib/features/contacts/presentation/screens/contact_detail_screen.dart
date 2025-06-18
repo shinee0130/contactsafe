@@ -44,20 +44,29 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
 
   Future<void> _loadCounts() async {
     try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      final contactId = widget.contact.identifier ?? '';
+      if (userId == null || contactId.isEmpty) {
+        setState(() {
+          _filesCount = 0;
+          _notesCount = 0;
+        });
+        return;
+      }
       final filesSnapshot =
           await FirebaseFirestore.instance
               .collection('user_files')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .doc(userId)
               .collection('contacts')
-              .doc(widget.contact.identifier ?? '')
+              .doc(contactId)
               .collection('files')
               .get();
       final notesSnapshot =
           await FirebaseFirestore.instance
               .collection('user_notes')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .doc(userId)
               .collection('contacts')
-              .doc(widget.contact.identifier ?? '')
+              .doc(contactId)
               .collection('notes')
               .get();
       setState(() {
@@ -83,10 +92,11 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   Future<void> _toggleFavorite() async {
     final prefs = await SharedPreferences.getInstance();
     final favIds = prefs.getStringList('favorite_contacts') ?? [];
-    if (favIds.contains(widget.contact.identifier)) {
-      favIds.remove(widget.contact.identifier);
+    final contactId = widget.contact.identifier ?? '';
+    if (favIds.contains(contactId)) {
+      favIds.remove(contactId);
     } else {
-      favIds.add(widget.contact.identifier ?? '');
+      favIds.add(contactId);
     }
     await prefs.setStringList('favorite_contacts', favIds);
     setState(() {
@@ -98,7 +108,9 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     try {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
-        final contacts = await ContactsService.getContacts(withThumbnails: false);
+        final contacts = await ContactsService.getContacts(
+          withThumbnails: false,
+        );
         final fetchedContact = contacts.firstWhere(
           (c) => c.identifier == contactId,
           orElse: () => widget.contact,
@@ -118,7 +130,13 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
   }
 
-  Future<void> _makePhoneCall(String phoneNumber) async {
+  Future<void> _makePhoneCall(String? phoneNumber) async {
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No phone number available')),
+      );
+      return;
+    }
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
@@ -131,7 +149,13 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
   }
 
-  Future<void> _sendSms(String phoneNumber) async {
+  Future<void> _sendSms(String? phoneNumber) async {
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No phone number available')),
+      );
+      return;
+    }
     final Uri launchUri = Uri(scheme: 'sms', path: phoneNumber);
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
@@ -144,7 +168,13 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
   }
 
-  Future<void> _sendEmail(String emailAddress) async {
+  Future<void> _sendEmail(String? emailAddress) async {
+    if (emailAddress == null || emailAddress.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No email address available')),
+      );
+      return;
+    }
     final Uri launchUri = Uri(
       scheme: 'mailto',
       path: emailAddress,
@@ -191,20 +221,26 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       vcfContent.writeln('ORG:${contact.company}');
     }
 
-    for (var phone in contact.phones) {
-      String typeLabel = _getPhoneLabelString(PhoneLabelX.fromString(phone.label));
-      vcfContent.writeln('TEL;TYPE=$typeLabel:${phone.value}');
+    for (var phone in (contact.phones ?? [])) {
+      String typeLabel = _getPhoneLabelString(
+        PhoneLabelX.fromString(phone.label),
+      );
+      vcfContent.writeln('TEL;TYPE=$typeLabel:${phone.value ?? ''}');
     }
 
-    for (var email in contact.emails) {
-      String typeLabel = _getEmailLabelString(EmailLabelX.fromString(email.label));
-      vcfContent.writeln('EMAIL;TYPE=$typeLabel:${email.value}');
+    for (var email in (contact.emails ?? [])) {
+      String typeLabel = _getEmailLabelString(
+        EmailLabelX.fromString(email.label),
+      );
+      vcfContent.writeln('EMAIL;TYPE=$typeLabel:${email.value ?? ''}');
     }
 
-    for (var address in contact.postalAddresses) {
-      String typeLabel = _getAddressLabelString(AddressLabelX.fromString(address.label));
+    for (var address in (contact.postalAddresses ?? [])) {
+      String typeLabel = _getAddressLabelString(
+        AddressLabelX.fromString(address.label),
+      );
       vcfContent.writeln(
-        'ADR;TYPE=$typeLabel:;;${address.street};${address.city};${address.postcode};${address.country}',
+        'ADR;TYPE=$typeLabel:;;${address.street ?? ''};${address.city ?? ''};${address.postcode ?? ''};${address.country ?? ''}',
       );
     }
 
@@ -222,12 +258,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       final status = await Permission.manageExternalStorage.request();
       if (status.isGranted) return true;
 
-      // Android 13+ хувьд media permission-уудыг шалгах
       final photos = await Permission.photos.request();
       final videos = await Permission.videos.request();
       if (photos.isGranted || videos.isGranted) return true;
 
-      // Storage permission ч олгогдсон эсэх
       final storage = await Permission.storage.request();
       return storage.isGranted;
     } else if (Platform.isIOS) {
@@ -249,7 +283,8 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         }
 
         if (directory != null) {
-          String fileName = '${contactName.replaceAll(' ', '_')}.vcf';
+          String fileName =
+              '${(contactName.isNotEmpty ? contactName : "Contact").replaceAll(' ', '_')}.vcf';
           File file = File('${directory.path}/$fileName');
           await file.writeAsString(vcfContent);
           if (mounted) {
@@ -354,6 +389,11 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   }
 
   Widget _buildAvatar(Contact contact) {
+    String initials = '?';
+    final name = contact.displayName ?? '';
+    if (name.isNotEmpty) {
+      initials = name[0].toUpperCase();
+    }
     return Container(
       width: 120,
       height: 120,
@@ -377,9 +417,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               )
               : Center(
                 child: Text(
-                  contact.displayName.isNotEmpty
-                      ? contact.displayName[0].toUpperCase()
-                      : '?',
+                  initials,
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
@@ -513,8 +551,8 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     String? subtitleText;
     if ((currentContact.company ?? '').isNotEmpty) {
       subtitleText = currentContact.company;
-    } else if (currentContact.phones.isNotEmpty) {
-      subtitleText = currentContact.phones.first.value ?? '';
+    } else if ((currentContact.phones?.isNotEmpty ?? false)) {
+      subtitleText = currentContact.phones!.first.value ?? '';
     }
 
     return Scaffold(
@@ -559,7 +597,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       (context) => EditContactScreen(contact: currentContact),
                 ),
               ).then(
-                (_) => {_loadContactDetails(currentContact.id), _loadCounts()},
+                (_) => {
+                  _loadContactDetails(currentContact.identifier ?? ''),
+                  _loadCounts(),
+                },
               );
             },
           ),
@@ -573,7 +614,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${currentContact.displayName} favorite status toggled!',
+                    '${currentContact.displayName ?? 'Contact'} favorite status toggled!',
                   ),
                 ),
               );
@@ -596,7 +637,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                   _buildAvatar(currentContact),
                   const SizedBox(height: 16),
                   Text(
-                    currentContact.displayName,
+                    currentContact.displayName ?? 'No name',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
@@ -619,60 +660,27 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildActionButton(Icons.call, 'Call', () {
-                        if (currentContact.phones.isNotEmpty) {
-                          _makePhoneCall(currentContact.phones.first.value ?? '');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Calling ${currentContact.displayName}',
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('No phone number available'),
-                            ),
-                          );
-                        }
+                        final phone =
+                            (currentContact.phones?.isNotEmpty ?? false)
+                                ? currentContact.phones!.first.value
+                                : null;
+                        _makePhoneCall(phone);
                       }),
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.message, 'Message', () {
-                        if (currentContact.phones.isNotEmpty) {
-                          _sendSms(currentContact.phones.first.value ?? '');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Messaging ${currentContact.displayName}',
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('No phone number available'),
-                            ),
-                          );
-                        }
+                        final phone =
+                            (currentContact.phones?.isNotEmpty ?? false)
+                                ? currentContact.phones!.first.value
+                                : null;
+                        _sendSms(phone);
                       }),
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.email, 'Email', () {
-                        if (currentContact.emails.isNotEmpty) {
-                          _sendEmail(currentContact.emails.first.value ?? '');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Emailing ${currentContact.displayName}',
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('No email address available'),
-                            ),
-                          );
-                        }
+                        final email =
+                            (currentContact.emails?.isNotEmpty ?? false)
+                                ? currentContact.emails!.first.value
+                                : null;
+                        _sendEmail(email);
                       }),
                     ],
                   ),
@@ -681,10 +689,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
             ),
 
             // Contact Details Section
-            if (currentContact.phones.isNotEmpty ||
-                currentContact.emails.isNotEmpty ||
-                currentContact.postalAddresses.isNotEmpty ||
-                (currentContact.company ?? '').isNotEmpty)
+            if ((currentContact.phones?.isNotEmpty ?? false) ||
+                (currentContact.emails?.isNotEmpty ?? false) ||
+                (currentContact.postalAddresses?.isNotEmpty ?? false) ||
+                ((currentContact.company ?? '').isNotEmpty))
               Container(
                 margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -725,28 +733,31 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       ),
                     ),
                     const Divider(indent: 16, endIndent: 16),
-                    if (currentContact.phones.isNotEmpty)
-                      ...currentContact.phones.map(
+                    if ((currentContact.phones?.isNotEmpty ?? false))
+                      ...currentContact.phones!.map(
                         (phone) => _buildDetailItem(
                           _getPhoneLabelString(
-                              PhoneLabelX.fromString(phone.label)),
+                            PhoneLabelX.fromString(phone.label),
+                          ),
                           phone.value ?? '',
                         ),
                       ),
-                    if (currentContact.emails.isNotEmpty)
-                      ...currentContact.emails.map(
+                    if ((currentContact.emails?.isNotEmpty ?? false))
+                      ...currentContact.emails!.map(
                         (email) => _buildDetailItem(
                           _getEmailLabelString(
-                              EmailLabelX.fromString(email.label)),
+                            EmailLabelX.fromString(email.label),
+                          ),
                           email.value ?? '',
                         ),
                       ),
-                    if (currentContact.postalAddresses.isNotEmpty)
-                      ...currentContact.postalAddresses.map(
+                    if ((currentContact.postalAddresses?.isNotEmpty ?? false))
+                      ...currentContact.postalAddresses!.map(
                         (address) => _buildDetailItem(
                           _getAddressLabelString(
-                              AddressLabelX.fromString(address.label)),
-                          '${address.street}, ${address.city}, ${address.postcode}',
+                            AddressLabelX.fromString(address.label),
+                          ),
+                          '${address.street ?? ''}, ${address.city ?? ''}, ${address.postcode ?? ''}',
                         ),
                       ),
                   ],
@@ -801,7 +812,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       String vcfContent = generateVcf(_detailedContact!);
                       await saveVcfFile(
                         vcfContent,
-                        _detailedContact!.displayName,
+                        _detailedContact!.displayName ?? 'Contact',
                       );
                     }
                   }),

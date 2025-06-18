@@ -51,9 +51,12 @@ class _EditContactScreenState extends State<EditContactScreen> {
     _companyController.text = widget.contact.company ?? '';
 
     // Populate phones
-    _phoneNumbers = widget.contact.phones.map((p) => p.value ?? '').toList();
+    _phoneNumbers =
+        (widget.contact.phones ?? []).map((p) => p.value ?? '').toList();
     _phoneLabels =
-        widget.contact.phones.map((p) => PhoneLabelX.fromString(p.label)).toList();
+        (widget.contact.phones ?? [])
+            .map((p) => PhoneLabelX.fromString(p.label))
+            .toList();
     if (_phoneNumbers.isEmpty) {
       _phoneNumbers.add('');
       _phoneLabels.add(PhoneLabel.mobile);
@@ -61,10 +64,13 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
     // Populate emails
     _emailControllers.addAll(
-      widget.contact.emails.map((e) => TextEditingController(text: e.value ?? '')),
+      (widget.contact.emails ?? []).map(
+        (e) => TextEditingController(text: e.value ?? ''),
+      ),
     );
     _emailLabels.addAll(
-        widget.contact.emails.map((e) => EmailLabelX.fromString(e.label)));
+      (widget.contact.emails ?? []).map((e) => EmailLabelX.fromString(e.label)),
+    );
     if (_emailControllers.isEmpty) {
       _emailControllers.add(TextEditingController());
       _emailLabels.add(EmailLabel.home);
@@ -75,11 +81,15 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
     // Populate addresses
     _addressControllers.addAll(
-      widget.contact.postalAddresses
-          .map((a) => TextEditingController(text: a.street ?? '')),
+      (widget.contact.postalAddresses ?? []).map(
+        (a) => TextEditingController(text: a.street ?? ''),
+      ),
     );
     _addressLabels.addAll(
-        widget.contact.postalAddresses.map((a) => AddressLabelX.fromString(a.label)));
+      (widget.contact.postalAddresses ?? []).map(
+        (a) => AddressLabelX.fromString(a.label),
+      ),
+    );
     if (_addressControllers.isEmpty) {
       _addressControllers.add(TextEditingController());
       _addressLabels.add(AddressLabel.home);
@@ -128,7 +138,10 @@ class _EditContactScreenState extends State<EditContactScreen> {
             .toList();
 
     final List<String> websitesToSave =
-        _websiteControllers.where((c) => c.text.trim().isNotEmpty).map((c) => c.text.trim()).toList();
+        _websiteControllers
+            .where((c) => c.text.trim().isNotEmpty)
+            .map((c) => c.text.trim())
+            .toList();
 
     final List<PostalAddress> addressesToSave =
         _addressControllers
@@ -145,14 +158,16 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
     // Update fields on the existing contact so that rawId and account
     // information are preserved during the update call.
-    Contact updatedContact = widget.contact;
-    updatedContact.givenName = _firstNameController.text.trim();
-    updatedContact.familyName = _lastNameController.text.trim();
-    updatedContact.company = _companyController.text.trim();
-    updatedContact.phones = phonesToSave;
-    updatedContact.emails = emailsToSave;
-    updatedContact.postalAddresses = addressesToSave;
-    updatedContact.avatar = _selectedPhoto;
+    Contact updatedContact = Contact(
+      givenName: _firstNameController.text.trim(),
+      familyName: _lastNameController.text.trim(),
+      company: _companyController.text.trim(),
+      phones: phonesToSave,
+      emails: emailsToSave,
+      postalAddresses: addressesToSave,
+      avatar: _selectedPhoto,
+      birthday: _selectedBirthday,
+    );
 
     try {
       final status = await Permission.contacts.request();
