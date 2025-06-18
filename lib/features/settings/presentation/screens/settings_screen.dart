@@ -69,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.could_not_open_url.replaceFirst('{url}', urlString),
+            context.loc.could_not_open_url(urlString),
           ),
         ),
       );
@@ -83,10 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.successfully_imported_contacts.replaceFirst(
-              '{count}',
-              '$count',
-            ),
+            context.loc.successfully_imported_contacts(count),
           ),
         ),
       );
@@ -95,10 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.error_importing_contacts.replaceFirst(
-              '{error}',
-              e.toString(),
-            ),
+            context.loc.error_importing_contacts(e.toString()),
           ),
         ),
       );
@@ -114,10 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.backup_created_successfully.replaceFirst(
-              '{fileName}',
-              fileName,
-            ),
+            context.loc.backup_created_successfully(fileName),
           ),
         ),
       );
@@ -128,8 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.failed_to_create_backup
-                .replaceFirst('{error}', e.toString()),
+            context.loc.failed_to_create_backup(e.toString()),
           ),
         ),
       );
@@ -146,8 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.loc.restored_contacts_from_backup
-                  .replaceFirst('{count}', '$count'),
+              context.loc.restored_contacts_from_backup(count),
             ),
           ),
         );
@@ -159,8 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.failed_to_restore_backup
-                .replaceFirst('{error}', e.toString()),
+            context.loc.failed_to_restore_backup(e.toString()),
           ),
         ),
       );
@@ -183,7 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.backup_failed.replaceFirst('{error}', e.toString()),
+            context.loc.backup_failed(e.toString()),
           ),
         ),
       );
@@ -199,10 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.restored_contacts_from_google_drive.replaceFirst(
-              '{count}',
-              '$count',
-            ),
+            context.loc.restored_contacts_from_google_drive(count),
           ),
         ),
       );
@@ -213,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.restore_failed.replaceFirst('{error}', e.toString()),
+            context.loc.restore_failed(e.toString()),
           ),
         ),
       );
@@ -229,10 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.imported_contacts_from_link.replaceFirst(
-              '{count}',
-              '$count',
-            ),
+            context.loc.imported_contacts_from_link(count),
           ),
         ),
       );
@@ -243,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.import_failed.replaceFirst('{error}', e.toString()),
+            context.loc.import_failed(e.toString()),
           ),
         ),
       );
@@ -333,10 +315,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.loc.failed_to_delete_all_data.replaceFirst(
-              '{error}',
-              e.toString(),
-            ),
+            context.loc.failed_to_delete_all_data(e.toString()),
           ),
         ),
       );
