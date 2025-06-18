@@ -55,7 +55,7 @@ class _SelectTabBarOrderScreenState extends State<SelectTabBarOrderScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: ListTile(
               leading: Icon(item.icon),
-              title: Text(context.loc.item.label),
+              title: Text(_localizedLabel(context, item.label)),
               trailing: const Icon(Icons.drag_handle), // Drag handle icon
             ),
           );
@@ -63,5 +63,22 @@ class _SelectTabBarOrderScreenState extends State<SelectTabBarOrderScreen> {
         onReorder: _onReorder,
       ),
     );
+  }
+
+  String _localizedLabel(BuildContext context, String labelKey) {
+    switch (labelKey) {
+      case 'contacts':
+        return context.loc.contacts;
+      case 'search':
+        return context.loc.search;
+      case 'events':
+        return context.loc.events;
+      case 'photos':
+        return context.loc.photos;
+      case 'settings':
+        return context.loc.settings;
+      default:
+        return labelKey;
+    }
   }
 }
