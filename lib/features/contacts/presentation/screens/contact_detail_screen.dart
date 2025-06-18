@@ -108,7 +108,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     try {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
-        final contacts = await ContactsService.getContacts(
+        final contacts = await FlutterContactsService.getContacts(
           withThumbnails: false,
         );
         final fetchedContact = contacts.firstWhere(

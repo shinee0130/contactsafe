@@ -154,7 +154,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
       // 1. Save to device contacts (optional, based on your app's needs)
       final status = await Permission.contacts.request();
       if (status.isGranted) {
-        await ContactsService.addContact(newDeviceContact);
+        await FlutterContactsService.addContact(newDeviceContact);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contact saved to device!')),

@@ -19,7 +19,7 @@ class ContactsProvider {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         final contacts =
-            (await ContactsService.getContacts(withThumbnails: false)).toList();
+            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
         contacts.sort((a, b) {
           String keyA =
               sortByFirstName

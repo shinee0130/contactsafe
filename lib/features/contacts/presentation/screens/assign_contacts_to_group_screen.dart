@@ -50,7 +50,7 @@ class _AssignContactsToGroupScreenState
 
     final status = await Permission.contacts.request();
     if (status.isGranted) {
-      _allContacts = await ContactsService.getContacts(
+      _allContacts = await FlutterContactsService.getContacts(
         withThumbnails: false,
       ).then((c) => c.toList());
 

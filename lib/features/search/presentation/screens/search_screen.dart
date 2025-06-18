@@ -69,7 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         List<Contact> contacts =
-            (await ContactsService.getContacts(withThumbnails: false)).toList();
+            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
         contacts.sort(
             (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''));
         if (!mounted) return; // <-- энд нэмж өгнө

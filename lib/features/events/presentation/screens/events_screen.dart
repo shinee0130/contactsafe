@@ -99,7 +99,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
     try {
       final contacts =
-          (await ContactsService.getContacts(withThumbnails: false)).toList();
+          (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
       contacts.sort(
         (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''),
       );
