@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:contactsafe/l10n/context_loc.dart';
 
 class ContactSafeNavigationBar extends StatelessWidget {
   final int currentIndex;

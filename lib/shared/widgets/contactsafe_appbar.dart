@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:contactsafe/l10n/context_loc.dart';
 
 /// A reusable AppBar that keeps the [ContactSafe] title and logo perfectly
 /// centered regardless of the width of the leading widget or action buttons.

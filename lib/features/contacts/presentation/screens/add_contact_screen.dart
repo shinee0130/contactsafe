@@ -9,6 +9,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:contactsafe/l10n/context_loc.dart';
 
 class AddContactScreen extends StatefulWidget {
   const AddContactScreen({super.key});
