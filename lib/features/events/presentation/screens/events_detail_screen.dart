@@ -278,8 +278,8 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                       ),
                       title: Text(participant.displayName ?? ''),
                       subtitle: Text(
-                        (participant.phones?.isNotEmpty ?? false)
-                            ? participant.phones!.first.number ?? 'No phone'
+                          (participant.phones?.isNotEmpty ?? false)
+                              ? participant.phones!.first.value ?? 'No phone'
                             : 'No phone',
                       ),
                       // You could add onTap to view contact details
