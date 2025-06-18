@@ -1,4 +1,3 @@
-import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:contactsafe/l10n/context_loc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
