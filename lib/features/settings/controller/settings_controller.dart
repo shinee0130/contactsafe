@@ -177,8 +177,8 @@ class SettingsController {
             return {
               'id': c.identifier,
               'displayName': c.displayName,
-              'phones': c.phones.map((p) => p.value).toList(),
-              'emails': c.emails.map((e) => e.value).toList(),
+              'phones': c.phones?.map((p) => p.value).toList() ?? [],
+              'emails': c.emails?.map((e) => e.value).toList() ?? [],
             };
           }).toList();
 
