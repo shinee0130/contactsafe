@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:contactsafe/l10n/app_localizations.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';

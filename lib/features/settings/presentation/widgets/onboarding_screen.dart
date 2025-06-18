@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:contactsafe/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

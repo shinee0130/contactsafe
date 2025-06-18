@@ -9,10 +9,6 @@ import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_mn.dart';
 
-extension AppLocalizationsX on BuildContext {
-  AppLocalizations get loc => AppLocalizations.of(this)!;
-}
-
 // ignore_for_file: type=lint
 
 /// Callers can lookup localized strings with an instance of AppLocalizations
