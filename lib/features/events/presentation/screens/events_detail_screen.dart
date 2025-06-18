@@ -276,10 +276,10 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                                 ? const Icon(Icons.person)
                                 : null,
                       ),
-                      title: Text(participant.displayName),
+                      title: Text(participant.displayName ?? ''),
                       subtitle: Text(
-                        participant.phones.isNotEmpty
-                            ? participant.phones.first.number
+                        (participant.phones?.isNotEmpty ?? false)
+                            ? participant.phones!.first.number ?? 'No phone'
                             : 'No phone',
                       ),
                       // You could add onTap to view contact details

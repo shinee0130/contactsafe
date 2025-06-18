@@ -100,7 +100,9 @@ class _EventsScreenState extends State<EventsScreen> {
     try {
       final contacts =
           (await ContactsService.getContacts(withThumbnails: false)).toList();
-      contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+      contacts.sort(
+        (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''),
+      );
       if (!mounted) {
         return;
       }
@@ -161,9 +163,9 @@ class _EventsScreenState extends State<EventsScreen> {
                         event
                             .getParticipants(_allContacts)
                             .any(
-                              (p) => p.displayName.toLowerCase().contains(
-                                query.toLowerCase(),
-                              ),
+                              (p) => (p.displayName ?? '')
+                                  .toLowerCase()
+                                  .contains(query.toLowerCase()),
                             ),
                   )
                   .toList();
@@ -362,7 +364,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                       itemBuilder: (context, index) {
                                         final contact = _allContacts[index];
                                         return CheckboxListTile(
-                                          title: Text(contact.displayName),
+                                          title: Text(contact.displayName ?? ''),
                                           value: tempSelected.contains(contact),
                                           onChanged: (bool? value) {
                                             setStateSB(() {
@@ -415,7 +417,7 @@ class _EventsScreenState extends State<EventsScreen> {
                               selectedParticipants
                                   .map(
                                     (contact) => Chip(
-                                      label: Text(contact.displayName),
+                                      label: Text(contact.displayName ?? ''),
                                       onDeleted: () {
                                         setStateSB(() {
                                           selectedParticipants.remove(contact);
@@ -684,10 +686,12 @@ class EventCard extends StatelessWidget {
     final List<Contact> eventParticipants = event.getParticipants(
       allDeviceContacts,
     );
-    final String participantNames =
-        eventParticipants.isEmpty
-            ? 'None'
-            : eventParticipants.map((c) => c.displayName).join(', ');
+    final String participantNames = eventParticipants.isEmpty
+        ? 'None'
+        : eventParticipants
+            .map((c) => c.displayName ?? '')
+            .where((name) => name.isNotEmpty)
+            .join(', ');
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
