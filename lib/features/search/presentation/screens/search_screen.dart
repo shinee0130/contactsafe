@@ -101,7 +101,7 @@ class _SearchScreenState extends State<SearchScreen> {
               id: doc.id,
               name: data['name'] ?? '',
               contactId: contactId,
-              contactName: contact.displayName,
+              contactName: contact.displayName ?? '',
             );
           }).toList();
 
@@ -127,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
               id: doc.id,
               content: data['content'] ?? '',
               contactId: contactId,
-              contactName: contact.displayName,
+              contactName: contact.displayName ?? '',
             );
           }).toList();
 
