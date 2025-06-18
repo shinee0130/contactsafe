@@ -9,6 +9,7 @@ import 'package:contactsafe/features/events/data/models/event_model.dart';
 import 'package:contactsafe/features/events/presentation/screens/events_detail_screen.dart';
 import 'package:contactsafe/features/events/presentation/screens/location_picker_screen.dart';
 import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
+import 'package:contactsafe/l10n/context_loc.dart';
 
 import '../../../../shared/widgets/navigation_bar.dart';
 

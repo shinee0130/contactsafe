@@ -8,6 +8,7 @@ import 'package:contactsafe/features/contacts/presentation/screens/assign_contac
 import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:contactsafe/l10n/context_loc.dart';
 import 'add_contact_screen.dart';
 
 class ContactsScreen extends StatefulWidget {

@@ -11,6 +11,7 @@ import 'package:contactsafe/features/settings/presentation/widgets/onboarding_sc
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:contactsafe/l10n/app_localizations.dart';
+import 'package:contactsafe/l10n/context_loc.dart';
 import 'package:contactsafe/l10n/locale_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
