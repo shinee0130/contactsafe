@@ -502,10 +502,10 @@ class _EventsScreenState extends State<EventsScreen> {
                                       descriptionController.text.isEmpty
                                           ? null
                                           : descriptionController.text,
-                                  participantContactIds:
-                                      selectedParticipants
-                                          .map((c) => c.id)
-                                          .toList(),
+                                    participantContactIds:
+                                        selectedParticipants
+                                            .map((c) => c.identifier)
+                                            .toList(),
                                   userId: '',
                                 );
 
