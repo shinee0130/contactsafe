@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts_service/flutter_contacts_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';

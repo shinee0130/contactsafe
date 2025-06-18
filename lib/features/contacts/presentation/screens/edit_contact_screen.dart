@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts_service/flutter_contacts_service.dart';
 import 'package:contactsafe/models/contact_labels.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';

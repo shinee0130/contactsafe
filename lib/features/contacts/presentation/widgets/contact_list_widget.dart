@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts_service/flutter_contacts_service.dart';
 
 class ContactListWidget extends StatelessWidget {
   final List<Contact> contacts;
