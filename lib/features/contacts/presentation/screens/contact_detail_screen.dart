@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:contactsafe/models/contact_labels.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,7 +37,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   void initState() {
     super.initState();
     _isFavorite = widget.isFavorite;
-    _loadContactDetails(widget.contact.id);
+    _loadContactDetails(widget.contact.identifier ?? '');
     _loadCounts();
     _loadFavoriteStatus();
   }
@@ -48,7 +49,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               .collection('user_files')
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .collection('contacts')
-              .doc(widget.contact.id)
+              .doc(widget.contact.identifier ?? '')
               .collection('files')
               .get();
       final notesSnapshot =
@@ -56,7 +57,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
               .collection('user_notes')
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .collection('contacts')
-              .doc(widget.contact.id)
+              .doc(widget.contact.identifier ?? '')
               .collection('notes')
               .get();
       setState(() {
@@ -75,17 +76,17 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     final prefs = await SharedPreferences.getInstance();
     final favIds = prefs.getStringList('favorite_contacts') ?? [];
     setState(() {
-      _isFavorite = favIds.contains(widget.contact.id);
+      _isFavorite = favIds.contains(widget.contact.identifier);
     });
   }
 
   Future<void> _toggleFavorite() async {
     final prefs = await SharedPreferences.getInstance();
     final favIds = prefs.getStringList('favorite_contacts') ?? [];
-    if (favIds.contains(widget.contact.id)) {
-      favIds.remove(widget.contact.id);
+    if (favIds.contains(widget.contact.identifier)) {
+      favIds.remove(widget.contact.identifier);
     } else {
-      favIds.add(widget.contact.id);
+      favIds.add(widget.contact.identifier ?? '');
     }
     await prefs.setStringList('favorite_contacts', favIds);
     setState(() {
@@ -95,15 +96,15 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
 
   Future<void> _loadContactDetails(String contactId) async {
     try {
-      if (await FlutterContacts.requestPermission()) {
-        Contact? fetchedContact = await FlutterContacts.getContact(
-          contactId,
-          withAccounts: true,
-          withProperties: true,
-          withPhoto: true,
+      final status = await Permission.contacts.request();
+      if (status.isGranted) {
+        final contacts = await ContactsService.getContacts(withThumbnails: false);
+        final fetchedContact = contacts.firstWhere(
+          (c) => c.identifier == contactId,
+          orElse: () => widget.contact,
         );
         setState(() {
-          _detailedContact = fetchedContact ?? widget.contact;
+          _detailedContact = fetchedContact;
         });
       } else {
         setState(() {
@@ -167,17 +168,17 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     vcfContent.writeln('VERSION:3.0');
 
     String formattedName = '';
-    if (contact.name.prefix.isNotEmpty) {
-      formattedName += '${contact.name.prefix} ';
+    if ((contact.prefix ?? '').isNotEmpty) {
+      formattedName += '${contact.prefix} ';
     }
-    if (contact.name.first.isNotEmpty) {
-      formattedName += '${contact.name.first} ';
+    if ((contact.givenName ?? '').isNotEmpty) {
+      formattedName += '${contact.givenName} ';
     }
-    if (contact.name.middle.isNotEmpty) {
-      formattedName += '${contact.name.middle} ';
+    if ((contact.middleName ?? '').isNotEmpty) {
+      formattedName += '${contact.middleName} ';
     }
-    if (contact.name.last.isNotEmpty) {
-      formattedName += contact.name.last;
+    if ((contact.familyName ?? '').isNotEmpty) {
+      formattedName += contact.familyName!;
     }
     formattedName = formattedName.trim();
 
@@ -186,29 +187,29 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     }
 
     // Add organization to VCF if available
-    if (contact.organizations.isNotEmpty) {
-      vcfContent.writeln('ORG:${contact.organizations.first.company}');
+    if ((contact.company ?? '').isNotEmpty) {
+      vcfContent.writeln('ORG:${contact.company}');
     }
 
     for (var phone in contact.phones) {
-      String typeLabel = _getPhoneLabelString(phone.label);
-      vcfContent.writeln('TEL;TYPE=$typeLabel:${phone.number}');
+      String typeLabel = _getPhoneLabelString(PhoneLabelX.fromString(phone.label));
+      vcfContent.writeln('TEL;TYPE=$typeLabel:${phone.value}');
     }
 
     for (var email in contact.emails) {
-      String typeLabel = _getEmailLabelString(email.label);
-      vcfContent.writeln('EMAIL;TYPE=$typeLabel:${email.address}');
+      String typeLabel = _getEmailLabelString(EmailLabelX.fromString(email.label));
+      vcfContent.writeln('EMAIL;TYPE=$typeLabel:${email.value}');
     }
 
-    for (var address in contact.addresses) {
-      String typeLabel = _getAddressLabelString(address.label);
+    for (var address in contact.postalAddresses) {
+      String typeLabel = _getAddressLabelString(AddressLabelX.fromString(address.label));
       vcfContent.writeln(
-        'ADR;TYPE=$typeLabel:;;${address.street};${address.city};${address.postalCode};${address.country}',
+        'ADR;TYPE=$typeLabel:;;${address.street};${address.city};${address.postcode};${address.country}',
       );
     }
 
-    if (contact.photo != null && contact.photo!.isNotEmpty) {
-      String base64Image = base64Encode(contact.photo!);
+    if (contact.avatar != null && contact.avatar!.isNotEmpty) {
+      String base64Image = base64Encode(contact.avatar!);
       vcfContent.writeln('PHOTO;ENCODING=BASE64;TYPE=JPEG:$base64Image');
     }
 
@@ -365,10 +366,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         ),
       ),
       child:
-          contact.photo != null && contact.photo!.isNotEmpty
+          contact.avatar != null && contact.avatar!.isNotEmpty
               ? ClipOval(
                 child: Image.memory(
-                  contact.photo!,
+                  contact.avatar!,
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
@@ -510,11 +511,10 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
 
     // Determine what to display under the contact name
     String? subtitleText;
-    if (currentContact.organizations.isNotEmpty &&
-        currentContact.organizations.first.company.isNotEmpty) {
-      subtitleText = currentContact.organizations.first.company;
+    if ((currentContact.company ?? '').isNotEmpty) {
+      subtitleText = currentContact.company;
     } else if (currentContact.phones.isNotEmpty) {
-      subtitleText = currentContact.phones.first.number;
+      subtitleText = currentContact.phones.first.value ?? '';
     }
 
     return Scaffold(
@@ -620,7 +620,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                     children: [
                       _buildActionButton(Icons.call, 'Call', () {
                         if (currentContact.phones.isNotEmpty) {
-                          _makePhoneCall(currentContact.phones.first.number);
+                          _makePhoneCall(currentContact.phones.first.value ?? '');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -639,7 +639,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.message, 'Message', () {
                         if (currentContact.phones.isNotEmpty) {
-                          _sendSms(currentContact.phones.first.number);
+                          _sendSms(currentContact.phones.first.value ?? '');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -658,7 +658,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       const SizedBox(width: 16),
                       _buildActionButton(Icons.email, 'Email', () {
                         if (currentContact.emails.isNotEmpty) {
-                          _sendEmail(currentContact.emails.first.address);
+                          _sendEmail(currentContact.emails.first.value ?? '');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -683,8 +683,8 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
             // Contact Details Section
             if (currentContact.phones.isNotEmpty ||
                 currentContact.emails.isNotEmpty ||
-                currentContact.addresses.isNotEmpty ||
-                currentContact.organizations.isNotEmpty)
+                currentContact.postalAddresses.isNotEmpty ||
+                (currentContact.company ?? '').isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -728,22 +728,25 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                     if (currentContact.phones.isNotEmpty)
                       ...currentContact.phones.map(
                         (phone) => _buildDetailItem(
-                          _getPhoneLabelString(phone.label),
-                          phone.number,
+                          _getPhoneLabelString(
+                              PhoneLabelX.fromString(phone.label)),
+                          phone.value ?? '',
                         ),
                       ),
                     if (currentContact.emails.isNotEmpty)
                       ...currentContact.emails.map(
                         (email) => _buildDetailItem(
-                          _getEmailLabelString(email.label),
-                          email.address,
+                          _getEmailLabelString(
+                              EmailLabelX.fromString(email.label)),
+                          email.value ?? '',
                         ),
                       ),
-                    if (currentContact.addresses.isNotEmpty)
-                      ...currentContact.addresses.map(
+                    if (currentContact.postalAddresses.isNotEmpty)
+                      ...currentContact.postalAddresses.map(
                         (address) => _buildDetailItem(
-                          _getAddressLabelString(address.label),
-                          '${address.street}, ${address.city}, ${address.postalCode}',
+                          _getAddressLabelString(
+                              AddressLabelX.fromString(address.label)),
+                          '${address.street}, ${address.city}, ${address.postcode}',
                         ),
                       ),
                   ],

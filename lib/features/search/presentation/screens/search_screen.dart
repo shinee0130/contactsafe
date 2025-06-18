@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contactsafe/l10n/context_loc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 
 import 'package:contactsafe/features/events/data/local_event_repository.dart';
@@ -65,13 +66,12 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> _fetchAllData() async {
     try {
       // Fetch contacts
-      bool isGranted = await FlutterContacts.requestPermission();
-      if (isGranted) {
-        List<Contact> contacts = await FlutterContacts.getContacts(
-          withProperties: true,
-          withPhoto: true,
-        );
-        contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
+      final status = await Permission.contacts.request();
+      if (status.isGranted) {
+        List<Contact> contacts =
+            (await ContactsService.getContacts(withThumbnails: false)).toList();
+        contacts.sort(
+            (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''));
         if (!mounted) return; // <-- энд нэмж өгнө
         setState(() {
           _allContacts = contacts;
@@ -160,11 +160,13 @@ class _SearchScreenState extends State<SearchScreen> {
             contact.displayName.toLowerCase().contains(lowerQuery) ||
             (contact.phones.isNotEmpty &&
                 contact.phones.any(
-                  (phone) => phone.number.toLowerCase().contains(lowerQuery),
+                  (phone) =>
+                      (phone.value ?? '').toLowerCase().contains(lowerQuery),
                 )) ||
             (contact.emails.isNotEmpty &&
                 contact.emails.any(
-                  (email) => email.address.toLowerCase().contains(lowerQuery),
+                  (email) =>
+                      (email.value ?? '').toLowerCase().contains(lowerQuery),
                 )),
       ),
     );
@@ -275,7 +277,7 @@ class _SearchScreenState extends State<SearchScreen> {
       subtitle:
           contact.phones.isNotEmpty
               ? Text(
-                contact.phones.first.number,
+                contact.phones.first.value ?? '',
                 style: TextStyle(
                   color: Theme.of(
                     context,

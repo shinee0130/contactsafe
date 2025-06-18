@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // Global storage for contact groups and their assignments.
 final List<String> globalGroups = [
@@ -47,11 +48,9 @@ class _AssignContactsToGroupScreenState
       _isLoading = true;
     });
 
-    if (await FlutterContacts.requestPermission()) {
-      _allContacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withThumbnail: true,
-      );
+    final status = await Permission.contacts.request();
+    if (status.isGranted) {
+      _allContacts = await ContactsService.getContacts(withThumbnails: false).then((c) => c.toList());
 
       // Sort contacts alphabetically
       _allContacts.sort((a, b) => a.displayName.compareTo(b.displayName));

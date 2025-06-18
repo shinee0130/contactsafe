@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:contactsafe/models/contact_labels.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
@@ -136,11 +138,10 @@ class SettingsController {
   // Import contacts
   Future<int> importContacts() async {
     try {
-      if (await FlutterContacts.requestPermission()) {
-        List<Contact> contacts = await FlutterContacts.getContacts(
-          withProperties: true,
-          withPhoto: true,
-        );
+      final status = await Permission.contacts.request();
+      if (status.isGranted) {
+        List<Contact> contacts =
+            (await ContactsService.getContacts(withThumbnails: false)).toList();
         return contacts.length;
       }
       return 0;
@@ -165,20 +166,19 @@ class SettingsController {
       final File file = File(filePath);
 
       List<Contact> contacts = [];
-      if (await FlutterContacts.requestPermission()) {
-        contacts = await FlutterContacts.getContacts(
-          withProperties: true,
-          withPhoto: true,
-        );
+      final status = await Permission.contacts.request();
+      if (status.isGranted) {
+        contacts =
+            (await ContactsService.getContacts(withThumbnails: false)).toList();
       }
 
       final List<Map<String, dynamic>> contactsData =
           contacts.map((c) {
             return {
-              'id': c.id,
+              'id': c.identifier,
               'displayName': c.displayName,
-              'phones': c.phones.map((p) => p.number).toList(),
-              'emails': c.emails.map((e) => e.address).toList(),
+              'phones': c.phones.map((p) => p.value).toList(),
+              'emails': c.emails.map((e) => e.value).toList(),
             };
           }).toList();
 
@@ -204,26 +204,23 @@ class SettingsController {
         File file = File(result.files.single.path!);
         String fileContent = await file.readAsString();
         final List<dynamic> decodedData = jsonDecode(fileContent);
-        if (await FlutterContacts.requestPermission()) {
+        final status = await Permission.contacts.request();
+        if (status.isGranted) {
           for (final item in decodedData) {
             try {
-              final contact =
-                  Contact()
-                    ..name = Name(
-                      first: item['firstName'] ?? '',
-                      last: item['lastName'] ?? '',
-                    )
-                    ..phones =
-                        (item['phones'] as List?)
-                            ?.map((p) => Phone(p.toString()))
-                            .toList() ??
-                        []
-                    ..emails =
-                        (item['emails'] as List?)
-                            ?.map((e) => Email(e.toString()))
-                            .toList() ??
-                        [];
-              await contact.insert();
+              final contact = Contact(
+                givenName: item['firstName'] ?? '',
+                familyName: item['lastName'] ?? '',
+                phones: (item['phones'] as List?)
+                        ?.map((p) => Item(label: PhoneLabel.mobile.label, value: p.toString()))
+                        .toList() ??
+                    [],
+                emails: (item['emails'] as List?)
+                        ?.map((e) => Item(label: EmailLabel.home.label, value: e.toString()))
+                        .toList() ??
+                    [],
+              );
+              await ContactsService.addContact(contact);
             } catch (_) {}
           }
         }
@@ -301,26 +298,23 @@ class SettingsController {
     final file = File(path);
     await file.writeAsBytes(bytes);
     final data = jsonDecode(utf8.decode(bytes)) as List<dynamic>;
-    if (await FlutterContacts.requestPermission()) {
+    final status = await Permission.contacts.request();
+    if (status.isGranted) {
       for (final item in data) {
         try {
-          final contact =
-              Contact()
-                ..name = Name(
-                  first: item['firstName'] ?? '',
-                  last: item['lastName'] ?? '',
-                )
-                ..phones =
-                    (item['phones'] as List?)
-                        ?.map((p) => Phone(p.toString()))
-                        .toList() ??
-                    []
-                ..emails =
-                    (item['emails'] as List?)
-                        ?.map((e) => Email(e.toString()))
-                        .toList() ??
-                    [];
-          await contact.insert();
+          final contact = Contact(
+            givenName: item['firstName'] ?? '',
+            familyName: item['lastName'] ?? '',
+            phones: (item['phones'] as List?)
+                    ?.map((p) => Item(label: PhoneLabel.mobile.label, value: p.toString()))
+                    .toList() ??
+                [],
+            emails: (item['emails'] as List?)
+                    ?.map((e) => Item(label: EmailLabel.home.label, value: e.toString()))
+                    .toList() ??
+                [],
+          );
+          await ContactsService.addContact(contact);
         } catch (_) {}
       }
     }
@@ -344,26 +338,23 @@ class SettingsController {
       final file = File(path);
       await file.writeAsBytes(response.bodyBytes);
       final data = jsonDecode(response.body) as List<dynamic>;
-      if (await FlutterContacts.requestPermission()) {
+      final status = await Permission.contacts.request();
+      if (status.isGranted) {
         for (final item in data) {
           try {
-            final contact =
-                Contact()
-                  ..name = Name(
-                    first: item['firstName'] ?? '',
-                    last: item['lastName'] ?? '',
-                  )
-                  ..phones =
-                      (item['phones'] as List?)
-                          ?.map((p) => Phone(p.toString()))
-                          .toList() ??
-                      []
-                  ..emails =
-                      (item['emails'] as List?)
-                          ?.map((e) => Email(e.toString()))
-                          .toList() ??
-                      [];
-            await contact.insert();
+            final contact = Contact(
+              givenName: item['firstName'] ?? '',
+              familyName: item['lastName'] ?? '',
+              phones: (item['phones'] as List?)
+                      ?.map((p) => Item(label: PhoneLabel.mobile.label, value: p.toString()))
+                      .toList() ??
+                  [],
+              emails: (item['emails'] as List?)
+                      ?.map((e) => Item(label: EmailLabel.home.label, value: e.toString()))
+                      .toList() ??
+                  [],
+            );
+            await ContactsService.addContact(contact);
           } catch (_) {}
         }
       }

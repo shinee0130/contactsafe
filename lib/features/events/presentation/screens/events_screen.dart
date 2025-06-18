@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -82,7 +82,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
   // Fetches contacts from the device
   Future<void> _fetchContacts() async {
-    if (!await FlutterContacts.requestPermission()) {
+    final status = await Permission.contacts.request();
+    if (!status.isGranted) {
       debugPrint('Contacts permission denied');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -97,10 +98,8 @@ class _EventsScreenState extends State<EventsScreen> {
     }
 
     try {
-      final contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withPhoto: true,
-      );
+      final contacts =
+          (await ContactsService.getContacts(withThumbnails: false)).toList();
       contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
       if (!mounted) {
         return;
