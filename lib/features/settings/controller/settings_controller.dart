@@ -141,7 +141,7 @@ class SettingsController {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         List<Contact> contacts =
-            (await ContactsService.getContacts(withThumbnails: false)).toList();
+            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
         return contacts.length;
       }
       return 0;
@@ -169,7 +169,7 @@ class SettingsController {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         contacts =
-            (await ContactsService.getContacts(withThumbnails: false)).toList();
+            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
       }
 
       final List<Map<String, dynamic>> contactsData =
@@ -220,7 +220,7 @@ class SettingsController {
                         .toList() ??
                     [],
               );
-              await ContactsService.addContact(contact);
+              await FlutterContactsService.addContact(contact);
             } catch (_) {}
           }
         }
@@ -314,7 +314,7 @@ class SettingsController {
                     .toList() ??
                 [],
           );
-          await ContactsService.addContact(contact);
+          await FlutterContactsService.addContact(contact);
         } catch (_) {}
       }
     }
@@ -354,7 +354,7 @@ class SettingsController {
                       .toList() ??
                   [],
             );
-            await ContactsService.addContact(contact);
+            await FlutterContactsService.addContact(contact);
           } catch (_) {}
         }
       }

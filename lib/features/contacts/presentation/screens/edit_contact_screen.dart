@@ -172,7 +172,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
     try {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
-        await ContactsService.updateContact(updatedContact);
+        await FlutterContactsService.updateContact(updatedContact);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contact updated successfully!')),
@@ -202,7 +202,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
   Future<void> _deleteContact() async {
     try {
-      await ContactsService.deleteContact(widget.contact);
+      await FlutterContactsService.deleteContact(widget.contact);
       if (mounted) {
         Navigator.pop(context);
         Navigator.pop(context);
