@@ -164,18 +164,14 @@ class _SearchScreenState extends State<SearchScreen> {
     // Search contacts
     results.addAll(
       _allContacts.where(
-        (contact) =>
-            contact.displayName.toLowerCase().contains(lowerQuery) ||
-            (contact.phones.isNotEmpty &&
-                contact.phones.any(
-                  (phone) =>
-                      (phone.value ?? '').toLowerCase().contains(lowerQuery),
-                )) ||
-            (contact.emails.isNotEmpty &&
-                contact.emails.any(
-                  (email) =>
-                      (email.value ?? '').toLowerCase().contains(lowerQuery),
-                )),
+        (contact) {
+          final name = (contact.displayName ?? '').toLowerCase();
+          final phoneMatch = (contact.phones ?? [])
+              .any((phone) => (phone.value ?? '').toLowerCase().contains(lowerQuery));
+          final emailMatch = (contact.emails ?? [])
+              .any((email) => (email.value ?? '').toLowerCase().contains(lowerQuery));
+          return name.contains(lowerQuery) || phoneMatch || emailMatch;
+        },
       ),
     );
 
@@ -252,47 +248,43 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildContactItem(Contact contact) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      leading:
-          contact.photo != null && contact.photo!.isNotEmpty
-              ? CircleAvatar(
-                backgroundImage: MemoryImage(contact.photo!),
-                radius: 22,
-              )
-              : CircleAvatar(
-                radius: 22,
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withOpacity(0.09),
-                child: Text(
-                  contact.displayName.isNotEmpty
-                      ? contact.displayName[0].toUpperCase()
-                      : '?',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+      leading: contact.avatar != null && contact.avatar!.isNotEmpty
+          ? CircleAvatar(
+              backgroundImage: MemoryImage(contact.avatar!),
+              radius: 22,
+            )
+          : CircleAvatar(
+              radius: 22,
+              backgroundColor:
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.09),
+              child: Text(
+                (contact.displayName ?? '').isNotEmpty
+                    ? (contact.displayName ?? '')[0].toUpperCase()
+                    : '?',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
+            ),
       title: Text(
-        contact.displayName,
+        contact.displayName ?? '',
         style: TextStyle(
           fontSize: 16,
           color: Theme.of(context).colorScheme.onSurface,
           fontWeight: FontWeight.w500,
         ),
       ),
-      subtitle:
-          contact.phones.isNotEmpty
-              ? Text(
-                contact.phones.first.value ?? '',
-                style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
-                ),
-              )
-              : null,
+      subtitle: (contact.phones?.isNotEmpty ?? false)
+          ? Text(
+              contact.phones!.first.value ?? '',
+              style: TextStyle(
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+            )
+          : null,
       trailing: Icon(
         Icons.chevron_right,
         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
