@@ -7,7 +7,7 @@ import 'package:contactsafe/features/contacts/presentation/screens/assign_contac
     show globalContactGroupsMap;
 import 'package:contactsafe/shared/widgets/custom_search_bar.dart';
 import 'package:contactsafe/shared/widgets/navigation_bar.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:contactsafe/l10n/context_loc.dart';
 import 'add_contact_screen.dart';
 
@@ -106,9 +106,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
       filtered =
           filtered
               .where(
-                (c) => (c.displayName ?? '').toLowerCase().contains(
-                  query.toLowerCase(),
-                ),
+                (c) =>
+                    c.displayName.toLowerCase().contains(query.toLowerCase()),
               )
               .toList();
     }

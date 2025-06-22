@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -99,10 +99,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
     try {
       final contacts =
-          (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
-      contacts.sort(
-        (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''),
-      );
+          (await ContactsService.getContacts(withThumbnails: false)).toList();
+      contacts.sort((a, b) => a.displayName.compareTo(b.displayName));
       if (!mounted) {
         return;
       }
@@ -163,9 +161,9 @@ class _EventsScreenState extends State<EventsScreen> {
                         event
                             .getParticipants(_allContacts)
                             .any(
-                              (p) => (p.displayName ?? '')
-                                  .toLowerCase()
-                                  .contains(query.toLowerCase()),
+                              (p) => p.displayName.toLowerCase().contains(
+                                query.toLowerCase(),
+                              ),
                             ),
                   )
                   .toList();
@@ -364,9 +362,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                       itemBuilder: (context, index) {
                                         final contact = _allContacts[index];
                                         return CheckboxListTile(
-                                          title: Text(
-                                            contact.displayName ?? '',
-                                          ),
+                                          title: Text(contact.displayName),
                                           value: tempSelected.contains(contact),
                                           onChanged: (bool? value) {
                                             setStateSB(() {
@@ -419,7 +415,7 @@ class _EventsScreenState extends State<EventsScreen> {
                               selectedParticipants
                                   .map(
                                     (contact) => Chip(
-                                      label: Text(contact.displayName ?? ''),
+                                      label: Text(contact.displayName),
                                       onDeleted: () {
                                         setStateSB(() {
                                           selectedParticipants.remove(contact);
@@ -506,11 +502,11 @@ class _EventsScreenState extends State<EventsScreen> {
                                           : descriptionController.text,
                                   participantContactIds:
                                       selectedParticipants
-                                          .map((c) => c.identifier)
-                                          .whereType<String>()
+                                          .map((c) => c.id)
                                           .toList(),
                                   userId: '',
                                 );
+
                                 try {
                                   await _eventRepository.addEvent(newAppEvent);
                                   if (!mounted) {
@@ -691,10 +687,7 @@ class EventCard extends StatelessWidget {
     final String participantNames =
         eventParticipants.isEmpty
             ? 'None'
-            : eventParticipants
-                .map((c) => c.displayName ?? '')
-                .where((name) => name.isNotEmpty)
-                .join(', ');
+            : eventParticipants.map((c) => c.displayName).join(', ');
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),

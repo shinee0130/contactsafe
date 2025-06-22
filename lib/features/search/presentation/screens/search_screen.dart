@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contactsafe/l10n/context_loc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 
@@ -69,7 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         List<Contact> contacts =
-            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
+            (await ContactsService.getContacts(withThumbnails: false)).toList();
         contacts.sort(
             (a, b) => (a.displayName ?? '').compareTo(b.displayName ?? ''));
         if (!mounted) return; // <-- энд нэмж өгнө
@@ -90,18 +90,14 @@ class _SearchScreenState extends State<SearchScreen> {
             final data = doc.data();
             final contactId = doc.reference.parent.parent!.id;
             final contact = _allContacts.firstWhere(
-              (c) => c.identifier == contactId,
-              orElse: () {
-                final c = Contact(displayName: 'Unknown');
-                c.identifier = contactId;
-                return c;
-              },
+              (c) => c.id == contactId,
+              orElse: () => Contact(id: contactId, displayName: 'Unknown'),
             );
             return _FileResult(
               id: doc.id,
               name: data['name'] ?? '',
               contactId: contactId,
-              contactName: contact.displayName ?? '',
+              contactName: contact.displayName,
             );
           }).toList();
 
@@ -116,18 +112,14 @@ class _SearchScreenState extends State<SearchScreen> {
             final data = doc.data();
             final contactId = doc.reference.parent.parent!.id;
             final contact = _allContacts.firstWhere(
-              (c) => c.identifier == contactId,
-              orElse: () {
-                final c = Contact(displayName: 'Unknown');
-                c.identifier = contactId;
-                return c;
-              },
+              (c) => c.id == contactId,
+              orElse: () => Contact(id: contactId, displayName: 'Unknown'),
             );
             return _NoteResult(
               id: doc.id,
               content: data['content'] ?? '',
               contactId: contactId,
-              contactName: contact.displayName ?? '',
+              contactName: contact.displayName,
             );
           }).toList();
 
@@ -164,14 +156,18 @@ class _SearchScreenState extends State<SearchScreen> {
     // Search contacts
     results.addAll(
       _allContacts.where(
-        (contact) {
-          final name = (contact.displayName ?? '').toLowerCase();
-          final phoneMatch = (contact.phones ?? [])
-              .any((phone) => (phone.value ?? '').toLowerCase().contains(lowerQuery));
-          final emailMatch = (contact.emails ?? [])
-              .any((email) => (email.value ?? '').toLowerCase().contains(lowerQuery));
-          return name.contains(lowerQuery) || phoneMatch || emailMatch;
-        },
+        (contact) =>
+            contact.displayName.toLowerCase().contains(lowerQuery) ||
+            (contact.phones.isNotEmpty &&
+                contact.phones.any(
+                  (phone) =>
+                      (phone.value ?? '').toLowerCase().contains(lowerQuery),
+                )) ||
+            (contact.emails.isNotEmpty &&
+                contact.emails.any(
+                  (email) =>
+                      (email.value ?? '').toLowerCase().contains(lowerQuery),
+                )),
       ),
     );
 
@@ -248,43 +244,47 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildContactItem(Contact contact) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      leading: contact.avatar != null && contact.avatar!.isNotEmpty
-          ? CircleAvatar(
-              backgroundImage: MemoryImage(contact.avatar!),
-              radius: 22,
-            )
-          : CircleAvatar(
-              radius: 22,
-              backgroundColor:
-                  Theme.of(context).colorScheme.onSurface.withOpacity(0.09),
-              child: Text(
-                (contact.displayName ?? '').isNotEmpty
-                    ? (contact.displayName ?? '')[0].toUpperCase()
-                    : '?',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+      leading:
+          contact.photo != null && contact.photo!.isNotEmpty
+              ? CircleAvatar(
+                backgroundImage: MemoryImage(contact.photo!),
+                radius: 22,
+              )
+              : CircleAvatar(
+                radius: 22,
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.09),
+                child: Text(
+                  contact.displayName.isNotEmpty
+                      ? contact.displayName[0].toUpperCase()
+                      : '?',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
-            ),
       title: Text(
-        contact.displayName ?? '',
+        contact.displayName,
         style: TextStyle(
           fontSize: 16,
           color: Theme.of(context).colorScheme.onSurface,
           fontWeight: FontWeight.w500,
         ),
       ),
-      subtitle: (contact.phones?.isNotEmpty ?? false)
-          ? Text(
-              contact.phones!.first.value ?? '',
-              style: TextStyle(
-                color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
-            )
-          : null,
+      subtitle:
+          contact.phones.isNotEmpty
+              ? Text(
+                contact.phones.first.value ?? '',
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
+              )
+              : null,
       trailing: Icon(
         Icons.chevron_right,
         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),

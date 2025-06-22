@@ -1,9 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:contactsafe/models/contact_labels.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -155,7 +154,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
       // 1. Save to device contacts (optional, based on your app's needs)
       final status = await Permission.contacts.request();
       if (status.isGranted) {
-        await FlutterContactsService.addContact(newDeviceContact);
+        await ContactsService.addContact(newDeviceContact);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contact saved to device!')),
@@ -374,6 +373,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
         return 'Other';
       case PhoneLabel.custom:
         return 'Custom';
+      default:
+        return 'Phone';
     }
   }
 
@@ -387,6 +388,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
         return 'Other';
       case EmailLabel.custom:
         return 'Custom';
+      default:
+        return 'Email';
     }
   }
 
@@ -400,6 +403,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
         return 'Other';
       case AddressLabel.custom:
         return 'Custom';
+      default:
+        return 'Address';
     }
   }
 

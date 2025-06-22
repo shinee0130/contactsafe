@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -111,17 +111,18 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
   void initState() {
     super.initState();
     // Log the contact ID to ensure it's valid
-    debugPrint('Loading files for contact ID: ${widget.contact.identifier}');
+    debugPrint('Loading files for contact ID: ${widget.contact.id}');
     _loadFiles();
   }
 
   CollectionReference<ContactFile> _contactFilesCollection() {
-    final contactId = widget.contact.identifier ?? '';
+    final contactId = widget.contact.id;
     if (contactId.isEmpty) {
       throw Exception(
         "Contact ID is empty, cannot access Firestore collection.",
       );
     }
+
     final uid = FirebaseAuth.instance.currentUser!.uid;
     return _firestore
         .collection('user_files')
@@ -221,8 +222,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
         try {
           final fileName = platformFile.name;
           final uid = FirebaseAuth.instance.currentUser!.uid;
-          final storagePath =
-              'user_files/$uid/${widget.contact.identifier}/$fileName';
+          final storagePath = 'user_files/$uid/${widget.contact.id}/$fileName';
           final ref = _storage.ref().child(storagePath);
 
           // 1. Upload file to Firebase Storage
@@ -238,7 +238,7 @@ class _ContactFilesScreenState extends State<ContactFilesScreen> {
             uploadDate: DateTime.now(),
             storagePath: storagePath,
             uid: uid,
-            contactId: widget.contact.identifier ?? '',
+            contactId: widget.contact.id,
           );
 
           // Add document to Firestore and get its ID
