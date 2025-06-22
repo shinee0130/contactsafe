@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactListWidget extends StatelessWidget {
   final List<Contact> contacts;
@@ -150,9 +150,9 @@ class ContactListWidget extends StatelessWidget {
     final Map<String, List<Contact>> groupedContacts = {};
     for (final contact in contacts) {
       final String displayName =
-          lastNameFirst && (contact.familyName?.isNotEmpty ?? false)
-              ? '${contact.familyName ?? ''} ${contact.givenName ?? ''}'
-              : (contact.displayName ?? '');
+          lastNameFirst && contact.name.last.isNotEmpty
+              ? '${contact.name.last} ${contact.name.first}'
+              : contact.displayName;
       if (displayName.isNotEmpty) {
         final firstLetter = displayName[0].toUpperCase();
         groupedContacts.putIfAbsent(firstLetter, () => []).add(contact);
@@ -191,9 +191,9 @@ class ContactListItem extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  lastNameFirst && (contact.familyName?.isNotEmpty ?? false)
-                      ? '${contact.familyName ?? ''} ${contact.givenName ?? ''}'
-                      : (contact.displayName ?? ''),
+                  lastNameFirst && contact.name.last.isNotEmpty
+                      ? '${contact.name.last} ${contact.name.first}'
+                      : contact.displayName,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -220,12 +220,12 @@ class ContactListItem extends StatelessWidget {
   }
 
   Widget _buildLeadingIcon(BuildContext context) {
-    final bool hasPhoto = contact.avatar != null && contact.avatar!.isNotEmpty;
+    final bool hasPhoto = contact.photo != null && contact.photo!.isNotEmpty;
     final String initials =
-        (lastNameFirst && (contact.familyName?.isNotEmpty ?? false)
-                ? contact.familyName![0]
-                : ((contact.displayName ?? '').isNotEmpty
-                    ? contact.displayName![0]
+        (lastNameFirst && contact.name.last.isNotEmpty
+                ? contact.name.last[0]
+                : (contact.displayName.isNotEmpty
+                    ? contact.displayName[0]
                     : '?'))
             .toUpperCase();
 
@@ -234,7 +234,7 @@ class ContactListItem extends StatelessWidget {
       backgroundColor: Theme.of(
         context,
       ).colorScheme.onSurface.withOpacity(0.09), // iOS avatar bg
-      backgroundImage: hasPhoto ? MemoryImage(contact.avatar!) : null,
+      backgroundImage: hasPhoto ? MemoryImage(contact.photo!) : null,
       child:
           !hasPhoto
               ? Text(

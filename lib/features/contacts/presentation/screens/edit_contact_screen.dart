@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:contactsafe/models/contact_labels.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
@@ -45,15 +44,17 @@ class _EditContactScreenState extends State<EditContactScreen> {
   }
 
   void _populateFields() {
-    _selectedPhoto = widget.contact.avatar;
-    _firstNameController.text = widget.contact.givenName ?? '';
-    _lastNameController.text = widget.contact.familyName ?? '';
-    _companyController.text = widget.contact.company ?? '';
+    _selectedPhoto = widget.contact.photo;
+    _firstNameController.text = widget.contact.name.first;
+    _lastNameController.text = widget.contact.name.last;
+    _companyController.text =
+        widget.contact.organizations.isNotEmpty == true
+            ? widget.contact.organizations.first.company
+            : '';
 
     // Populate phones
-    _phoneNumbers = widget.contact.phones.map((p) => p.value ?? '').toList();
-    _phoneLabels =
-        widget.contact.phones.map((p) => PhoneLabelX.fromString(p.label)).toList();
+    _phoneNumbers = widget.contact.phones.map((p) => p.number).toList();
+    _phoneLabels = widget.contact.phones.map((p) => p.label).toList();
     if (_phoneNumbers.isEmpty) {
       _phoneNumbers.add('');
       _phoneLabels.add(PhoneLabel.mobile);
@@ -61,25 +62,29 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
     // Populate emails
     _emailControllers.addAll(
-      widget.contact.emails.map((e) => TextEditingController(text: e.value ?? '')),
+      widget.contact.emails.map((e) => TextEditingController(text: e.address)),
     );
-    _emailLabels.addAll(
-        widget.contact.emails.map((e) => EmailLabelX.fromString(e.label)));
+    _emailLabels.addAll(widget.contact.emails.map((e) => e.label));
     if (_emailControllers.isEmpty) {
       _emailControllers.add(TextEditingController());
       _emailLabels.add(EmailLabel.home);
     }
 
     // Populate websites
-    // contacts_service has no websites field; keep empty controllers
+    _websiteControllers.addAll(
+      widget.contact.websites.map((w) => TextEditingController(text: w.url)),
+    );
+    if (_websiteControllers.isEmpty) {
+      _websiteControllers.add(TextEditingController());
+    }
 
     // Populate addresses
     _addressControllers.addAll(
-      widget.contact.postalAddresses
-          .map((a) => TextEditingController(text: a.street ?? '')),
+      widget.contact.addresses.map(
+        (a) => TextEditingController(text: a.address),
+      ),
     );
-    _addressLabels.addAll(
-        widget.contact.postalAddresses.map((a) => AddressLabelX.fromString(a.label)));
+    _addressLabels.addAll(widget.contact.addresses.map((a) => a.label));
     if (_addressControllers.isEmpty) {
       _addressControllers.add(TextEditingController());
       _addressLabels.add(AddressLabel.home);
@@ -105,40 +110,43 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
   Future<void> _saveContact() async {
     // Filter out empty entries before saving
-    final List<Item> phonesToSave = [];
+    final List<Phone> phonesToSave = [];
     for (int i = 0; i < _phoneNumbers.length; i++) {
       if (_phoneNumbers[i].trim().isNotEmpty) {
         phonesToSave.add(
-          Item(label: _phoneLabels[i].label, value: _phoneNumbers[i].trim()),
+          Phone(_phoneNumbers[i].trim(), label: _phoneLabels[i]),
         );
       }
     }
 
-    final List<Item> emailsToSave =
+    final List<Email> emailsToSave =
         _emailControllers
             .asMap()
             .entries
             .where((entry) => entry.value.text.trim().isNotEmpty)
             .map(
-              (entry) => Item(
-                label: _emailLabels[entry.key].label,
-                value: entry.value.text.trim(),
+              (entry) => Email(
+                entry.value.text.trim(),
+                label: _emailLabels[entry.key],
               ),
             )
             .toList();
 
-    final List<String> websitesToSave =
-        _websiteControllers.where((c) => c.text.trim().isNotEmpty).map((c) => c.text.trim()).toList();
+    final List<Website> websitesToSave =
+        _websiteControllers
+            .where((c) => c.text.trim().isNotEmpty)
+            .map((c) => Website(c.text.trim()))
+            .toList();
 
-    final List<PostalAddress> addressesToSave =
+    final List<Address> addressesToSave =
         _addressControllers
             .asMap()
             .entries
             .where((entry) => entry.value.text.trim().isNotEmpty)
             .map(
-              (entry) => PostalAddress(
-                label: _addressLabels[entry.key].label,
-                street: entry.value.text.trim(),
+              (entry) => Address(
+                entry.value.text.trim(),
+                label: _addressLabels[entry.key],
               ),
             )
             .toList();
@@ -146,18 +154,23 @@ class _EditContactScreenState extends State<EditContactScreen> {
     // Update fields on the existing contact so that rawId and account
     // information are preserved during the update call.
     Contact updatedContact = widget.contact;
-    updatedContact.givenName = _firstNameController.text.trim();
-    updatedContact.familyName = _lastNameController.text.trim();
-    updatedContact.company = _companyController.text.trim();
+    updatedContact.name = Name(
+      first: _firstNameController.text.trim(),
+      last: _lastNameController.text.trim(),
+    );
+    updatedContact.organizations =
+        _companyController.text.trim().isNotEmpty
+            ? [Organization(company: _companyController.text.trim())]
+            : [];
     updatedContact.phones = phonesToSave;
     updatedContact.emails = emailsToSave;
-    updatedContact.postalAddresses = addressesToSave;
-    updatedContact.avatar = _selectedPhoto;
+    updatedContact.websites = websitesToSave;
+    updatedContact.addresses = addressesToSave;
+    updatedContact.photo = _selectedPhoto;
 
     try {
-      final status = await Permission.contacts.request();
-      if (status.isGranted) {
-        await ContactsService.updateContact(updatedContact);
+      if (await FlutterContacts.requestPermission()) {
+        await updatedContact.update();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contact updated successfully!')),
@@ -187,7 +200,7 @@ class _EditContactScreenState extends State<EditContactScreen> {
 
   Future<void> _deleteContact() async {
     try {
-      await ContactsService.deleteContact(widget.contact);
+      await FlutterContacts.deleteContact(widget.contact);
       if (mounted) {
         Navigator.pop(context);
         Navigator.pop(context);
