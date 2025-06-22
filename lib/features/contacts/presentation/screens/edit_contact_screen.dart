@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:flutter_contacts_service/flutter_contacts_service.dart';
 import 'package:contactsafe/models/contact_labels.dart';
 import 'package:image_picker/image_picker.dart';
