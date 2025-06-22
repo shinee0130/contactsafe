@@ -85,11 +85,7 @@ class AppEvent {
         .map(
           (id) => allDeviceContacts.firstWhere(
             (contact) => contact.identifier == id,
-            orElse: () {
-              final c = Contact(givenName: 'Unknown Contact');
-              c.identifier = id;
-              return c;
-            },
+            orElse: () => Contact(identifier: id, givenName: 'Unknown Contact'),
           ),
         )
         .toList();

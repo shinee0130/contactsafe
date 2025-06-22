@@ -90,12 +90,8 @@ class _SearchScreenState extends State<SearchScreen> {
             final data = doc.data();
             final contactId = doc.reference.parent.parent!.id;
             final contact = _allContacts.firstWhere(
-              (c) => c.identifier == contactId,
-              orElse: () {
-                final c = Contact(displayName: 'Unknown');
-                c.identifier = contactId;
-                return c;
-              },
+              (c) => c.id == contactId,
+              orElse: () => Contact(id: contactId, displayName: 'Unknown'),
             );
             return _FileResult(
               id: doc.id,
@@ -116,12 +112,8 @@ class _SearchScreenState extends State<SearchScreen> {
             final data = doc.data();
             final contactId = doc.reference.parent.parent!.id;
             final contact = _allContacts.firstWhere(
-              (c) => c.identifier == contactId,
-              orElse: () {
-                final c = Contact(displayName: 'Unknown');
-                c.identifier = contactId;
-                return c;
-              },
+              (c) => c.id == contactId,
+              orElse: () => Contact(id: contactId, displayName: 'Unknown'),
             );
             return _NoteResult(
               id: doc.id,
