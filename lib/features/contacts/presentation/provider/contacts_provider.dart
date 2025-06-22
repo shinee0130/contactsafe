@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactsProvider {
   final bool sortByFirstName;
@@ -16,16 +15,22 @@ class ContactsProvider {
 
   Future<void> fetchContacts() async {
     try {
-      final status = await Permission.contacts.request();
-      if (status.isGranted) {
-        final contacts = (await ContactsService.getContacts(withThumbnails: false)).toList();
+      bool isGranted = await FlutterContacts.requestPermission();
+      if (isGranted) {
+        List<Contact> contacts = await FlutterContacts.getContacts(
+          withProperties: true,
+          withPhoto: true,
+          withAccounts: true,
+        );
         contacts.sort((a, b) {
-          String keyA = sortByFirstName
-              ? (a.givenName ?? '')
-              : ((a.familyName?.isNotEmpty ?? false) ? a.familyName! : (a.displayName ?? ''));
-          String keyB = sortByFirstName
-              ? (b.givenName ?? '')
-              : ((b.familyName?.isNotEmpty ?? false) ? b.familyName! : (b.displayName ?? ''));
+          String keyA =
+              sortByFirstName
+                  ? a.name.first
+                  : (a.name.last.isNotEmpty ? a.name.last : a.displayName);
+          String keyB =
+              sortByFirstName
+                  ? b.name.first
+                  : (b.name.last.isNotEmpty ? b.name.last : b.displayName);
           return keyA.compareTo(keyB);
         });
         _contacts = contacts;
@@ -56,9 +61,9 @@ class ContactsProvider {
     final Map<String, List<Contact>> groupedContacts = {};
     for (final contact in contacts) {
       final String displayName =
-          lastNameFirst && (contact.familyName?.isNotEmpty ?? false)
-              ? '${contact.familyName ?? ''} ${contact.givenName ?? ''}'
-              : (contact.displayName ?? '');
+          lastNameFirst && contact.name.last.isNotEmpty
+              ? '${contact.name.last} ${contact.name.first}'
+              : contact.displayName;
       if (displayName.isNotEmpty) {
         final firstLetter = displayName[0].toUpperCase();
         groupedContacts.putIfAbsent(firstLetter, () => []).add(contact);

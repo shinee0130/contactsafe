@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart' as geo;
@@ -268,11 +268,11 @@ class _EventsDetailScreenState extends State<EventsDetailScreen> {
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage:
-                            participant.avatar != null
-                                ? MemoryImage(participant.avatar!)
+                            participant.photo != null
+                                ? MemoryImage(participant.photo!)
                                 : null,
                         child:
-                            participant.avatar == null
+                            participant.photo == null
                                 ? const Icon(Icons.person)
                                 : null,
                       ),

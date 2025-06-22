@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +28,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
         .collection('user_notes')
         .doc(uid)
         .collection('contacts')
-        .doc(widget.contact.identifier ?? '')
+        .doc(widget.contact.id)
         .collection('notes')
         .withConverter<ContactNote>(
           fromFirestore: (snapshot, _) => ContactNote.fromFirestore(snapshot),
@@ -85,7 +85,7 @@ class _ContactNotesScreenState extends State<ContactNotesScreen> {
         content: _noteController.text,
         createdAt: DateTime.now(),
         uid: FirebaseAuth.instance.currentUser!.uid,
-        contactId: widget.contact.identifier ?? '',
+        contactId: widget.contact.id,
       );
       try {
         final doc = await _contactNotesCollection().add(newNote);
