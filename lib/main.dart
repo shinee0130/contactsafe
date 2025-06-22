@@ -15,7 +15,7 @@ import 'package:contactsafe/features/settings/presentation/screens/settings_scre
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:contactsafe/app.dart';
 import 'package:contactsafe/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
