@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:contactsafe/models/contact_labels.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -67,56 +66,62 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   Future<void> _saveContact() async {
     // --- Data preparation for flutter_contacts (existing logic) ---
-    final List<Item> phonesToSave = [];
+    final List<Phone> phonesToSave = [];
     for (int i = 0; i < _phoneNumbers.length; i++) {
       if (_phoneNumbers[i].trim().isNotEmpty) {
         phonesToSave.add(
-          Item(label: _phoneLabels[i].label, value: _phoneNumbers[i].trim()),
+          Phone(_phoneNumbers[i].trim(), label: _phoneLabels[i]),
         );
       }
     }
 
-    final List<Item> emailsToSave =
+    final List<Email> emailsToSave =
         _emailControllers
             .asMap()
             .entries
             .where((entry) => entry.value.text.trim().isNotEmpty)
             .map(
-              (entry) => Item(
-                label: _emailLabels[entry.key].label,
-                value: entry.value.text.trim(),
+              (entry) => Email(
+                entry.value.text.trim(),
+                label: _emailLabels[entry.key],
               ),
             )
             .toList();
 
-    final List<String> websitesToSave =
+    final List<Website> websitesToSave =
         _websiteControllers
             .where((c) => c.text.trim().isNotEmpty)
-            .map((c) => c.text.trim())
+            .map((c) => Website(c.text.trim()))
             .toList();
 
-    final List<PostalAddress> addressesToSave =
+    final List<Address> addressesToSave =
         _addressControllers
             .asMap()
             .entries
             .where((entry) => entry.value.text.trim().isNotEmpty)
             .map(
-              (entry) => PostalAddress(
-                label: _addressLabels[entry.key].label,
-                street: entry.value.text.trim(),
+              (entry) => Address(
+                entry.value.text.trim(),
+                label: _addressLabels[entry.key],
               ),
             )
             .toList();
 
     // Create a Contact object for saving to device (if needed)
     Contact newDeviceContact = Contact(
-      givenName: _firstNameController.text.trim(),
-      familyName: _lastNameController.text.trim(),
-      company: _companyController.text.trim(),
+      name: Name(
+        first: _firstNameController.text.trim(),
+        last: _lastNameController.text.trim(),
+      ),
+      organizations:
+          _companyController.text.trim().isNotEmpty
+              ? [Organization(company: _companyController.text.trim())]
+              : [],
       phones: phonesToSave,
       emails: emailsToSave,
-      postalAddresses: addressesToSave,
-      avatar: _selectedPhoto,
+      websites: websitesToSave,
+      addresses: addressesToSave,
+      photo: _selectedPhoto,
       // You can add birthday here too if FlutterContacts supports it
       // birthday: _selectedBirthday, // Check flutter_contacts docs for exact usage
     );
@@ -128,16 +133,16 @@ class _AddContactScreenState extends State<AddContactScreen> {
       'company': _companyController.text.trim(),
       'phones':
           phonesToSave
-              .map((p) => {'number': p.value, 'label': p.label})
+              .map((p) => {'number': p.number, 'label': p.label.toString()})
               .toList(),
       'emails':
           emailsToSave
-              .map((e) => {'address': e.value, 'label': e.label})
+              .map((e) => {'address': e.address, 'label': e.label.toString()})
               .toList(),
-      'websites': websitesToSave,
+      'websites': websitesToSave.map((w) => w.url).toList(),
       'addresses':
           addressesToSave
-              .map((a) => {'address': a.street, 'label': a.label})
+              .map((a) => {'address': a.address, 'label': a.label.toString()})
               .toList(),
       'birthday':
           _selectedBirthday != null
@@ -152,9 +157,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
     try {
       // 1. Save to device contacts (optional, based on your app's needs)
-      final status = await Permission.contacts.request();
-      if (status.isGranted) {
-        await ContactsService.addContact(newDeviceContact);
+      if (await FlutterContacts.requestPermission()) {
+        await newDeviceContact.insert();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Contact saved to device!')),
