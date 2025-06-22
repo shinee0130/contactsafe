@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 class AppEvent {
   final String? id; // Firestore document ID
@@ -59,9 +59,8 @@ class AppEvent {
       date: DateTime.parse(json['date'] as String),
       location: json['location'] as String?,
       description: json['description'] as String?,
-      participantContactIds: List<String>.from(
-        json['participantContactIds'] ?? const [],
-      ),
+      participantContactIds:
+          List<String>.from(json['participantContactIds'] ?? const []),
       userId: json['userId'] as String? ?? '',
     );
   }
@@ -85,11 +84,9 @@ class AppEvent {
         .map(
           (id) => allDeviceContacts.firstWhere(
             (contact) => contact.identifier == id,
-            orElse: () {
-              final c = Contact(givenName: 'Unknown Contact');
-              c.identifier = id;
-              return c;
-            },
+            orElse:
+                () =>
+                    Contact(identifier: id, displayName: 'Unknown Contact'), // Fallback
           ),
         )
         .toList();

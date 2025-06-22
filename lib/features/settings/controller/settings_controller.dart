@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:contactsafe/models/contact_labels.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -142,7 +141,7 @@ class SettingsController {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         List<Contact> contacts =
-            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
+            (await ContactsService.getContacts(withThumbnails: false)).toList();
         return contacts.length;
       }
       return 0;
@@ -170,7 +169,7 @@ class SettingsController {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
         contacts =
-            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
+            (await ContactsService.getContacts(withThumbnails: false)).toList();
       }
 
       final List<Map<String, dynamic>> contactsData =
@@ -178,8 +177,8 @@ class SettingsController {
             return {
               'id': c.identifier,
               'displayName': c.displayName,
-              'phones': c.phones?.map((p) => p.value).toList() ?? [],
-              'emails': c.emails?.map((e) => e.value).toList() ?? [],
+              'phones': c.phones.map((p) => p.value).toList(),
+              'emails': c.emails.map((e) => e.value).toList(),
             };
           }).toList();
 
@@ -221,7 +220,7 @@ class SettingsController {
                         .toList() ??
                     [],
               );
-              await FlutterContactsService.addContact(contact);
+              await ContactsService.addContact(contact);
             } catch (_) {}
           }
         }
@@ -315,7 +314,7 @@ class SettingsController {
                     .toList() ??
                 [],
           );
-          await FlutterContactsService.addContact(contact);
+          await ContactsService.addContact(contact);
         } catch (_) {}
       }
     }
@@ -355,7 +354,7 @@ class SettingsController {
                       .toList() ??
                   [],
             );
-            await FlutterContactsService.addContact(contact);
+            await ContactsService.addContact(contact);
           } catch (_) {}
         }
       }

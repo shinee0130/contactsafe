@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts_service/flutter_contacts_service.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ContactsProvider {
@@ -18,21 +18,14 @@ class ContactsProvider {
     try {
       final status = await Permission.contacts.request();
       if (status.isGranted) {
-        final contacts =
-            (await FlutterContactsService.getContacts(withThumbnails: false)).toList();
+        final contacts = (await ContactsService.getContacts(withThumbnails: false)).toList();
         contacts.sort((a, b) {
-          String keyA =
-              sortByFirstName
-                  ? (a.givenName ?? '')
-                  : ((a.familyName?.isNotEmpty ?? false)
-                      ? a.familyName!
-                      : (a.displayName ?? ''));
-          String keyB =
-              sortByFirstName
-                  ? (b.givenName ?? '')
-                  : ((b.familyName?.isNotEmpty ?? false)
-                      ? b.familyName!
-                      : (b.displayName ?? ''));
+          String keyA = sortByFirstName
+              ? (a.givenName ?? '')
+              : ((a.familyName?.isNotEmpty ?? false) ? a.familyName! : (a.displayName ?? ''));
+          String keyB = sortByFirstName
+              ? (b.givenName ?? '')
+              : ((b.familyName?.isNotEmpty ?? false) ? b.familyName! : (b.displayName ?? ''));
           return keyA.compareTo(keyB);
         });
         _contacts = contacts;
@@ -51,8 +44,9 @@ class ContactsProvider {
       _contacts =
           _allContacts
               .where(
-                (contact) => (contact.displayName?.toLowerCase() ?? '')
-                    .contains(query.toLowerCase()),
+                (contact) => contact.displayName.toLowerCase().contains(
+                  query.toLowerCase(),
+                ),
               )
               .toList();
     }
