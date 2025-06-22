@@ -318,8 +318,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-<<<<<<< HEAD
-=======
   flutter_contacts:
     dependency: "direct main"
     description:
@@ -328,7 +326,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.9+2"
->>>>>>> 5fb85cb727ba2aa117c768bb617bda1658b08a12
   flutter_launcher_icons:
     dependency: "direct main"
     description:
