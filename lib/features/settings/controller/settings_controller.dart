@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:contactsafe/shared/widgets/navigation_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts_service/flutter_contacts_service.dart';
